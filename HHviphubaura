@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - LOW CORTISOL IMAGE & DANCE EDITION
+-- H-HUB VIPAURA - LOW CORTISOL INTENSE DANCE & IMAGE
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -80,7 +80,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [LOW CORTISOL DANCE MODE]"
+LogoText.Text = "🌿 H-HUB VIPAURA [INTENSE DANCE & CORTISOL MODE]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 13
@@ -452,7 +452,7 @@ end)
 local titleP5 = Instance.new("TextLabel", P5)
 titleP5.Size = UDim2.new(1, 0, 0, 20)
 titleP5.BackgroundTransparency = 1
-titleP5.Text = "🎵 NHẠC & CHẾ ĐỘ NHẢY LOW CORTISOL"
+titleP5.Text = "🎵 NHẠC & CHẾ ĐỘ NHẢY MẠNH LOW CORTISOL"
 titleP5.TextColor3 = Color3.fromRGB(0, 255, 150)
 titleP5.Font = Enum.Font.GothamBold
 titleP5.TextSize = 11
@@ -529,8 +529,8 @@ HipSwayToggleBtn.Size = UDim2.new(1, 0, 1, 0)
 HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 HipSwayToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 HipSwayToggleBtn.Font = Enum.Font.GothamBold
-HipSwayToggleBtn.TextSize = 10
-HipSwayToggleBtn.Text = "💃 BẬT NHẢY LẮC HÔNG & HIỆN ẢNH LOW CORTISOL: TẮT"
+HipSwayToggleBtn.TextSize = 9.5
+HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: TẮT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local DEFAULT_SOUND_ID = "110919391228823"
@@ -565,26 +565,27 @@ local function updateHeadBillboard()
         if headBillboard then headBillboard:Destroy() end
         
         headBillboard = Instance.new("BillboardGui")
-        headBillboard.Name = "CortisolImageHeadBillboard"
-        headBillboard.Size = UDim2.new(0, 180, 0, 100)
-        headBillboard.StudsOffset = Vector3.new(0, 3.5, 0)
+        headBillboard.Name = "CortisolGaugeBillboard"
+        headBillboard.Size = UDim2.new(0, 210, 0, 115)
+        headBillboard.StudsOffset = Vector3.new(0, 4.0, 0)
         headBillboard.AlwaysOnTop = true
         headBillboard.Parent = head
         
         local bgFrame = Instance.new("Frame", headBillboard)
-        bgFrame.Name = "BgFrame"
         bgFrame.Size = UDim2.new(1, 0, 1, 0)
-        bgFrame.BackgroundTransparency = 1
+        bgFrame.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
+        bgFrame.BackgroundTransparency = 0.2
+        Instance.new("UICorner", bgFrame).CornerRadius = UDim.new(0, 8)
+        
+        local bgStroke = Instance.new("UIStroke", bgFrame)
+        bgStroke.Color = Color3.fromRGB(0, 255, 150)
+        bgStroke.Thickness = 2
         
         local cortisolImage = Instance.new("ImageLabel", bgFrame)
-        cortisolImage.Name = "CortisolImageLabel"
-        cortisolImage.Size = UDim2.new(1, 0, 1, 0)
-        cortisolImage.Position = UDim2.new(0, 0, 0, 0)
+        cortisolImage.Size = UDim2.new(1, -6, 1, -6)
+        cortisolImage.Position = UDim2.new(0, 3, 0, 3)
         cortisolImage.BackgroundTransparency = 1
-        cortisolImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
         cortisolImage.ScaleType = Enum.ScaleType.Fit
-        
-        -- Dùng tạm Asset ID chuẩn mô tả Cortisol Level để chắc chắn hiện ảnh đồng hồ đo
         cortisolImage.Image = "rbxassetid://13835613385"
     end
 end
@@ -597,12 +598,12 @@ end)
 HipSwayToggleBtn.MouseButton1Click:Connect(function()
     isHipSwayEnabled = not isHipSwayEnabled
     if isHipSwayEnabled then
-        HipSwayToggleBtn.Text = "💃 BẬT NHẢY LẮC HÔNG & HIỆN ẢNH LOW CORTISOL: BẬT"
+        HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: BẬT"
         HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
         if not bgSound.IsPlaying then bgSound:Play() end
         updateHeadBillboard()
     else
-        HipSwayToggleBtn.Text = "💃 BẬT NHẢY LẮC HÔNG & HIỆN ẢNH LOW CORTISOL: TẮT"
+        HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: TẮT"
         HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
         updateHeadBillboard()
     end
@@ -628,36 +629,40 @@ RunService.RenderStepped:Connect(function()
             if rightShoulder and not originalRightShoulderC0 then originalRightShoulderC0 = rightShoulder.C0 end
             
             if isHipSwayEnabled then
-                local t = tick() * 3.8
-                local bodySwayX = math.sin(t) * 0.55
-                local bodySwayZ = math.sin(t) * 0.42
+                local t = tick() * 6.5 -- Tăng tốc độ nhịp nhảy cực sung
                 
-                local swayCFrame = originalRootC0 * CFrame.new(bodySwayX, 0, 0) * CFrame.Angles(0, 0, bodySwayZ)
-                rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.3)
+                -- Biên độ lắc hông và đánh người cực mạnh
+                local bodySwayX = math.sin(t * 2) * 0.25
+                local bodySwayY = math.cos(t) * 0.35 -- Nhún nhảy lên xuống rõ rệt
+                local bodySwayZ = math.sin(t) * 0.75 -- Lắc hông sang hai bên cực rộng
                 
+                local swayCFrame = originalRootC0 * CFrame.new(0, bodySwayY, 0) * CFrame.Angles(math.rad(bodySwayX * 20), 0, bodySwayZ)
+                rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.4)
+                
+                -- Giải phóng phần chân để chân uốn lượn, bước uyển chuyển không còn cứng đơ
                 if leftHip and originalLeftHipC0 then
-                    local legSwayL = originalLeftHipC0 * CFrame.Angles(-math.sin(t) * 0.38, 0, -math.sin(t) * 0.3)
-                    leftHip.C0 = leftHip.C0:Lerp(legSwayL, 0.3)
+                    local legSwayL = originalLeftHipC0 * CFrame.Angles(math.sin(t) * 0.65, 0, -math.sin(t) * 0.5)
+                    leftHip.C0 = leftHip.C0:Lerp(legSwayL, 0.4)
                 end
                 if rightHip and originalRightHipC0 then
-                    local legSwayR = originalRightHipC0 * CFrame.Angles(math.sin(t) * 0.38, 0, math.sin(t) * 0.3)
-                    rightHip.C0 = rightHip.C0:Lerp(legSwayR, 0.3)
+                    local legSwayR = originalRightHipC0 * CFrame.Angles(-math.sin(t) * 0.65, 0, math.sin(t) * 0.5)
+                    rightHip.C0 = rightHip.C0:Lerp(legSwayR, 0.4)
                 end
                 
                 if leftShoulder and originalLeftShoulderC0 then
                     local handsOnHipsL = originalLeftShoulderC0 * CFrame.new(-0.25, 0.15, -0.35) * CFrame.Angles(math.rad(50), math.rad(-20), math.rad(-35))
-                    leftShoulder.C0 = leftShoulder.C0:Lerp(handsOnHipsL, 0.3)
+                    leftShoulder.C0 = leftShoulder.C0:Lerp(handsOnHipsL, 0.4)
                 end
                 if rightShoulder and originalRightShoulderC0 then
                     local handsOnHipsR = originalRightShoulderC0 * CFrame.new(0.25, 0.15, -0.35) * CFrame.Angles(math.rad(50), math.rad(20), math.rad(35))
-                    rightShoulder.C0 = rightShoulder.C0:Lerp(handsOnHipsR, 0.3)
+                    rightShoulder.C0 = rightShoulder.C0:Lerp(handsOnHipsR, 0.4)
                 end
             else
-                if originalRootC0 and rootJoint.C0 ~= originalRootC0 then rootJoint.C0 = rootJoint.C0:Lerp(originalRootC0, 0.2) end
-                if leftHip and originalLeftHipC0 then leftHip.C0 = leftHip.C0:Lerp(originalLeftHipC0, 0.2) end
-                if rightHip and originalRightHipC0 then rightHip.C0 = rightHip.C0:Lerp(originalRightHipC0, 0.2) end
-                if leftShoulder and originalLeftShoulderC0 then leftShoulder.C0 = leftShoulder.C0:Lerp(originalLeftShoulderC0, 0.2) end
-                if rightShoulder and originalRightShoulderC0 then rightShoulder.C0 = rightShoulder.C0:Lerp(originalRightShoulderC0, 0.2) end
+                if originalRootC0 and rootJoint.C0 ~= originalRootC0 then rootJoint.C0 = rootJoint.C0:Lerp(originalRootC0, 0.3) end
+                if leftHip and originalLeftHipC0 then leftHip.C0 = leftHip.C0:Lerp(originalLeftHipC0, 0.3) end
+                if rightHip and originalRightHipC0 then rightHip.C0 = rightHip.C0:Lerp(originalRightHipC0, 0.3) end
+                if leftShoulder and originalLeftShoulderC0 then leftShoulder.C0 = leftShoulder.C0:Lerp(originalLeftShoulderC0, 0.3) end
+                if rightShoulder and originalRightShoulderC0 then rightShoulder.C0 = rightShoulder.C0:Lerp(originalRightShoulderC0, 0.3) end
             end
         end
     end)
@@ -678,7 +683,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Ảnh Low Cortisol chỉ hiển thị và đồng bộ ngay khi bấm nút bật Nhảy lắc hông."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã sửa lỗi cứng chân, tăng biên độ lắc hông cực mạnh và hiển thị chuẩn ảnh đồng hồ Cortisol."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
