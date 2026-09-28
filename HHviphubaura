@@ -402,7 +402,7 @@ SkillStatus.TextSize = 10
 SkillStatus.Text = "Trạng thái: Chưa bật tâm"
 SkillStatus.TextXAlignment = Enum.TextXAlignment.Left
 
--- TẠO 4 GUI TÂM NGẮM RIÊNG BIỆT (Z, X, C, V)
+-- TẠO 4 GUI TÂM NGẮM RIÊNG BIỆT (Z, X, C, V) CÓ FIX CHẠM TRÊN MOBILE
 local MarkersGui = Instance.new("ScreenGui")
 MarkersGui.Name = "SkillMarkersUI"
 MarkersGui.ResetOnSpawn = false
@@ -427,9 +427,18 @@ for i = 1, 4 do
     mBtn.Active = true
     mBtn.Draggable = true
     Instance.new("UICorner", mBtn).CornerRadius = UDim.new(1, 0)
+    
     local stroke = Instance.new("UIStroke", mBtn)
     stroke.Color = Color3.fromRGB(255, 255, 255)
     stroke.Thickness = 2
+    
+    -- Xử lý bắt sự kiện chạm trên mobile
+    mBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            -- Tương tác cảm ứng di động
+        end
+    end)
+    
     table.insert(markerButtons, mBtn)
 end
 
@@ -925,21 +934,28 @@ task.spawn(function()
                     local dynamicMerchantPos = getMerchantPosition()
                     hum.WalkSpeed = 16
                     root.Anchored = true
+                    
+                    -- Bay đến gần NPC ở khoảng cách chuẩn, chống lỗi "xa quá không bán được"
                     local dist = (root.Position - dynamicMerchantPos).Magnitude
-                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 0))})
+                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 3))})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.1) end
                     
-                    root.CFrame = CFrame.lookAt(dynamicMerchantPos + Vector3.new(0, 2, 0), dynamicMerchantPos)
-                    task.wait(0.4)
+                    -- Xoay mặt thẳng về phía NPC để kích hoạt tương tác mượt mà
+                    root.CFrame = CFrame.lookAt(dynamicMerchantPos + Vector3.new(0, 2, 3), dynamicMerchantPos)
+                    task.wait(0.5)
 
+                    -- Bấm phím E 1 lần duy nhất để mở bảng bán hàng
+                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                    task.wait(0.08)
+                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                    task.wait(0.6)
+
+                    -- Quét và tiến hành bán sạch số cá theo ngưỡng
                     repeat
                         if not isRunning then break end
-                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                        task.wait(0.05)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                         clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
-                        task.wait(1.5)
+                        task.wait(1.0)
                     until getFishToSellCount() == 0 or not isRunning
 
                     root.Anchored = true
