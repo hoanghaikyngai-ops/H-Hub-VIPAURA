@@ -1,5 +1,5 @@
 -- ====================================================
--- HOANGHAI HUB - FISCH (FIX VỊ TRÍ TOGGLE & FULL HIỆU ỨNG)
+-- HOANGHAI HUB - FISCH (TĂNG ĐỘ ĐẬM VIỀN LẤP LÁNH & FULL TÍNH NĂNG)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -34,7 +34,7 @@ LoadFrame.BorderSizePixel = 0
 Instance.new("UICorner", LoadFrame).CornerRadius = UDim.new(0, 8)
 
 local LoadStroke = Instance.new("UIStroke", LoadFrame)
-LoadStroke.Thickness = 2
+LoadStroke.Thickness = 3.5 -- Tăng độ dày viền loading
 LoadStroke.Color = Color3.fromRGB(255, 215, 0)
 
 local LoadText = Instance.new("TextLabel", LoadFrame)
@@ -53,7 +53,7 @@ ScreenGui.Name = "HHubUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- NÚT TOGGLE (ĐÓNG/MỞ TAB) - ĐÃ ĐẨY LÊN CAO HƠN, KHÔNG BỊ BẢNG ĐÈ
+-- NÚT TOGGLE (ĐÓNG/MỞ TAB) - ĐÃ ĐẨY LÊN CAO VÀ TĂNG ĐỘ ĐẬM VIỀN RỰC RỠ
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
@@ -66,10 +66,10 @@ Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 
 local ToggleStrokeRed = Instance.new("UIStroke", ToggleBtn)
 ToggleStrokeRed.Color = Color3.fromRGB(255, 0, 0)
-ToggleStrokeRed.Thickness = 3
+ToggleStrokeRed.Thickness = 4.5 -- Tăng độ đậm viền đỏ
 
 local ToggleStrokeGold = Instance.new("UIStroke", ToggleBtn)
-ToggleStrokeGold.Thickness = 2.5
+ToggleStrokeGold.Thickness = 4.0 -- Tăng độ đậm viền vàng lấp lánh cho dễ thấy
 local ToggleGrad = Instance.new("UIGradient", ToggleStrokeGold)
 ToggleGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
@@ -93,7 +93,7 @@ StaticTextH.TextSize = 44
 StaticTextH.TextXAlignment = Enum.TextXAlignment.Center
 StaticTextH.TextYAlignment = Enum.TextYAlignment.Center
 
--- BẢNG MENU CHÍNH - CÓ HIỆU ỨNG LẤP LÁNH XOAY MÀU RỰC RỠ
+-- BẢNG MENU CHÍNH - TĂNG ĐỘ DÀY VIỀN LẤP LÁNH XOAY MÀU RỰC RỠ
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0, 420, 0, 260)
 Main.Position = UDim2.new(0.05, 0, 0.55, 0)
@@ -103,7 +103,7 @@ Main.Active = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke", Main)
-MainStroke.Thickness = 2.5
+MainStroke.Thickness = 4.0 -- Tăng độ đậm viền menu chính lên rõ nét
 local MainGrad = Instance.new("UIGradient", MainStroke)
 MainGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
@@ -296,7 +296,6 @@ local function simulateHeavyLagSpike(duration)
     end
 end
 
--- HÀM TELEPORT CHUẨN: KHÓA CỨNG TOÀN DIỆN ĐỦ CHUẨN 17 GIÂY KHÔNG BỊ KÉO VỀ
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -384,7 +383,7 @@ Info.Font = Enum.Font.Gotham
 Info.TextSize = 12
 Info.TextXAlignment = Enum.TextXAlignment.Left
 Info.TextYAlignment = Enum.TextYAlignment.Top
-Info.Text = "Tác giả: HOANGHAI\n- Bản fix chuẩn 17s khóa chống kéo về & full lấp lánh."
+Info.Text = "Tác giả: HOANGHAI\n- Bản fix tăng độ đậm viền & bán cá thông minh."
 
 Tab1.MouseButton1Click:Connect(function()
     P1.Visible = true; P2.Visible = false; P3.Visible = false
@@ -442,7 +441,7 @@ KillFishToggle.MouseButton1Click:Connect(function()
     end
 end)
 
--- HÀM LẤY SỐ CÁ
+-- HÀM LẤY SỐ LƯỢNG CÁ TRONG TÚI (BỎ QUA CẦN CÂU, MỒI, GPS,...)
 local function getFish()
     local count = 0
     local function check(cont)
@@ -472,6 +471,29 @@ task.spawn(function()
         end)
     end
 end)
+
+-- HÀM TÌM VÀ BẤM NÚT TRÊN GIAO DIỆN (DỰA VÀO TỪ KHÓA)
+local function clickBtn(keys)
+    local inset = GuiService:GetGuiInset()
+    for _, obj in pairs(PlayerGui:GetDescendants()) do
+        if obj and obj.Parent and not obj:IsDescendantOf(ScreenGui) then
+            if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
+                local txt = string.lower(obj.Text or "")
+                for _, kw in ipairs(keys) do
+                    if txt:find(kw) then
+                        local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
+                        local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
+                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
+                        task.wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                        return true
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
 
 local CUSTOM_MERCHANT_POS = Vector3.new(1264.13, 27.42, -353.30) 
 
@@ -516,43 +538,6 @@ local function triggerOneHit()
     end)
 end
 
--- HÀM CLICK NÚT BÁN VÀ TẠM BIỆT AN TOÀN
-local function clickBtn(keys)
-    local inset = GuiService:GetGuiInset()
-    for _, obj in pairs(PlayerGui:GetDescendants()) do
-        if obj and obj.Parent and not obj:IsDescendantOf(ScreenGui) then
-            pcall(function()
-                if obj.Visible then
-                    local name = string.lower(obj.Name or "")
-                    local text = ""
-                    if obj:IsA("TextButton") or obj:IsA("TextLabel") then
-                        text = string.lower(obj.Text or "")
-                    end
-
-                    for _, kw in ipairs(keys) do
-                        if text:find(kw) or name:find(kw) then
-                            local targetObj = obj
-                            if not (obj:IsA("TextButton") or obj:IsA("ImageButton")) then
-                                local ancestor = obj:FindFirstAncestorWhichIsA("TextButton") or obj:FindFirstAncestorWhichIsA("ImageButton")
-                                if ancestor then targetObj = ancestor end
-                            end
-
-                            if targetObj.AbsoluteSize.X > 0 and targetObj.AbsoluteSize.Y > 0 then
-                                local pos, sz = targetObj.AbsolutePosition, targetObj.AbsoluteSize
-                                local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
-                                
-                                VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
-                                task.wait(0.05)
-                                VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end
-
 -- VÒNG LẶP CÀY CUỐC ĐỘC LẬP
 task.spawn(function()
     while ScreenGui.Parent do
@@ -579,6 +564,7 @@ task.spawn(function()
                 if fCount >= maxFishCapacity then
                     Status.Text = "TÚI ĐÃ ĐẠT MỐC -> BÁN CÁ..."
                     
+                    -- Bước 1: Click tắt bảng ảnh cá
                     local vp = Workspace.CurrentCamera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
                     task.wait(0.05)
@@ -587,6 +573,7 @@ task.spawn(function()
 
                     hum.WalkSpeed = 16; root.Anchored = true
                     
+                    -- Bước 2: Bay mượt đến vị trí NPC bán cá
                     local dist = (root.Position - CUSTOM_MERCHANT_POS).Magnitude
                     local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(CUSTOM_MERCHANT_POS + Vector3.new(0, 3, 0))})
                     merchantTween:Play(); merchantTween.Completed:Wait()
@@ -594,6 +581,7 @@ task.spawn(function()
                     root.CFrame = CFrame.new(CUSTOM_MERCHANT_POS)
                     task.wait(0.4)
 
+                    -- Bước 3: Định vị ProximityPrompt của NPC
                     local targetPrompt = nil
                     local targetPart = nil
                     
@@ -602,61 +590,53 @@ task.spawn(function()
                             local parent = obj.Parent
                             if parent and parent:IsA("BasePart") then
                                 local parentName = string.lower(parent.Name)
-                                if (parentName:find("merchant") or parentName:find("fish") or parentName:find("sell") or parentName:find("fishmonger")) then
-                                    targetPrompt = obj
-                                    targetPart = parent
-                                    break
+                                local distanceToMerchant = (parent.Position - CUSTOM_MERCHANT_POS).Magnitude
+                                local distanceToPlayer = (parent.Position - root.Position).Magnitude
+                                if (parentName:find("merchant") or parentName:find("fish") or parentName:find("sell") or parentName:find("fishmonger")) and distanceToMerchant < 25 and distanceToPlayer < 6 then
+                                    targetPrompt = obj; targetPart = parent; break
                                 end
                             end
                         end
                     end
 
+                    -- Bước 4: Đi sát và xoay mặt thẳng vào NPC
                     if targetPart then
-                        root.CFrame = CFrame.new(targetPart.Position + Vector3.new(0, 0, 2), targetPart.Position)
+                        local npcPos = targetPart.Position
+                        root.CFrame = CFrame.new(npcPos + Vector3.new(0, 0, 2), npcPos)
                         task.wait(0.2)
                     end
 
-                    -- KHÓA CHẶT TẠI NPC VÀ LẶP LIÊN TỤC ĐẾN KHI CÁ VỀ 0
+                    root.Anchored = true; hum.WalkSpeed = 0
+
+                    -- Bước 5: Lặp lại việc bấm E và ấn nút "Bán tất cả" cho đến khi hết cá
                     repeat
-                        Status.Text = "ĐANG BÁN CÁ (CÒN " .. tostring(fCount) .. " CON) - ĐANG KHÓA TẠI NPC..."
-                        root.Anchored = true
-                        hum.WalkSpeed = 0
-                        hum.JumpPower = 0
-                        
-                        if targetPrompt then
-                            pcall(function() fireproximityprompt(targetPrompt) end)
-                        end
-                        
+                        if targetPrompt then pcall(function() fireproximityprompt(targetPrompt) end) end
                         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                         task.wait(0.1)
                         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                        task.wait(0.5)
-
-                        clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý", "all", "tất cả"})
+                        task.wait(0.6)
+                        
+                        clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
                         task.wait(1.5)
                         fCount = getFish()
                     until fCount == 0 or not isRunning
 
-                    Status.Text = "CÁ ĐÃ HẾT (0) - ĐANG ẤN TẠM BIỆT..."
+                    -- Bước 6: Đóng hội thoại (Bấm tạm biệt/thoát)
                     local cStart = tick()
-                    while tick() - cStart < 4 do 
-                        clickBtn({"tạm biệt", "bye", "thoát", "close", "x", "leave", "exit"})
-                        task.wait(0.3) 
+                    while tick() - cStart < 3 do 
+                        clickBtn({"tạm biệt", "bye", "thoát", "close", "x"})
+                        task.wait(0.5) 
                     end
-                    task.wait(0.5)
 
+                    -- Bước 7: Mở khóa và bay trở về bãi câu cũ
                     Status.Text = "TÚI ĐÃ TRỐNG - NHẢ KHÓA VỀ BÃI CÂU..."
-                    root.Anchored = false
-                    hum.WalkSpeed = 16
-                    hum.JumpPower = 50
-                    
+                    root.Anchored = true; hum.WalkSpeed = 16
                     local dBack = (root.Position - FishingSpotCFrame.Position).Magnitude
                     if dBack > 3 then
-                        root.Anchored = true
                         local backTween = TweenService:Create(root, TweenInfo.new(dBack / 60, Enum.EasingStyle.Linear), {CFrame = FishingSpotCFrame})
                         backTween:Play(); backTween.Completed:Wait()
-                        root.Anchored = false
                     end
+                    root.Anchored = false
                 end
 
                 if not isRunning then return end
