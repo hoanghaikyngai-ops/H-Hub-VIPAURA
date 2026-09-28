@@ -469,7 +469,7 @@ local function clickBtn(keys)
     return false
 end
 
-local CUSTOM_MERCHANT_POS = Vector3.new(1264.13, 27.42, -353.30) 
+local CUSTOM_MERCHANT_POS = Vector3.new(1263.48, 27.71, -349.61) 
 
 local function solveMiniGameFast()
     local inset = GuiService:GetGuiInset()
