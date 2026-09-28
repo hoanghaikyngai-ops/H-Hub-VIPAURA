@@ -1,5 +1,5 @@
 -- ====================================================
--- HOANGHAI HUB - FISCH (FIX TRIỆT ĐỂ: VIỀN SÁNG LẤP LÁNH & NÚT ĐÓNG MỞ)
+-- HOANGHAI HUB - FISCH (FIX XOAY MẶT CHUẨN XÁC KHI TƯƠNG TÁC NPC)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -25,11 +25,12 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 99999
 ScreenGui.Parent = PlayerGui
 
--- NÚT TOGGLE (CHỮ H) - ĐÓNG/MỞ MENU
+-- NÚT TOGGLE (CHỮ H) - NỀN ĐẬM VÀ VIỀN SÁNG CHẠY LIÊN TỤC
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
-ToggleBtn.BackgroundTransparency = 1 
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+ToggleBtn.BackgroundTransparency = 0.05
 ToggleBtn.Text = ""
 ToggleBtn.AutoButtonColor = false
 ToggleBtn.Active = true
@@ -37,16 +38,17 @@ ToggleBtn.Draggable = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 
 local ToggleStrokeRed = Instance.new("UIStroke", ToggleBtn)
-ToggleStrokeRed.Color = Color3.fromRGB(255, 0, 0)
-ToggleStrokeRed.Thickness = 4.5
+ToggleStrokeRed.Color = Color3.fromRGB(200, 0, 0)
+ToggleStrokeRed.Thickness = 4.0
 
 local ToggleStrokeGold = Instance.new("UIStroke", ToggleBtn)
-ToggleStrokeGold.Thickness = 4.0
+ToggleStrokeGold.Thickness = 4.5
 local ToggleGrad = Instance.new("UIGradient", ToggleStrokeGold)
 ToggleGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(255, 255, 255)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 180, 0)),
+    ColorSequenceKeypoint.new(0.25, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 165, 0)),
+    ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255, 215, 0)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 215, 0))
 })
 
@@ -60,29 +62,31 @@ StaticTextH.TextSize = 44
 StaticTextH.TextXAlignment = Enum.TextXAlignment.Center
 StaticTextH.TextYAlignment = Enum.TextYAlignment.Center
 
--- BẢNG MENU CHÍNH
+-- BẢNG MENU CHÍNH - NỀN CỰC ĐẬM VÀ VIỀN VỆT SÁNG DI CHUYỂN
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0, 420, 0, 260)
 Main.Position = UDim2.new(0.05, 0, 0.55, 0)
-Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+Main.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
+Main.BackgroundTransparency = 0.02
 Main.BorderSizePixel = 0
 Main.Active = true
 Main.Visible = true
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
 
 local MainStroke = Instance.new("UIStroke", Main)
-MainStroke.Thickness = 4.0
+MainStroke.Thickness = 4.5
 local MainGrad = Instance.new("UIGradient", MainStroke)
 MainGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(255, 255, 255)),
-    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 180, 0)),
+    ColorSequenceKeypoint.new(0.25, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 140, 0)),
+    ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255, 215, 0)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 215, 0))
 })
 
--- HIỆU ỨNG SÁNG LẤP LÁNH XOAY LIÊN TỤC (Dùng RenderStepped siêu mượt)
+-- HIỆU ỨNG QUAY VỆT SÁNG LIÊN TỤC
 RunService.RenderStepped:Connect(function()
-    local rot = (tick() * 120) % 360
+    local rot = (tick() * 140) % 360
     ToggleGrad.Rotation = rot
     MainGrad.Rotation = rot
 end)
@@ -113,9 +117,9 @@ end)
 
 local TopBar = Instance.new("Frame", Main)
 TopBar.Size = UDim2.new(1, 0, 0, 32)
-TopBar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+TopBar.BackgroundColor3 = Color3.fromRGB(6, 6, 8)
 TopBar.BorderSizePixel = 0
-Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 10)
 
 local Title = Instance.new("TextLabel", TopBar)
 Title.Size = UDim2.new(1, -15, 1, 0)
@@ -130,7 +134,7 @@ Title.TextXAlignment = Enum.TextXAlignment.Left
 local TabC = Instance.new("Frame", Main)
 TabC.Size = UDim2.new(0, 105, 1, -32)
 TabC.Position = UDim2.new(0, 0, 0, 32)
-TabC.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+TabC.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
 TabC.BorderSizePixel = 0
 Instance.new("UICorner", TabC).CornerRadius = UDim.new(0, 8)
 
@@ -143,7 +147,7 @@ Instance.new("UIPadding", TabC).PaddingTop = UDim.new(0, 8)
 local function mkTab(name, order)
     local b = Instance.new("TextButton", TabC)
     b.Size = UDim2.new(0, 90, 0, 28)
-    b.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    b.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
     b.Text = name
     b.TextColor3 = Color3.fromRGB(200, 200, 200)
     b.Font = Enum.Font.GothamSemibold
@@ -169,7 +173,7 @@ P1.BackgroundTransparency = 1
 
 local Status = Instance.new("TextLabel", P1)
 Status.Size = UDim2.new(1, 0, 0, 28)
-Status.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+Status.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
 Status.TextColor3 = Color3.fromRGB(255, 215, 0)
 Status.Font = Enum.Font.GothamBold
 Status.TextSize = 11
@@ -324,7 +328,7 @@ end
 for i, island in ipairs(Islands) do
     local btn = Instance.new("TextButton", TpScroll)
     btn.Size = UDim2.new(1, -5, 0, 30)
-    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamSemibold
     btn.TextSize = 11
@@ -351,7 +355,7 @@ Info.Font = Enum.Font.Gotham
 Info.TextSize = 12
 Info.TextXAlignment = Enum.TextXAlignment.Left
 Info.TextYAlignment = Enum.TextYAlignment.Top
-Info.Text = "Tác giả: HOANGHAI\n- Fix viền sáng lấp lánh & nút đóng mở hoàn hảo."
+Info.Text = "Tác giả: HOANGHAI\n- Tối ưu hóa hướng nhìn thẳng NPC khi bán cá."
 
 Tab1.MouseButton1Click:Connect(function()
     P1.Visible = true; P2.Visible = false; P3.Visible = false
@@ -562,7 +566,7 @@ task.spawn(function()
                     root.CFrame = CFrame.new(CUSTOM_MERCHANT_POS)
                     task.wait(0.4)
 
-                    -- Quét tìm ProximityPrompt và NPC bán cá ở gần nhất
+                    -- Quét tìm ProximityPrompt và NPC bán cá gần nhất chính xác tuyệt đối
                     local targetPrompt = nil
                     local targetPart = nil
                     local shortestDist = math.huge
@@ -585,18 +589,27 @@ task.spawn(function()
                         end
                     end
 
-                    -- Tiến lại gần hơn một chút & xoay thẳng mặt trực diện vào NPC
+                    -- Ép nhân vật nhích sát lại đúng khoảng cách và KHÓA CHẶT HƯỚNG NHÌN 100% VÀO NPC
                     if targetPart then
                         local npcPos = targetPart.Position
-                        local directionPos = Vector3.new(npcPos.X, root.Position.Y, npcPos.Z)
-                        root.CFrame = CFrame.lookAt(directionPos + (root.Position - directionPos).Unit * 2.5, npcPos)
-                        task.wait(0.2)
+                        local flatNpcPos = Vector3.new(npcPos.X, root.Position.Y, npcPos.Z)
+                        local approachPos = flatNpcPos + (root.Position - flatNpcPos).Unit * 2.2
+                        
+                        -- Cập nhật CFrame đứng sát và nhìn thẳng trực diện vào NPC, tuyệt đối không bị lệch target
+                        root.CFrame = CFrame.lookAt(approachPos, npcPos)
+                        task.wait(0.25)
                     end
 
                     root.Anchored = true; hum.WalkSpeed = 0
 
                     repeat
                         if not isRunning then break end
+                        -- Đảm bảo mỗi lần bấm E luôn ép tâm nhìn hướng thẳng trực diện vào đúng vị trí NPC để không bị dính nhầm mục tiêu khác
+                        if targetPart then
+                            local npcPos = targetPart.Position
+                            root.CFrame = CFrame.lookAt(root.Position, Vector3.new(npcPos.X, root.Position.Y, npcPos.Z))
+                        end
+                        
                         if targetPrompt then pcall(function() fireproximityprompt(targetPrompt) end) end
                         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                         task.wait(0.1)
