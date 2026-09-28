@@ -356,11 +356,11 @@ titleP4.TextXAlignment = Enum.TextXAlignment.Left
 local AutoSkillToggle = Instance.new("TextButton", P4)
 AutoSkillToggle.Size = UDim2.new(1, 0, 0, 28)
 AutoSkillToggle.Position = UDim2.new(0, 0, 0, 22)
-AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
 AutoSkillToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoSkillToggle.Font = Enum.Font.GothamBold
 AutoSkillToggle.TextSize = 10
-AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
+AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): BẬT"
 Instance.new("UICorner", AutoSkillToggle).CornerRadius = UDim.new(0, 6)
 
 local ShowMarkersBtn = Instance.new("TextButton", P4)
@@ -390,7 +390,7 @@ SkillStatus.BackgroundTransparency = 1
 SkillStatus.TextColor3 = Color3.fromRGB(180, 180, 200)
 SkillStatus.Font = Enum.Font.GothamSemibold
 SkillStatus.TextSize = 10
-SkillStatus.Text = "Trạng thái: Chưa bật tâm"
+SkillStatus.Text = "Trạng thái: Tích hợp tự động spam khi thả cần!"
 SkillStatus.TextXAlignment = Enum.TextXAlignment.Left
 
 local MarkersGui = Instance.new("ScreenGui")
@@ -446,13 +446,13 @@ LockMarkersBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-local isAutoSkillOn = false
+local isAutoSkillOn = true
 AutoSkillToggle.MouseButton1Click:Connect(function()
     isAutoSkillOn = not isAutoSkillOn
     if isAutoSkillOn then
         AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): BẬT"
         AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-        SkillStatus.Text = "Trạng thái: Đang chạy vòng lặp 4 chiêu (2s/chiêu)..."
+        SkillStatus.Text = "Trạng thái: Đang hoạt động tự động!"
     else
         AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
         AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
@@ -460,54 +460,6 @@ AutoSkillToggle.MouseButton1Click:Connect(function()
         MarkersGui.Enabled = false
         ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
         ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
-    end
-end)
-
-task.spawn(function()
-    local skillsList = {
-        {key = Enum.KeyCode.Z, index = 1, name = "Z"},
-        {key = Enum.KeyCode.X, index = 2, name = "X"},
-        {key = Enum.KeyCode.C, index = 3, name = "C"},
-        {key = Enum.KeyCode.V, index = 4, name = "V"}
-    }
-    
-    while ScreenGui.Parent do
-        task.wait(0.2)
-        if isAutoSkillOn then
-            pcall(function()
-                for _, skill in ipairs(skillsList) do
-                    if not isAutoSkillOn then break end
-                    
-                    VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                    task.wait(0.04)
-                    VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
-                    
-                    local btn = markerButtons[skill.index]
-                    local inset = GuiService:GetGuiInset()
-                    local finalX, finalY
-                    
-                    if btn then
-                        local pos = btn.AbsolutePosition
-                        local sz = btn.AbsoluteSize
-                        finalX = pos.X + sz.X / 2 + inset.X
-                        finalY = pos.Y + sz.Y / 2 + inset.Y
-                    else
-                        local vp = Workspace.CurrentCamera.ViewportSize
-                        finalX = vp.X / 2
-                        finalY = vp.Y / 2
-                    end
-                    
-                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                    task.wait(0.04)
-                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
-                    
-                    SkillStatus.Text = "Đang dùng chiêu: " .. skill.name .. " -> Chờ 2 giây..."
-                    
-                    local waitStart = tick()
-                    while tick() - waitStart < 2.0 and isAutoSkillOn do task.wait(0.1) end
-                end
-            end)
-        end
     end
 end)
 
@@ -586,7 +538,7 @@ StopMusicBtn.TextSize = 9
 StopMusicBtn.Text = "⏹ DỪNG"
 Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 5)
 
--- NÚT BẬT/TẮT ẢNH CORTISOL VÀ LẮC HÔNG
+-- NÚT BẬT/TẮT ẢNH CORTISOL VÀ LẮC HÔNG + CHÂN
 local ChillRow = Instance.new("Frame", P5)
 ChillRow.Size = UDim2.new(1, 0, 0, 28)
 ChillRow.Position = UDim2.new(0, 0, 0, 132)
@@ -598,7 +550,7 @@ HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
 HipSwayToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 HipSwayToggleBtn.Font = Enum.Font.GothamBold
 HipSwayToggleBtn.TextSize = 10
-HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG: BẬT"
+HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG/CHÂN: BẬT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local DEFAULT_SOUND_ID = "110919391228823"
@@ -611,9 +563,11 @@ bgSound.Parent = SoundService
 
 local isHipSwayEnabled = true
 local originalRootC0 = nil
+local originalLeftHipC0 = nil
+local originalRightHipC0 = nil
 local headBillboard = nil
 
--- 🎯 BẢNG CHỈ HIỂN THỊ DUY NHẤT 1 HÌNH ẢNH ĐỒNG HỒ CORTISOL TRÊN ĐẦU
+-- 🎯 FIX LỖI MÀU GỐC ẢNH CORTISOL CHUẨN XÁC
 local function updateHeadBillboard()
     local char = LocalPlayer.Character
     local head = char and char:FindFirstChild("Head")
@@ -636,21 +590,14 @@ local function updateHeadBillboard()
         local bgFrame = Instance.new("Frame", headBillboard)
         bgFrame.Name = "BgFrame"
         bgFrame.Size = UDim2.new(1, 0, 1, 0)
-        bgFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Trắng trong suốt nhẹ
-        bgFrame.BackgroundTransparency = 0.05
-        Instance.new("UICorner", bgFrame).CornerRadius = UDim.new(0, 10)
+        bgFrame.BackgroundTransparency = 1
         
-        local bStroke = Instance.new("UIStroke", bgFrame)
-        bStroke.Name = "Stroke"
-        bStroke.Thickness = 2
-        bStroke.Color = Color3.fromRGB(0, 220, 120)
-        
-        -- DÁN ẢNH ĐỒNG HỒ CORTISOL LEVEL
         local cortisolImage = Instance.new("ImageLabel", bgFrame)
         cortisolImage.Name = "CortisolImageLabel"
-        cortisolImage.Size = UDim2.new(1, -8, 1, -8)
-        cortisolImage.Position = UDim2.new(0, 4, 0, 4)
+        cortisolImage.Size = UDim2.new(1, 0, 1, 0)
+        cortisolImage.Position = UDim2.new(0, 0, 0, 0)
         cortisolImage.BackgroundTransparency = 1
+        cortisolImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
         cortisolImage.ScaleType = Enum.ScaleType.Fit
         
         if getcustomasset and isfile and isfile("LowCortisol.png") then
@@ -671,37 +618,61 @@ end)
 HipSwayToggleBtn.MouseButton1Click:Connect(function()
     isHipSwayEnabled = not isHipSwayEnabled
     if isHipSwayEnabled then
-        HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG: BẬT"
+        HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG/CHÂN: BẬT"
         HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
         if not bgSound.IsPlaying then bgSound:Play() end
     else
-        HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG: TẮT"
+        HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG/CHÂN: TẮT"
         HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
     end
     updateHeadBillboard()
 end)
 
--- 💃 LẮC HÔNG
+-- 💃 LẮC HÔNG VÀ CẢ CHÂN NHỊP NHÀNG
 RunService.RenderStepped:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
-        local rootJoint = char and char:FindFirstChild("HumanoidRootPart") and char.HumanoidRootPart:FindFirstChild("RootJoint")
+        local upperTorso = char and (char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso"))
+        local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+        
+        local rootJoint = rootPart and rootPart:FindFirstChild("RootJoint")
+        local leftHip = upperTorso and (upperTorso:FindFirstChild("LeftHip") or char:FindFirstChild("Left Hip"))
+        local rightHip = upperTorso and (upperTorso:FindFirstChild("RightHip") or char:FindFirstChild("Right Hip"))
         
         if rootJoint then
             if not originalRootC0 then originalRootC0 = rootJoint.C0 end
+            if leftHip and not originalLeftHipC0 then originalLeftHipC0 = leftHip.C0 end
+            if rightHip and not originalRightHipC0 then originalRightHipC0 = rightHip.C0 end
             
             if isHipSwayEnabled then
-                local t = tick() * 2.2
+                local t = tick() * 2.5
                 local hipX = math.sin(t) * 0.45
                 local bounceY = math.abs(math.sin(t * 2)) * 0.12
                 local angleZ = math.sin(t) * 0.35
                 local angleY = math.cos(t * 0.5) * 0.2
                 
+                -- Lắc hông
                 local swayCFrame = originalRootC0 * CFrame.new(hipX, bounceY, 0) * CFrame.Angles(0, angleY, angleZ)
                 rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.25)
+                
+                -- Lắc chân trái & chân phải đồng bộ để không bị cứng đờ
+                if leftHip and originalLeftHipC0 then
+                    local legSwayL = originalLeftHipC0 * CFrame.Angles(math.sin(t) * 0.2, 0, math.cos(t) * 0.15)
+                    leftHip.C0 = leftHip.C0:Lerp(legSwayL, 0.25)
+                end
+                if rightHip and originalRightHipC0 then
+                    local legSwayR = originalRightHipC0 * CFrame.Angles(-math.sin(t) * 0.2, 0, -math.cos(t) * 0.15)
+                    rightHip.C0 = rightHip.C0:Lerp(legSwayR, 0.25)
+                end
             else
                 if originalRootC0 and rootJoint.C0 ~= originalRootC0 then
                     rootJoint.C0 = rootJoint.C0:Lerp(originalRootC0, 0.2)
+                end
+                if leftHip and originalLeftHipC0 and leftHip.C0 ~= originalLeftHipC0 then
+                    leftHip.C0 = leftHip.C0:Lerp(originalLeftHipC0, 0.2)
+                end
+                if rightHip and originalRightHipC0 and rightHip.C0 ~= originalRightHipC0 then
+                    rightHip.C0 = rightHip.C0:Lerp(originalRightHipC0, 0.2)
                 end
             end
         end
@@ -724,7 +695,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Giữ nguyên Tab Âm nhạc/Lắc hông, xóa bảng chữ trên đầu và dán duy nhất hình ảnh Low Cortisol."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã fix lắc đều cả hông và chân mượt mà, không còn cứng đờ."
 
 -- CHUYỂN TAB
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
@@ -871,8 +842,15 @@ local function solveMiniGameFast()
     end)
 end
 
--- VÒNG LẶP CHÍNH
+-- VÒNG LẶP CHÍNH CÂY CẤU & TỰ ĐỘNG CÂU + TÍCH HỢP SPAM ZXCV NGAY KHI THẢ CẦN
 task.spawn(function()
+    local skillsList = {
+        {key = Enum.KeyCode.Z, index = 1, name = "Z"},
+        {key = Enum.KeyCode.X, index = 2, name = "X"},
+        {key = Enum.KeyCode.C, index = 3, name = "C"},
+        {key = Enum.KeyCode.V, index = 4, name = "V"}
+    }
+
     while ScreenGui.Parent do
         task.wait(0.4)
         if isRunning then
@@ -954,11 +932,54 @@ task.spawn(function()
                     task.wait(2)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
 
-                    local initialFish = getFishToSellCount()
+                    -- VÒNG CHỜ CÂU VÀ SPAM CHIÊU LUÔN TỪ KHI THẢ CẦN
+                    local initialFishCount = getFishToSellCount()
                     local aStart = tick()
 
-                    while tick() - aStart < 60 and isRunning and not isSellingFish and getFishToSellCount() <= initialFish do
+                    while tick() - aStart < 60 and isRunning and not isSellingFish do
                         solveMiniGameFast()
+                        
+                        -- SPAM Z, X, C, V LIÊN TỤC TRONG LÚC ĐỢI CÁ
+                        if isAutoSkillOn then
+                            pcall(function()
+                                for _, skill in ipairs(skillsList) do
+                                    if not isAutoSkillOn or not isRunning or isSellingFish then break end
+                                    
+                                    VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
+                                    task.wait(0.04)
+                                    VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
+                                    
+                                    local btn = markerButtons[skill.index]
+                                    local inset = GuiService:GetGuiInset()
+                                    local finalX, finalY
+                                    
+                                    if btn then
+                                        local pos = btn.AbsolutePosition
+                                        local sz = btn.AbsoluteSize
+                                        finalX = pos.X + sz.X / 2 + inset.X
+                                        finalY = pos.Y + sz.Y / 2 + inset.Y
+                                    else
+                                        local vps = Workspace.CurrentCamera.ViewportSize
+                                        finalX = vps.X / 2
+                                        finalY = vps.Y / 2
+                                    end
+                                    
+                                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
+                                    task.wait(0.04)
+                                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
+                                    
+                                    SkillStatus.Text = "Đang dùng chiêu: " .. skill.name
+                                end
+                            end)
+                        end
+                        
+                        -- NẾU NHẬN ĐƯỢC +1 CÁ THÌ TẠM NGƯNG SPAM CHIÊU 5 GIÂY (CẦN CÂU VẪN HOẠT ĐỘNG)
+                        if getFishToSellCount() > initialFishCount then
+                            SkillStatus.Text = "Trạng thái: Đã nhận +1 cá! Ngưng spam chiêu 5 giây..."
+                            task.wait(5)
+                            break
+                        end
+                        
                         task.wait(0.05)
                     end
                 end
@@ -970,5 +991,7 @@ end)
 LocalPlayer.CharacterAdded:Connect(function()
     task.wait(1)
     originalRootC0 = nil
+    originalLeftHipC0 = nil
+    originalRightHipC0 = nil
     if isHipSwayEnabled then updateHeadBillboard() end
 end)
