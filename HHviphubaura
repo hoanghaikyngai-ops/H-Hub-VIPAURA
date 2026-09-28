@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - ĐỒNG BỘ NGUYÊN BỘ LOW CORTISOL DANCE & CÀY CÚOC
+-- H-HUB VIPAURA - LOW CORTISOL IMAGE DISPLAY ON HEAD
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -19,21 +19,21 @@ pcall(function()
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
--- ================= GIAO DIỆN CHÍNH (METALLIC & GLOW EFFECT) =================
+-- ================= GIAO DIỆN CHÍNH =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HHubVipUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 99999
 ScreenGui.Parent = PlayerGui
 
--- NÚT TOGGLE (MỞ/ĐÓNG BẢNG)
+-- NÚT TOGGLE
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 46, 0, 46)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 38, 48)
 ToggleBtn.BackgroundTransparency = 0.1
 ToggleBtn.Text = "H"
-ToggleBtn.TextColor3 = Color3.fromRGB(150, 240, 255)
+ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 150)
 ToggleBtn.Font = Enum.Font.GothamBold
 ToggleBtn.TextSize = 22
 ToggleBtn.AutoButtonColor = false
@@ -41,59 +41,40 @@ ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 
-local ToggleGradient = Instance.new("UIGradient", ToggleBtn)
-ToggleGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 90, 110)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 220, 240)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 45, 55))
-})
-ToggleGradient.Rotation = 45
-
 local ToggleStroke = Instance.new("UIStroke", ToggleBtn)
-ToggleStroke.Color = Color3.fromRGB(0, 220, 255)
+ToggleStroke.Color = Color3.fromRGB(0, 255, 128)
 ToggleStroke.Thickness = 2
 
 -- BẢNG MENU CHÍNH
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0, 520, 0, 350)
 Main.Position = UDim2.new(0.5, -260, 0.5, -175)
-Main.BackgroundColor3 = Color3.fromRGB(24, 26, 34)
-Main.BackgroundTransparency = 0.03
-Main.BorderSizePixel = 0
+Main.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
+Main.BackgroundTransparency = 0.05
 Main.Active = true
 Main.Visible = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
 
-Main.ClipsDescendants = true
-local MainGradient = Instance.new("UIGradient", Main)
-MainGradient.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 55, 70)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(25, 27, 36)),
-    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(20, 22, 28)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(45, 50, 65))
-})
-MainGradient.Rotation = 35
-
 local MainStroke = Instance.new("UIStroke", Main)
-MainStroke.Color = Color3.fromRGB(0, 200, 255)
+MainStroke.Color = Color3.fromRGB(0, 255, 128)
 MainStroke.Thickness = 1.8
 
--- HIỆU ỨNG VIỀN PHÁT SÁNG
+-- HIỆU ỨNG VIỀN PHÁT SÁNG NEON GREEN
 task.spawn(function()
     while ScreenGui.Parent do
-        local tweenUp = TweenService:Create(MainStroke, TweenInfo.new(1.0, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
+        local tweenUp = TweenService:Create(MainStroke, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
             Transparency = 0,
-            Color = Color3.fromRGB(0, 255, 255)
+            Color = Color3.fromRGB(0, 255, 150)
         })
         tweenUp:Play()
-        task.wait(1.0)
+        task.wait(1.2)
         
-        local tweenDown = TweenService:Create(MainStroke, TweenInfo.new(1.0, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
-            Transparency = 0.6,
-            Color = Color3.fromRGB(0, 120, 180)
+        local tweenDown = TweenService:Create(MainStroke, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+            Transparency = 0.5,
+            Color = Color3.fromRGB(0, 150, 90)
         })
         tweenDown:Play()
-        task.wait(1.0)
+        task.wait(1.2)
     end
 end)
 
@@ -105,11 +86,10 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "  H-Hub VIPAURA [LOW CORTISOL INTEGRATED]"
-LogoText.TextColor3 = Color3.fromRGB(220, 245, 255)
+LogoText.Text = "🌿 H-HUB VIPAURA [LOW CORTISOL IMAGE ON HEAD]"
+LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 13
-LogoText.TextXAlignment = Enum.TextXAlignment.Center
 
 local CloseBtn = Instance.new("TextButton", TopBar)
 CloseBtn.Size = UDim2.new(0, 28, 0, 28)
@@ -160,7 +140,7 @@ ContentContainer.BackgroundTransparency = 1
 local function createTabButton(name, order)
     local btn = Instance.new("TextButton", MenuContainer)
     btn.Size = UDim2.new(1, -4, 0, 34)
-    btn.BackgroundColor3 = Color3.fromRGB(30, 32, 42)
+    btn.BackgroundColor3 = Color3.fromRGB(25, 28, 38)
     btn.TextColor3 = Color3.fromRGB(160, 175, 195)
     btn.Font = Enum.Font.GothamSemibold
     btn.Text = "   " .. name
@@ -170,7 +150,7 @@ local function createTabButton(name, order)
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     
     local stroke = Instance.new("UIStroke", btn)
-    stroke.Color = Color3.fromRGB(60, 70, 95)
+    stroke.Color = Color3.fromRGB(0, 255, 128)
     stroke.Thickness = 1
     stroke.Transparency = 1
     return btn
@@ -233,6 +213,9 @@ local function simulateHeavyLagSpike(duration)
     end
 end
 
+local isRunning = true
+local OriginalFishingSpotCFrame = nil 
+
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -261,7 +244,16 @@ local function teleportAndRespawnAtIsland(targetPos)
                         end)
                         task.wait(0.1)
                     end
-                    newRoot.Anchored = false; newHum.WalkSpeed = 16
+                    
+                    if isRunning then
+                        OriginalFishingSpotCFrame = newRoot.CFrame
+                        newRoot.Anchored = true
+                        newHum.WalkSpeed = 0
+                    else
+                        OriginalFishingSpotCFrame = nil
+                        newRoot.Anchored = false
+                        newHum.WalkSpeed = 16
+                    end
                 end
             end)
         end)
@@ -351,7 +343,7 @@ MaxFishCapBtn.MouseButton1Click:Connect(function()
     MaxFishCapBtn.Text = "NGƯỠNG BÁN: " .. maxFishCapacity .. " (ĐỔI)"
 end)
 
--- TRANG 4: 4 TÂM NGẮM & SPAM KĨ NĂNG
+-- TRANG 4: KỸ NĂNG
 local titleP4 = Instance.new("TextLabel", P4)
 titleP4.Size = UDim2.new(1, 0, 0, 20)
 titleP4.BackgroundTransparency = 1
@@ -519,17 +511,17 @@ task.spawn(function()
     end
 end)
 
--- TRANG 5: ÂM NHẠC & LẮC HÔNG CORTISOL
+-- TRANG 5: ÂM NHẠC & CÀI ĐẶT
 local titleP5 = Instance.new("TextLabel", P5)
 titleP5.Size = UDim2.new(1, 0, 0, 20)
 titleP5.BackgroundTransparency = 1
-titleP5.Text = "Âm Nhạc & Lắc Hông Low Cortisol"
-titleP5.TextColor3 = Color3.fromRGB(0, 220, 255)
+titleP5.Text = "🎵 ÂM NHẠC & HIỂN THỊ CORTISOL"
+titleP5.TextColor3 = Color3.fromRGB(0, 255, 150)
 titleP5.Font = Enum.Font.GothamBold
 titleP5.TextSize = 11
 titleP5.TextXAlignment = Enum.TextXAlignment.Left
 
--- 🎵 SÓNG NHẠC VISUALIZER
+-- SÓNG NHẠC VISUALIZER
 local VisualizerFrame = Instance.new("Frame", P5)
 VisualizerFrame.Size = UDim2.new(1, 0, 0, 16)
 VisualizerFrame.Position = UDim2.new(0, 0, 0, 22)
@@ -540,24 +532,22 @@ for i = 1, 7 do
     local bar = Instance.new("Frame", VisualizerFrame)
     bar.Size = UDim2.new(0, 18, 0, 4)
     bar.Position = UDim2.new(0, (i - 1) * 24 + 80, 0.5, -2)
-    bar.BackgroundColor3 = Color3.fromRGB(0, 220, 255)
+    bar.BackgroundColor3 = Color3.fromRGB(0, 255, 150)
     bar.BorderSizePixel = 0
     Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
     table.insert(visualizerBars, bar)
 end
 
--- 🌟 NÚT ĐỘC LẬP: PHÁT NHẠC MẶC ĐỊNH (110919391228823)
 local DefaultMusicBtn = Instance.new("TextButton", P5)
 DefaultMusicBtn.Size = UDim2.new(1, 0, 0, 26)
 DefaultMusicBtn.Position = UDim2.new(0, 0, 0, 42)
-DefaultMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 220)
+DefaultMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
 DefaultMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 DefaultMusicBtn.Font = Enum.Font.GothamBold
 DefaultMusicBtn.TextSize = 9
-DefaultMusicBtn.Text = "🎵 PHÁT NHẠC MẶC ĐỊNH (110919391228823)"
+DefaultMusicBtn.Text = "🎵 PHÁT NHẠC CHILL MẶC ĐỊNH (110919391228823)"
 Instance.new("UICorner", DefaultMusicBtn).CornerRadius = UDim.new(0, 5)
 
--- Ô NHẬP SOUND ID TÙY CHỈNH
 local MusicInput = Instance.new("TextBox", P5)
 MusicInput.Size = UDim2.new(1, 0, 0, 24)
 MusicInput.Position = UDim2.new(0, 0, 0, 72)
@@ -572,38 +562,13 @@ Instance.new("UICorner", MusicInput).CornerRadius = UDim.new(0, 5)
 local savedLastID = ""
 MusicInput.FocusLost:Connect(function(enterPressed) if enterPressed then savedLastID = MusicInput.Text end end)
 
--- HÀNG NÚT BÀI TRƯỚC / PHÁT ID NHẬP / DỪNG / BÀI TIẾP
 local MusicRow = Instance.new("Frame", P5)
 MusicRow.Size = UDim2.new(1, 0, 0, 26)
 MusicRow.Position = UDim2.new(0, 0, 0, 100) 
 MusicRow.BackgroundTransparency = 1
 
-local BtnVolDown = Instance.new("TextButton", MusicRow)
-BtnVolDown.Size = UDim2.new(0, 24, 1, 0)
-BtnVolDown.BackgroundColor3 = Color3.fromRGB(40, 45, 60)
-BtnVolDown.Text = "🔉"
-BtnVolDown.TextColor3 = Color3.fromRGB(0, 255, 255)
-Instance.new("UICorner", BtnVolDown).CornerRadius = UDim.new(0, 5)
-
-local BtnVolUp = Instance.new("TextButton", MusicRow)
-BtnVolUp.Size = UDim2.new(0, 24, 1, 0)
-BtnVolUp.Position = UDim2.new(1, -24, 0, 0)
-BtnVolUp.BackgroundColor3 = Color3.fromRGB(40, 45, 60)
-BtnVolUp.Text = "🔊"
-BtnVolUp.TextColor3 = Color3.fromRGB(0, 255, 255)
-Instance.new("UICorner", BtnVolUp).CornerRadius = UDim.new(0, 5)
-
-local PrevTrackBtn = Instance.new("TextButton", MusicRow)
-PrevTrackBtn.Size = UDim2.new(0, 26, 1, 0)
-PrevTrackBtn.Position = UDim2.new(0, 28, 0, 0)
-PrevTrackBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
-PrevTrackBtn.Text = "⏮️"
-PrevTrackBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", PrevTrackBtn).CornerRadius = UDim.new(0, 5)
-
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
-PlayMusicBtn.Size = UDim2.new(0.5, -58, 1, 0)
-PlayMusicBtn.Position = UDim2.new(0, 58, 0, 0)
+PlayMusicBtn.Size = UDim2.new(0.5, -2, 1, 0)
 PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
 PlayMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 PlayMusicBtn.Font = Enum.Font.GothamBold
@@ -612,7 +577,7 @@ PlayMusicBtn.Text = "▶ PHÁT ID NHẬP"
 Instance.new("UICorner", PlayMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local StopMusicBtn = Instance.new("TextButton", MusicRow)
-StopMusicBtn.Size = UDim2.new(0.5, -58, 1, 0)
+StopMusicBtn.Size = UDim2.new(0.5, -2, 1, 0)
 StopMusicBtn.Position = UDim2.new(0.5, 2, 0, 0)
 StopMusicBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 StopMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -621,106 +586,34 @@ StopMusicBtn.TextSize = 9
 StopMusicBtn.Text = "⏹ DỪNG"
 Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 5)
 
-local NextTrackBtn = Instance.new("TextButton", MusicRow)
-NextTrackBtn.Size = UDim2.new(0, 26, 1, 0)
-NextTrackBtn.Position = UDim2.new(1, -54, 0, 0)
-NextTrackBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
-NextTrackBtn.Text = "⏭️"
-NextTrackBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-Instance.new("UICorner", NextTrackBtn).CornerRadius = UDim.new(0, 5)
-
--- HÀNG CORTISOL LEVEL VÀ LẮC HÔNG CHẬM
+-- NÚT BẬT/TẮT ẢNH CORTISOL VÀ LẮC HÔNG
 local ChillRow = Instance.new("Frame", P5)
-ChillRow.Size = UDim2.new(1, 0, 0, 26)
-ChillRow.Position = UDim2.new(0, 0, 0, 130)
+ChillRow.Size = UDim2.new(1, 0, 0, 28)
+ChillRow.Position = UDim2.new(0, 0, 0, 132)
 ChillRow.BackgroundTransparency = 1
 
-local CortisolLevelBtn = Instance.new("TextButton", ChillRow)
-CortisolLevelBtn.Size = UDim2.new(0.5, -2, 1, 0)
-CortisolLevelBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 180)
-CortisolLevelBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-CortisolLevelBtn.Font = Enum.Font.GothamBold
-CortisolLevelBtn.TextSize = 9
-CortisolLevelBtn.Text = "🌿 CORTISOL: LV 1 (DEEP CHILL)"
-Instance.new("UICorner", CortisolLevelBtn).CornerRadius = UDim.new(0, 5)
-
 local HipSwayToggleBtn = Instance.new("TextButton", ChillRow)
-HipSwayToggleBtn.Size = UDim2.new(0.5, -2, 1, 0)
-HipSwayToggleBtn.Position = UDim2.new(0.5, 2, 0, 0)
-HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(140, 50, 180)
+HipSwayToggleBtn.Size = UDim2.new(1, 0, 1, 0)
+HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
 HipSwayToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 HipSwayToggleBtn.Font = Enum.Font.GothamBold
-HipSwayToggleBtn.TextSize = 9
-HipSwayToggleBtn.Text = "💃 LẮC HÔNG CHẬM: TẮT"
-Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 5)
-
--- HÀNG PLAYLIST VÀ LẶP LẠI
-local PlaylistRow = Instance.new("Frame", P5)
-PlaylistRow.Size = UDim2.new(1, 0, 0, 26)
-PlaylistRow.Position = UDim2.new(0, 0, 0, 160)
-PlaylistRow.BackgroundTransparency = 1
-
-local AddPlaylistBtn = Instance.new("TextButton", PlaylistRow)
-AddPlaylistBtn.Size = UDim2.new(0.5, -2, 1, 0)
-AddPlaylistBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
-AddPlaylistBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-AddPlaylistBtn.Font = Enum.Font.GothamBold
-AddPlaylistBtn.TextSize = 9
-AddPlaylistBtn.Text = "+ THÊM VÀO PLAYLIST"
-Instance.new("UICorner", AddPlaylistBtn).CornerRadius = UDim.new(0, 5)
-
-local LoopToggleBtn = Instance.new("TextButton", PlaylistRow)
-LoopToggleBtn.Size = UDim2.new(0.5, -2, 1, 0)
-LoopToggleBtn.Position = UDim2.new(0.5, 2, 0, 0)
-LoopToggleBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
-LoopToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoopToggleBtn.Font = Enum.Font.GothamBold
-LoopToggleBtn.TextSize = 9
-LoopToggleBtn.Text = "LẶP LẠI: TẮT"
-Instance.new("UICorner", LoopToggleBtn).CornerRadius = UDim.new(0, 5)
-
--- DANH SÁCH PLAYLIST
-local PlaylistContainer = Instance.new("ScrollingFrame", P5)
-PlaylistContainer.Size = UDim2.new(1, 0, 0, 70)
-PlaylistContainer.Position = UDim2.new(0, 0, 0, 190)
-PlaylistContainer.BackgroundColor3 = Color3.fromRGB(16, 18, 26)
-PlaylistContainer.BorderSizePixel = 0
-PlaylistContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
-PlaylistContainer.ScrollBarThickness = 2
-Instance.new("UICorner", PlaylistContainer).CornerRadius = UDim.new(0, 6)
-
-local PlaylistLayout = Instance.new("UIListLayout", PlaylistContainer)
-PlaylistLayout.SortOrder = Enum.SortOrder.LayoutOrder
-PlaylistLayout.Padding = UDim.new(0, 3)
-
-local MusicStatus = Instance.new("TextLabel", P5)
-MusicStatus.Size = UDim2.new(1, 0, 0, 20)
-MusicStatus.Position = UDim2.new(0, 0, 0, 265)
-MusicStatus.BackgroundTransparency = 1
-MusicStatus.TextColor3 = Color3.fromRGB(180, 180, 200)
-MusicStatus.Font = Enum.Font.GothamSemibold
-MusicStatus.TextSize = 9
-MusicStatus.Text = "Vol: 100% | Playlist: 1 bài"
-MusicStatus.TextXAlignment = Enum.TextXAlignment.Left
+HipSwayToggleBtn.TextSize = 10
+HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG: BẬT"
+Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local DEFAULT_SOUND_ID = "110919391228823"
 local bgSound = Instance.new("Sound")
 bgSound.Name = "HHubMusic"
 bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
-bgSound.Looped = false
+bgSound.Looped = true
 bgSound.Volume = 1.0
 bgSound.Parent = SoundService
 
-local playlistIDs = {110919391228823, 1837879082, 1839845507, 1845554017}
-local currentPlaylistIndex = 1
-local isLoopEnabled = false
-
-local cortisolLevel = 1
-local isHipSwayEnabled = false
+local isHipSwayEnabled = true
 local originalRootC0 = nil
 local headBillboard = nil
 
--- 🎯 BẢNG CORTISOL LEVEL LƠ LỬNG TRÊN ĐẦU NHÂN VẬT
+-- 🎯 BẢNG CHỈ HIỂN THỊ DUY NHẤT 1 HÌNH ẢNH ĐỒNG HỒ CORTISOL TRÊN ĐẦU
 local function updateHeadBillboard()
     local char = LocalPlayer.Character
     local head = char and char:FindFirstChild("Head")
@@ -734,151 +627,61 @@ local function updateHeadBillboard()
         if headBillboard then headBillboard:Destroy() end
         
         headBillboard = Instance.new("BillboardGui")
-        headBillboard.Name = "CortisolHeadBillboard"
-        headBillboard.Size = UDim2.new(0, 150, 0, 48)
-        headBillboard.StudsOffset = Vector3.new(0, 3, 0)
+        headBillboard.Name = "CortisolImageHeadBillboard"
+        headBillboard.Size = UDim2.new(0, 170, 0, 95)
+        headBillboard.StudsOffset = Vector3.new(0, 3.5, 0)
         headBillboard.AlwaysOnTop = true
         headBillboard.Parent = head
         
         local bgFrame = Instance.new("Frame", headBillboard)
         bgFrame.Name = "BgFrame"
         bgFrame.Size = UDim2.new(1, 0, 1, 0)
-        bgFrame.BackgroundColor3 = Color3.fromRGB(18, 20, 28)
-        bgFrame.BackgroundTransparency = 0.15
-        Instance.new("UICorner", bgFrame).CornerRadius = UDim.new(0, 8)
+        bgFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Trắng trong suốt nhẹ
+        bgFrame.BackgroundTransparency = 0.05
+        Instance.new("UICorner", bgFrame).CornerRadius = UDim.new(0, 10)
         
         local bStroke = Instance.new("UIStroke", bgFrame)
         bStroke.Name = "Stroke"
-        bStroke.Thickness = 1.8
+        bStroke.Thickness = 2
+        bStroke.Color = Color3.fromRGB(0, 220, 120)
         
-        local title = Instance.new("TextLabel", bgFrame)
-        title.Size = UDim2.new(1, 0, 0, 18)
-        title.Position = UDim2.new(0, 0, 0, 3)
-        title.BackgroundTransparency = 1
-        title.Text = "CORTISOL LEVEL"
-        title.TextColor3 = Color3.fromRGB(255, 255, 255)
-        title.Font = Enum.Font.GothamBold
-        title.TextSize = 10
+        -- DÁN ẢNH ĐỒNG HỒ CORTISOL LEVEL
+        local cortisolImage = Instance.new("ImageLabel", bgFrame)
+        cortisolImage.Name = "CortisolImageLabel"
+        cortisolImage.Size = UDim2.new(1, -8, 1, -8)
+        cortisolImage.Position = UDim2.new(0, 4, 0, 4)
+        cortisolImage.BackgroundTransparency = 1
+        cortisolImage.ScaleType = Enum.ScaleType.Fit
         
-        local statusLbl = Instance.new("TextLabel", bgFrame)
-        statusLbl.Name = "StatusLbl"
-        statusLbl.Size = UDim2.new(1, 0, 0, 20)
-        statusLbl.Position = UDim2.new(0, 0, 0, 22)
-        statusLbl.BackgroundTransparency = 1
-        statusLbl.Font = Enum.Font.GothamBold
-        statusLbl.TextSize = 10
-    end
-    
-    local bgFrame = headBillboard:FindFirstChild("BgFrame")
-    if bgFrame then
-        local statusLbl = bgFrame:FindFirstChild("StatusLbl")
-        local bStroke = bgFrame:FindFirstChild("Stroke")
-        
-        if cortisolLevel == 1 then
-            if statusLbl then statusLbl.Text = "🟢 LOW CORTISOL 🌿"; statusLbl.TextColor3 = Color3.fromRGB(0, 255, 120) end
-            if bStroke then bStroke.Color = Color3.fromRGB(0, 255, 120) end
-        elseif cortisolLevel == 2 then
-            if statusLbl then statusLbl.Text = "🟡 NORMAL LEVEL ⚡"; statusLbl.TextColor3 = Color3.fromRGB(255, 200, 0) end
-            if bStroke then bStroke.Color = Color3.fromRGB(255, 200, 0) end
+        if getcustomasset and isfile and isfile("LowCortisol.png") then
+            cortisolImage.Image = getcustomasset("LowCortisol.png")
         else
-            if statusLbl then statusLbl.Text = "🔴 HIGH VIBE 🔥"; statusLbl.TextColor3 = Color3.fromRGB(255, 60, 100) end
-            if bStroke then bStroke.Color = Color3.fromRGB(255, 60, 100) end
+            cortisolImage.Image = "rbxassetid://13835613385"
         end
     end
 end
 
-local function updatePlaylistUI()
-    for _, child in pairs(PlaylistContainer:GetChildren()) do
-        if child:IsA("TextButton") then child:Destroy() end
-    end
-    for i, id in ipairs(playlistIDs) do
-        local itemBtn = Instance.new("TextButton", PlaylistContainer)
-        itemBtn.Size = UDim2.new(1, -4, 0, 22)
-        itemBtn.BackgroundColor3 = (i == currentPlaylistIndex) and Color3.fromRGB(0, 100, 150) or Color3.fromRGB(25, 28, 38)
-        itemBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        itemBtn.Font = Enum.Font.Gotham
-        itemBtn.TextSize = 9
-        itemBtn.Text = "  Bài " .. i .. ": ID " .. id
-        itemBtn.TextXAlignment = Enum.TextXAlignment.Left
-        Instance.new("UICorner", itemBtn).CornerRadius = UDim.new(0, 4)
-        itemBtn.MouseButton1Click:Connect(function()
-            currentPlaylistIndex = i
-            bgSound.SoundId = "rbxassetid://" .. id
-            bgSound:Play()
-            MusicStatus.Text = "Đang phát bài " .. i .. " (ID: " .. id .. ")"
-            updatePlaylistUI()
-        end)
-    end
-    PlaylistContainer.CanvasSize = UDim2.new(0, 0, 0, #playlistIDs * 25)
-end
+updateHeadBillboard()
 
-updatePlaylistUI()
-
-local function playTrackAtIndex(index)
-    if #playlistIDs == 0 then return end
-    currentPlaylistIndex = index
-    if currentPlaylistIndex > #playlistIDs then currentPlaylistIndex = 1 end
-    if currentPlaylistIndex < 1 then currentPlaylistIndex = #playlistIDs end
-    local nextID = playlistIDs[currentPlaylistIndex]
-    if nextID then
-        bgSound.SoundId = "rbxassetid://" .. nextID
-        bgSound:Play()
-        MusicStatus.Text = "Đang phát bài " .. currentPlaylistIndex .. " (ID: " .. nextID .. ")"
-        updatePlaylistUI()
-    end
-end
-
--- 🎵 EVENT PHÁT NHẠC MẶC ĐỊNH
 DefaultMusicBtn.MouseButton1Click:Connect(function()
     bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
     bgSound:Play()
-    MusicStatus.Text = "Đang phát Nhạc Mặc Định (ID: " .. DEFAULT_SOUND_ID .. ")"
 end)
 
-NextTrackBtn.MouseButton1Click:Connect(function() playTrackAtIndex(currentPlaylistIndex + 1) end)
-PrevTrackBtn.MouseButton1Click:Connect(function() playTrackAtIndex(currentPlaylistIndex - 1) end)
-
-CortisolLevelBtn.MouseButton1Click:Connect(function()
-    cortisolLevel = (cortisolLevel % 3) + 1
-    if cortisolLevel == 1 then
-        CortisolLevelBtn.Text = "🌿 CORTISOL: LV 1 (DEEP CHILL)"
-        CortisolLevelBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 180)
-    elseif cortisolLevel == 2 then
-        CortisolLevelBtn.Text = "🌿 CORTISOL: LV 2 (SOFT RHYTHM)"
-        CortisolLevelBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
-    else
-        CortisolLevelBtn.Text = "🌿 CORTISOL: LV 3 (MAX VIBE)"
-        CortisolLevelBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 160)
-    end
-    updateHeadBillboard()
-end)
-
--- 💃 ĐỒNG BỘ: KHI BẬT LẮC HÔNG SẼ TỰ BẬT BẢNG CORTISOL TRÊN ĐẦU VÀ PHÁT NHẠC MẶC ĐỊNH
 HipSwayToggleBtn.MouseButton1Click:Connect(function()
     isHipSwayEnabled = not isHipSwayEnabled
     if isHipSwayEnabled then
-        HipSwayToggleBtn.Text = "💃 LẮC HÔNG CHẬM: BẬT"
-        HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 80)
-        
-        -- Tự động phát nhạc mặc định nếu nhạc chưa phát
-        if not bgSound.IsPlaying then
-            bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
-            bgSound:Play()
-            MusicStatus.Text = "Đang phát nhạc Low Cortisol (ID: " .. DEFAULT_SOUND_ID .. ")"
-        end
+        HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG: BẬT"
+        HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+        if not bgSound.IsPlaying then bgSound:Play() end
     else
-        HipSwayToggleBtn.Text = "💃 LẮC HÔNG CHẬM: TẮT"
-        HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(140, 50, 180)
-        pcall(function()
-            local char = LocalPlayer.Character
-            local rootJoint = char and char:FindFirstChild("HumanoidRootPart") and char.HumanoidRootPart:FindFirstChild("RootJoint")
-            if rootJoint and originalRootC0 then rootJoint.C0 = originalRootC0 end
-        end)
+        HipSwayToggleBtn.Text = "💃 HIỆN ẢNH CORTISOL TRÊN ĐẦU & LẮC HÔNG: TẮT"
+        HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
     end
     updateHeadBillboard()
 end)
 
--- 💃 LẮC HÔNG CFRAME UYỂN CHUYỂN DỰA THEO CẤP ĐỘ CORTISOL
+-- 💃 LẮC HÔNG
 RunService.RenderStepped:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
@@ -887,66 +690,30 @@ RunService.RenderStepped:Connect(function()
         if rootJoint then
             if not originalRootC0 then originalRootC0 = rootJoint.C0 end
             
-            if isHipSwayEnabled and bgSound.IsPlaying then
-                local speedMult = 2.2 * (cortisolLevel * 0.2 + 0.8)
-                local t = tick() * speedMult
+            if isHipSwayEnabled then
+                local t = tick() * 2.2
+                local hipX = math.sin(t) * 0.45
+                local bounceY = math.abs(math.sin(t * 2)) * 0.12
+                local angleZ = math.sin(t) * 0.35
+                local angleY = math.cos(t * 0.5) * 0.2
                 
-                local angleZ = math.sin(t) * (0.12 * cortisolLevel)
-                local angleY = math.cos(t * 0.5) * (0.08 * cortisolLevel)
-                local bounceY = math.abs(math.sin(t)) * (0.05 * cortisolLevel)
-                
-                local swayCFrame = originalRootC0 * CFrame.new(0, bounceY, 0) * CFrame.Angles(0, angleY, angleZ)
-                rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.15)
+                local swayCFrame = originalRootC0 * CFrame.new(hipX, bounceY, 0) * CFrame.Angles(0, angleY, angleZ)
+                rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.25)
             else
                 if originalRootC0 and rootJoint.C0 ~= originalRootC0 then
-                    rootJoint.C0 = rootJoint.C0:Lerp(originalRootC0, 0.1)
+                    rootJoint.C0 = rootJoint.C0:Lerp(originalRootC0, 0.2)
                 end
             end
         end
     end)
 end)
 
-task.spawn(function()
-    while ScreenGui.Parent do
-        task.wait(0.08)
-        if bgSound.IsPlaying then
-            for i, bar in ipairs(visualizerBars) do
-                local amp = cortisolLevel * 3
-                local randomHeight = math.random(4 + amp, 12 + amp)
-                TweenService:Create(bar, TweenInfo.new(0.08), {Size = UDim2.new(0, 18, 0, randomHeight)}):Play()
-            end
-        else
-            for _, bar in ipairs(visualizerBars) do
-                TweenService:Create(bar, TweenInfo.new(0.1), {Size = UDim2.new(0, 18, 0, 3)}):Play()
-            end
-        end
-    end
-end)
-
-AddPlaylistBtn.MouseButton1Click:Connect(function()
-    local idNum = tonumber(MusicInput.Text)
-    if idNum then table.insert(playlistIDs, idNum); updatePlaylistUI(); MusicStatus.Text = "Đã thêm ID " .. idNum else MusicStatus.Text = "ID không hợp lệ!" end
-end)
-
-LoopToggleBtn.MouseButton1Click:Connect(function()
-    isLoopEnabled = not isLoopEnabled
-    LoopToggleBtn.Text = isLoopEnabled and "LẶP LẠI: BẬT" or "LẶP LẠI: TẮT"
-    LoopToggleBtn.BackgroundColor3 = isLoopEnabled and Color3.fromRGB(0, 160, 80) or Color3.fromRGB(90, 60, 140)
-end)
-
 PlayMusicBtn.MouseButton1Click:Connect(function()
     local idNum = tonumber(MusicInput.Text)
-    if idNum then savedLastID = tostring(idNum); bgSound.SoundId = "rbxassetid://" .. idNum; bgSound:Play(); MusicStatus.Text = "Phát ID: " .. idNum else MusicStatus.Text = "ID không hợp lệ!" end
+    if idNum then bgSound.SoundId = "rbxassetid://" .. idNum; bgSound:Play() end
 end)
 
-StopMusicBtn.MouseButton1Click:Connect(function() bgSound:Stop(); MusicStatus.Text = "Đã dừng nhạc." end)
-BtnVolDown.MouseButton1Click:Connect(function() bgSound.Volume = math.clamp(bgSound.Volume - 0.1, 0, 1); MusicStatus.Text = "Vol: " .. math.floor(bgSound.Volume * 100 + 0.5) .."%" end)
-BtnVolUp.MouseButton1Click:Connect(function() bgSound.Volume = math.clamp(bgSound.Volume + 0.1, 0, 1); MusicStatus.Text = "Vol: " .. math.floor(bgSound.Volume * 100 + 0.5) .."%" end)
-
-bgSound.Ended:Connect(function()
-    if isLoopEnabled and bgSound.SoundId ~= "" then bgSound:Play(); return end
-    if #playlistIDs > 0 then playTrackAtIndex(currentPlaylistIndex + 1) end
-end)
+StopMusicBtn.MouseButton1Click:Connect(function() bgSound:Stop() end)
 
 -- TRANG 6: THÔNG TIN
 local titleP6 = Instance.new("TextLabel", P6)
@@ -957,7 +724,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống thông minh tự động.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Bổ sung: Đồng bộ Lắc Hông Low Cortisol + Nhạc Mặc Định 110919391228823 & Bảng Cortisol lơ lửng trên đầu."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Giữ nguyên Tab Âm nhạc/Lắc hông, xóa bảng chữ trên đầu và dán duy nhất hình ảnh Low Cortisol."
 
 -- CHUYỂN TAB
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
@@ -967,12 +734,11 @@ local function switchTab(index)
     for i, page in ipairs(pages) do
         page.Visible = (i == index)
         if i == index then
-            tabs[i].BackgroundColor3 = Color3.fromRGB(45, 50, 70)
-            tabs[i].TextColor3 = Color3.fromRGB(0, 220, 255)
+            tabs[i].BackgroundColor3 = Color3.fromRGB(0, 80, 50)
+            tabs[i].TextColor3 = Color3.fromRGB(0, 255, 150)
             tabs[i].UIStroke.Transparency = 0
-            if i == 5 and savedLastID ~= "" and MusicInput.Text == "" then MusicInput.Text = savedLastID end
         else
-            tabs[i].BackgroundColor3 = Color3.fromRGB(30, 32, 42)
+            tabs[i].BackgroundColor3 = Color3.fromRGB(25, 28, 38)
             tabs[i].TextColor3 = Color3.fromRGB(160, 175, 195)
             tabs[i].UIStroke.Transparency = 1
         end
@@ -987,11 +753,9 @@ Tab5.MouseButton1Click:Connect(function() switchTab(5) end)
 Tab6.MouseButton1Click:Connect(function() switchTab(6) end)
 switchTab(1)
 
--- ================= LOGIC CÀY CUỐC & BẢO VỆ CÁ HIẾM =================
-local isRunning = true
+-- ================= LOGIC CÀY CUỐC & BÁN CÁ =================
 local isServerDmgOn = true
 local isSellingFish = false
-local OriginalFishingSpotCFrame = nil 
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
@@ -1002,7 +766,11 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     if isRunning then
         AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (BẬT)"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-        if root then OriginalFishingSpotCFrame = root.CFrame end
+        if root then 
+            OriginalFishingSpotCFrame = root.CFrame 
+            root.Anchored = true
+            if hum then hum.WalkSpeed = 0 end
+        end
     else
         AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (TẮT)"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
@@ -1013,15 +781,6 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
             if root then root.Anchored = false end
             if hum then hum.WalkSpeed = 16 end
         end)
-        
-        if isAutoSkillOn then
-            isAutoSkillOn = false
-            AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
-            AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        end
-        MarkersGui.Enabled = false
-        ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
-        ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
     end
 end)
 
@@ -1096,25 +855,6 @@ local function clickBtn(keys)
     return false
 end
 
-local cachedDamageRemotes = {}
-local isRemoteSearched = false
-
-local function findAndCacheRemotes()
-    if isRemoteSearched then return end
-    isRemoteSearched = true
-    task.spawn(function()
-        for _, remote in pairs(game:GetDescendants()) do
-            if remote:IsA("RemoteEvent") or remote:IsA("UnreliableRemoteEvent") then
-                local rName = string.lower(remote.Name)
-                if rName:find("damage") or rName:find("hit") or rName:find("fish") or rName:find("catch") or rName:find("reel") or rName:find("progress") then
-                    table.insert(cachedDamageRemotes, remote)
-                end
-            end
-        end
-    end)
-end
-findAndCacheRemotes()
-
 local function solveMiniGameFast()
     local inset = GuiService:GetGuiInset()
     pcall(function()
@@ -1126,38 +866,12 @@ local function solveMiniGameFast()
                         pcall(function() obj.Size = UDim2.new(1, 0, obj.Size.Y.Scale, obj.Size.Y.Offset) end)
                     end
                 end
-                if n:find("minigame") or n:find("progress") or n:find("container") or n:find("bar") then
-                    for _, child in pairs(obj:GetDescendants()) do
-                        if child.Visible and (child:IsA("TextButton") or child:IsA("ImageButton") or child:IsA("Frame")) then
-                            local sz = child.AbsoluteSize
-                            local pos = child.AbsolutePosition
-                            if sz.X > 5 and sz.X < 300 and sz.Y > 5 and sz.Y < 300 then
-                                local cx = pos.X + sz.X / 2 + inset.X
-                                local cy = pos.Y + sz.Y / 2 + inset.Y
-                                VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
-                                task.wait(0.001)
-                                VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                            end
-                        end
-                    end
-                end
             end
         end
     end)
 end
 
-local function triggerServerDamageMultiplier()
-    pcall(function()
-        for _, remote in ipairs(cachedDamageRemotes) do
-            if remote and remote.Parent then
-                pcall(function() remote:FireServer(250) end)
-                pcall(function() remote:FireServer("damage", 250) end)
-                pcall(function() remote:FireServer(100) end)
-            end
-        end
-    end)
-end
-
+-- VÒNG LẶP CHÍNH
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(0.4)
@@ -1170,28 +884,21 @@ task.spawn(function()
                 
                 if not OriginalFishingSpotCFrame and not isSellingFish then OriginalFishingSpotCFrame = root.CFrame end
 
+                -- BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
-                    if isAutoSkillOn then
-                        isAutoSkillOn = false
-                        AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
-                        AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-                    end
-                    MarkersGui.Enabled = false
-                    ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
-                    ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
-
                     local vp = Workspace.CurrentCamera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
                     task.wait(0.08)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1)
                     task.wait(0.4)
 
-                    local dynamicMerchantPos = getMerchantPosition()
+                    root.Anchored = false
                     hum.WalkSpeed = 16
-                    root.Anchored = true
-                    
+                    task.wait(0.1)
+
+                    local dynamicMerchantPos = getMerchantPosition()
                     local dist = (root.Position - dynamicMerchantPos).Magnitude
                     local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 3))})
                     merchantTween:Play()
@@ -1211,15 +918,16 @@ task.spawn(function()
                         task.wait(1.0)
                     until getFishToSellCount() == 0 or not isRunning
 
-                    root.Anchored = true
-                    hum.WalkSpeed = 16
                     if OriginalFishingSpotCFrame then
+                        root.Anchored = false
+                        hum.WalkSpeed = 16
                         local dBack = (root.Position - OriginalFishingSpotCFrame.Position).Magnitude
                         local backTween = TweenService:Create(root, TweenInfo.new(dBack / 60, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
                         backTween:Play()
                         while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.1) end
                         root.CFrame = OriginalFishingSpotCFrame
                     end
+                    
                     isSellingFish = false 
                 end
 
@@ -1237,8 +945,6 @@ task.spawn(function()
                     task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game)
                     task.wait(0.5)
-                    activeTool = char and char:FindFirstChildOfClass("Tool")
-                    isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
                 end
 
                 if isHoldingRod and isRunning and not isSellingFish then
@@ -1253,15 +959,8 @@ task.spawn(function()
 
                     while tick() - aStart < 60 and isRunning and not isSellingFish and getFishToSellCount() <= initialFish do
                         solveMiniGameFast()
-                        if isServerDmgOn then triggerServerDamageMultiplier() end
                         task.wait(0.05)
                     end
-
-                    VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
-                    task.wait(0.05)
-                    VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1)
-                    task.wait(0.5)
-                    task.wait(5.0)
                 end
             end)
         end
