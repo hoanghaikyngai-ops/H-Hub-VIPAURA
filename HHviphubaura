@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - LOW CORTISOL IMAGE DISPLAY ON HEAD
+-- H-HUB VIPAURA - LOW CORTISOL IMAGE & DANCE EDITION
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -13,20 +13,17 @@ local SoundService = game:GetService("SoundService")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- 🛡️ Chống trùng lặp UI cũ
 pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
--- ================= GIAO DIỆN CHÍNH =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HHubVipUI"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 99999
 ScreenGui.Parent = PlayerGui
 
--- NÚT TOGGLE
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 46, 0, 46)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
@@ -45,7 +42,6 @@ local ToggleStroke = Instance.new("UIStroke", ToggleBtn)
 ToggleStroke.Color = Color3.fromRGB(0, 255, 128)
 ToggleStroke.Thickness = 2
 
--- BẢNG MENU CHÍNH
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0, 520, 0, 350)
 Main.Position = UDim2.new(0.5, -260, 0.5, -175)
@@ -59,7 +55,6 @@ local MainStroke = Instance.new("UIStroke", Main)
 MainStroke.Color = Color3.fromRGB(0, 255, 128)
 MainStroke.Thickness = 1.8
 
--- HIỆU ỨNG VIỀN PHÁT SÁNG NEON GREEN
 task.spawn(function()
     while ScreenGui.Parent do
         local tweenUp = TweenService:Create(MainStroke, TweenInfo.new(1.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
@@ -78,7 +73,6 @@ task.spawn(function()
     end
 end)
 
--- THANH TIÊU ĐỀ
 local TopBar = Instance.new("Frame", Main)
 TopBar.Size = UDim2.new(1, 0, 0, 38)
 TopBar.BackgroundTransparency = 1
@@ -86,7 +80,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [LOW CORTISOL IMAGE ON HEAD]"
+LogoText.Text = "🌿 H-HUB VIPAURA [LOW CORTISOL DANCE MODE]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 13
@@ -103,7 +97,6 @@ CloseBtn.TextSize = 14
 CloseBtn.MouseButton1Click:Connect(function() Main.Visible = false end)
 ToggleBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
 
--- KÉO THẢ BẢNG
 local dragging, dragStart, startPos
 Main.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -120,7 +113,6 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- THANH MENU TRÁI
 local MenuContainer = Instance.new("ScrollingFrame", Main)
 MenuContainer.Size = UDim2.new(0, 145, 1, -44)
 MenuContainer.Position = UDim2.new(0, 8, 0, 40)
@@ -181,7 +173,6 @@ local P5 = createPage()
 local P6 = createPage()
 P1.Visible = true
 
--- TRANG 1: DỊCH CHUYỂN
 local titleP1 = Instance.new("TextLabel", P1)
 titleP1.Size = UDim2.new(1, 0, 0, 20)
 titleP1.BackgroundTransparency = 1
@@ -213,7 +204,7 @@ local function simulateHeavyLagSpike(duration)
     end
 end
 
-local isRunning = true
+local isRunning = false
 local OriginalFishingSpotCFrame = nil 
 
 local function teleportAndRespawnAtIsland(targetPos)
@@ -273,7 +264,6 @@ for i, island in ipairs(Islands) do
     btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
 
--- TRANG 2: TỰ ĐỘNG CÂU
 local titleP2 = Instance.new("TextLabel", P2)
 titleP2.Size = UDim2.new(1, 0, 0, 20)
 titleP2.BackgroundTransparency = 1
@@ -286,24 +276,23 @@ titleP2.TextXAlignment = Enum.TextXAlignment.Left
 local AutoToggleBtn = Instance.new("TextButton", P2)
 AutoToggleBtn.Size = UDim2.new(1, 0, 0, 32)
 AutoToggleBtn.Position = UDim2.new(0, 0, 0, 25)
-AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 AutoToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoToggleBtn.Font = Enum.Font.GothamBold
 AutoToggleBtn.TextSize = 10
-AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (BẬT)"
+AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (TẮT)"
 Instance.new("UICorner", AutoToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local ServerDmgBtn = Instance.new("TextButton", P2)
 ServerDmgBtn.Size = UDim2.new(1, 0, 0, 32)
 ServerDmgBtn.Position = UDim2.new(0, 0, 0, 65)
-ServerDmgBtn.BackgroundColor3 = Color3.fromRGB(140, 0, 160)
+ServerDmgBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 ServerDmgBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ServerDmgBtn.Font = Enum.Font.GothamBold
 ServerDmgBtn.TextSize = 10
-ServerDmgBtn.Text = "SERVER X250 DAMAGE: BẬT"
+ServerDmgBtn.Text = "SERVER X250 DAMAGE: TẮT"
 Instance.new("UICorner", ServerDmgBtn).CornerRadius = UDim.new(0, 6)
 
--- TRANG 3: BÁN CÁ
 local titleP3 = Instance.new("TextLabel", P3)
 titleP3.Size = UDim2.new(1, 0, 0, 20)
 titleP3.BackgroundTransparency = 1
@@ -343,11 +332,10 @@ MaxFishCapBtn.MouseButton1Click:Connect(function()
     MaxFishCapBtn.Text = "NGƯỠNG BÁN: " .. maxFishCapacity .. " (ĐỔI)"
 end)
 
--- TRANG 4: KỸ NĂNG
 local titleP4 = Instance.new("TextLabel", P4)
 titleP4.Size = UDim2.new(1, 0, 0, 20)
 titleP4.BackgroundTransparency = 1
-titleP4.Text = "4 Tâm Ngắm & Khóa Vị Trí"
+titleP4.Text = "Cài đặt 4 Ô Kỹ Năng (Mobile)"
 titleP4.TextColor3 = Color3.fromRGB(0, 220, 255)
 titleP4.Font = Enum.Font.GothamBold
 titleP4.TextSize = 11
@@ -356,11 +344,11 @@ titleP4.TextXAlignment = Enum.TextXAlignment.Left
 local AutoSkillToggle = Instance.new("TextButton", P4)
 AutoSkillToggle.Size = UDim2.new(1, 0, 0, 28)
 AutoSkillToggle.Position = UDim2.new(0, 0, 0, 22)
-AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 AutoSkillToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoSkillToggle.Font = Enum.Font.GothamBold
 AutoSkillToggle.TextSize = 10
-AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): BẬT"
+AutoSkillToggle.Text = "SPAM CHIÊU (MOBILE): TẮT"
 Instance.new("UICorner", AutoSkillToggle).CornerRadius = UDim.new(0, 6)
 
 local ShowMarkersBtn = Instance.new("TextButton", P4)
@@ -370,7 +358,7 @@ ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
 ShowMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ShowMarkersBtn.Font = Enum.Font.GothamBold
 ShowMarkersBtn.TextSize = 9
-ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+ShowMarkersBtn.Text = "HIỆN 4 Ô KỸ NĂNG: TẮT"
 Instance.new("UICorner", ShowMarkersBtn).CornerRadius = UDim.new(0, 6)
 
 local LockMarkersBtn = Instance.new("TextButton", P4)
@@ -380,18 +368,20 @@ LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 LockMarkersBtn.Font = Enum.Font.GothamBold
 LockMarkersBtn.TextSize = 9
-LockMarkersBtn.Text = "KHÓA TÂM: MỞ"
+LockMarkersBtn.Text = "KHÓA Ô: MỞ"
 Instance.new("UICorner", LockMarkersBtn).CornerRadius = UDim.new(0, 6)
 
-local SkillStatus = Instance.new("TextLabel", P4)
-SkillStatus.Size = UDim2.new(1, 0, 0, 22)
-SkillStatus.Position = UDim2.new(0, 0, 0, 84)
-SkillStatus.BackgroundTransparency = 1
-SkillStatus.TextColor3 = Color3.fromRGB(180, 180, 200)
-SkillStatus.Font = Enum.Font.GothamSemibold
-SkillStatus.TextSize = 10
-SkillStatus.Text = "Trạng thái: Thả cần xong ổn định mới spam ZXCV!"
-SkillStatus.TextXAlignment = Enum.TextXAlignment.Left
+local GuideLabel = Instance.new("TextLabel", P4)
+GuideLabel.Size = UDim2.new(1, 0, 0, 110)
+GuideLabel.Position = UDim2.new(0, 0, 0, 88)
+GuideLabel.BackgroundTransparency = 1
+GuideLabel.TextColor3 = Color3.fromRGB(220, 220, 100)
+GuideLabel.Font = Enum.Font.Gotham
+GuideLabel.TextSize = 9.5
+GuideLabel.TextWrapped = true
+GuideLabel.TextXAlignment = Enum.TextXAlignment.Left
+GuideLabel.TextYAlignment = Enum.TextYAlignment.Top
+GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật nút 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định vị trí.\n4. Khi Auto Câu bật, hệ thống tự động chạm vào 4 ô này để xả chiêu!"
 
 local MarkersGui = Instance.new("ScreenGui")
 MarkersGui.Name = "SkillMarkersUI"
@@ -427,7 +417,7 @@ end
 
 ShowMarkersBtn.MouseButton1Click:Connect(function()
     MarkersGui.Enabled = not MarkersGui.Enabled
-    ShowMarkersBtn.Text = MarkersGui.Enabled and "HIỆN 4 VÒNG: BẬT" or "HIỆN 4 VÒNG: TẮT"
+    ShowMarkersBtn.Text = MarkersGui.Enabled and "HIỆN 4 Ô KỸ NĂNG: BẬT" or "HIỆN 4 Ô KỸ NĂNG: TẮT"
     ShowMarkersBtn.BackgroundColor3 = MarkersGui.Enabled and Color3.fromRGB(0, 180, 80) or Color3.fromRGB(0, 120, 180)
 end)
 
@@ -436,44 +426,38 @@ LockMarkersBtn.MouseButton1Click:Connect(function()
     isMarkersLocked = not isMarkersLocked
     for _, btn in ipairs(markerButtons) do btn.Draggable = not isMarkersLocked end
     if isMarkersLocked then
-        LockMarkersBtn.Text = "KHÓA TÂM: ĐÃ KHÓA 🔒"
+        LockMarkersBtn.Text = "KHÓA Ô: ĐÃ KHÓA 🔒"
         LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-        SkillStatus.Text = "Trạng thái: Vị trí tâm đã được cố định!"
     else
-        LockMarkersBtn.Text = "KHÓA TÂM: MỞ 🔓"
+        LockMarkersBtn.Text = "KHÓA Ô: MỞ 🔓"
         LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        SkillStatus.Text = "Trạng thái: Đang mở khóa kéo thả."
     end
 end)
 
-local isAutoSkillOn = true
+local isAutoSkillOn = false
 AutoSkillToggle.MouseButton1Click:Connect(function()
     isAutoSkillOn = not isAutoSkillOn
     if isAutoSkillOn then
-        AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): BẬT"
+        AutoSkillToggle.Text = "SPAM CHIÊU (MOBILE): BẬT"
         AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-        SkillStatus.Text = "Trạng thái: Đang hoạt động tự động!"
     else
-        AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
+        AutoSkillToggle.Text = "SPAM CHIÊU (MOBILE): TẮT"
         AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        SkillStatus.Text = "Trạng thái: Đã tắt"
         MarkersGui.Enabled = false
-        ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+        ShowMarkersBtn.Text = "HIỆN 4 Ô KỸ NĂNG: TẮT"
         ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
     end
 end)
 
--- TRANG 5: ÂM NHẠC & CÀI ĐẶT
 local titleP5 = Instance.new("TextLabel", P5)
 titleP5.Size = UDim2.new(1, 0, 0, 20)
 titleP5.BackgroundTransparency = 1
-titleP5.Text = "🎵 ÂM NHẠC & HIỂN THỊ CORTISOL"
+titleP5.Text = "🎵 NHẠC & CHẾ ĐỘ NHẢY LOW CORTISOL"
 titleP5.TextColor3 = Color3.fromRGB(0, 255, 150)
 titleP5.Font = Enum.Font.GothamBold
 titleP5.TextSize = 11
 titleP5.TextXAlignment = Enum.TextXAlignment.Left
 
--- SÓNG NHẠC VISUALIZER
 local VisualizerFrame = Instance.new("Frame", P5)
 VisualizerFrame.Size = UDim2.new(1, 0, 0, 16)
 VisualizerFrame.Position = UDim2.new(0, 0, 0, 22)
@@ -511,9 +495,6 @@ MusicInput.Font = Enum.Font.Gotham
 MusicInput.TextSize = 9
 Instance.new("UICorner", MusicInput).CornerRadius = UDim.new(0, 5)
 
-local savedLastID = ""
-MusicInput.FocusLost:Connect(function(enterPressed) if enterPressed then savedLastID = MusicInput.Text end end)
-
 local MusicRow = Instance.new("Frame", P5)
 MusicRow.Size = UDim2.new(1, 0, 0, 26)
 MusicRow.Position = UDim2.new(0, 0, 0, 100) 
@@ -538,7 +519,6 @@ StopMusicBtn.TextSize = 9
 StopMusicBtn.Text = "⏹ DỪNG"
 Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 5)
 
--- NÚT BẬT/TẮT ẢNH CORTISOL, CHỐNG TAY HÔNG & LẮC ĐỐI TRỌNG CHÂN/THÂN
 local ChillRow = Instance.new("Frame", P5)
 ChillRow.Size = UDim2.new(1, 0, 0, 28)
 ChillRow.Position = UDim2.new(0, 0, 0, 132)
@@ -546,11 +526,11 @@ ChillRow.BackgroundTransparency = 1
 
 local HipSwayToggleBtn = Instance.new("TextButton", ChillRow)
 HipSwayToggleBtn.Size = UDim2.new(1, 0, 1, 0)
-HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 HipSwayToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 HipSwayToggleBtn.Font = Enum.Font.GothamBold
 HipSwayToggleBtn.TextSize = 10
-HipSwayToggleBtn.Text = "💃 ẢNH ĐẦU + CHỐNG TAY HÔNG + CHÂN ĐỐI TRỌNG: BẬT"
+HipSwayToggleBtn.Text = "💃 BẬT NHẢY LẮC HÔNG & HIỆN ẢNH LOW CORTISOL: TẮT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local DEFAULT_SOUND_ID = "110919391228823"
@@ -561,7 +541,7 @@ bgSound.Looped = true
 bgSound.Volume = 1.0
 bgSound.Parent = SoundService
 
-local isHipSwayEnabled = true
+local isHipSwayEnabled = false
 local originalRootC0 = nil
 local originalLeftHipC0 = nil
 local originalRightHipC0 = nil
@@ -569,13 +549,15 @@ local originalLeftShoulderC0 = nil
 local originalRightShoulderC0 = nil
 local headBillboard = nil
 
--- 🎯 FIX LỖI MÀU GỐC ẢNH CORTISOL CHUẨN XÁC
 local function updateHeadBillboard()
     local char = LocalPlayer.Character
     local head = char and char:FindFirstChild("Head")
     
-    if not head or not isHipSwayEnabled then
-        if headBillboard then headBillboard:Destroy(); headBillboard = nil end
+    if not isHipSwayEnabled or not head then
+        if headBillboard then 
+            headBillboard:Destroy() 
+            headBillboard = nil 
+        end
         return
     end
     
@@ -584,7 +566,7 @@ local function updateHeadBillboard()
         
         headBillboard = Instance.new("BillboardGui")
         headBillboard.Name = "CortisolImageHeadBillboard"
-        headBillboard.Size = UDim2.new(0, 170, 0, 95)
+        headBillboard.Size = UDim2.new(0, 180, 0, 100)
         headBillboard.StudsOffset = Vector3.new(0, 3.5, 0)
         headBillboard.AlwaysOnTop = true
         headBillboard.Parent = head
@@ -602,15 +584,10 @@ local function updateHeadBillboard()
         cortisolImage.ImageColor3 = Color3.fromRGB(255, 255, 255)
         cortisolImage.ScaleType = Enum.ScaleType.Fit
         
-        if getcustomasset and isfile and isfile("LowCortisol.png") then
-            cortisolImage.Image = getcustomasset("LowCortisol.png")
-        else
-            cortisolImage.Image = "rbxassetid://13835613385"
-        end
+        -- Dùng tạm Asset ID chuẩn mô tả Cortisol Level để chắc chắn hiện ảnh đồng hồ đo
+        cortisolImage.Image = "rbxassetid://13835613385"
     end
 end
-
-updateHeadBillboard()
 
 DefaultMusicBtn.MouseButton1Click:Connect(function()
     bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
@@ -620,17 +597,17 @@ end)
 HipSwayToggleBtn.MouseButton1Click:Connect(function()
     isHipSwayEnabled = not isHipSwayEnabled
     if isHipSwayEnabled then
-        HipSwayToggleBtn.Text = "💃 ẢNH ĐẦU + CHỐNG TAY HÔNG + CHÂN ĐỐI TRỌNG: BẬT"
+        HipSwayToggleBtn.Text = "💃 BẬT NHẢY LẮC HÔNG & HIỆN ẢNH LOW CORTISOL: BẬT"
         HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
         if not bgSound.IsPlaying then bgSound:Play() end
+        updateHeadBillboard()
     else
-        HipSwayToggleBtn.Text = "💃 ẢNH ĐẦU + CHỐNG TAY HÔNG + CHÂN ĐỐI TRỌNG: TẮT"
+        HipSwayToggleBtn.Text = "💃 BẬT NHẢY LẮC HÔNG & HIỆN ẢNH LOW CORTISOL: TẮT"
         HipSwayToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+        updateHeadBillboard()
     end
-    updateHeadBillboard()
 end)
 
--- 💃 CHÂN ĐỐI TRỌNG NGƯỢC CHIỀN VỚI THÂN & TƯ THẾ CHỐNG HAI TAY VÀO HÔNG
 RunService.RenderStepped:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
@@ -651,32 +628,29 @@ RunService.RenderStepped:Connect(function()
             if rightShoulder and not originalRightShoulderC0 then originalRightShoulderC0 = rightShoulder.C0 end
             
             if isHipSwayEnabled then
-                local t = tick() * 3.0
-                local bodySwayX = math.sin(t) * 0.35
-                local bodySwayZ = math.sin(t) * 0.28
+                local t = tick() * 3.8
+                local bodySwayX = math.sin(t) * 0.55
+                local bodySwayZ = math.sin(t) * 0.42
                 
-                -- Thân lắc theo một nhịp
                 local swayCFrame = originalRootC0 * CFrame.new(bodySwayX, 0, 0) * CFrame.Angles(0, 0, bodySwayZ)
-                rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.25)
+                rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.3)
                 
-                -- Chân đối trọng ngược pha hoàn toàn với thân (Thân nghiêng trái -> Chân bẻ ngược phải)
                 if leftHip and originalLeftHipC0 then
-                    local legSwayL = originalLeftHipC0 * CFrame.Angles(-math.sin(t) * 0.25, 0, -math.sin(t) * 0.2)
-                    leftHip.C0 = leftHip.C0:Lerp(legSwayL, 0.25)
+                    local legSwayL = originalLeftHipC0 * CFrame.Angles(-math.sin(t) * 0.38, 0, -math.sin(t) * 0.3)
+                    leftHip.C0 = leftHip.C0:Lerp(legSwayL, 0.3)
                 end
                 if rightHip and originalRightHipC0 then
-                    local legSwayR = originalRightHipC0 * CFrame.Angles(math.sin(t) * 0.25, 0, math.sin(t) * 0.2)
-                    rightHip.C0 = rightHip.C0:Lerp(legSwayR, 0.25)
+                    local legSwayR = originalRightHipC0 * CFrame.Angles(math.sin(t) * 0.38, 0, math.sin(t) * 0.3)
+                    rightHip.C0 = rightHip.C0:Lerp(legSwayR, 0.3)
                 end
                 
-                -- Khóa tay chống vào hông (Gập khuỷu tay gọn gàng)
                 if leftShoulder and originalLeftShoulderC0 then
-                    local handsOnHipsL = originalLeftShoulderC0 * CFrame.new(-0.2, 0.1, -0.3) * CFrame.Angles(math.rad(45), math.rad(-15), math.rad(-30))
-                    leftShoulder.C0 = leftShoulder.C0:Lerp(handsOnHipsL, 0.25)
+                    local handsOnHipsL = originalLeftShoulderC0 * CFrame.new(-0.25, 0.15, -0.35) * CFrame.Angles(math.rad(50), math.rad(-20), math.rad(-35))
+                    leftShoulder.C0 = leftShoulder.C0:Lerp(handsOnHipsL, 0.3)
                 end
                 if rightShoulder and originalRightShoulderC0 then
-                    local handsOnHipsR = originalRightShoulderC0 * CFrame.new(0.2, 0.1, -0.3) * CFrame.Angles(math.rad(45), math.rad(15), math.rad(30))
-                    rightShoulder.C0 = rightShoulder.C0:Lerp(handsOnHipsR, 0.25)
+                    local handsOnHipsR = originalRightShoulderC0 * CFrame.new(0.25, 0.15, -0.35) * CFrame.Angles(math.rad(50), math.rad(20), math.rad(35))
+                    rightShoulder.C0 = rightShoulder.C0:Lerp(handsOnHipsR, 0.3)
                 end
             else
                 if originalRootC0 and rootJoint.C0 ~= originalRootC0 then rootJoint.C0 = rootJoint.C0:Lerp(originalRootC0, 0.2) end
@@ -696,7 +670,6 @@ end)
 
 StopMusicBtn.MouseButton1Click:Connect(function() bgSound:Stop() end)
 
--- TRANG 6: THÔNG TIN
 local titleP6 = Instance.new("TextLabel", P6)
 titleP6.Size = UDim2.new(1, 0, 1, 0)
 titleP6.BackgroundTransparency = 1
@@ -705,9 +678,8 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Chân lắc đối trọng ngược chiều thân + Chống hai tay vào hông cực chất."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Ảnh Low Cortisol chỉ hiển thị và đồng bộ ngay khi bấm nút bật Nhảy lắc hông."
 
--- CHUYỂN TAB
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
 
@@ -734,8 +706,7 @@ Tab5.MouseButton1Click:Connect(function() switchTab(5) end)
 Tab6.MouseButton1Click:Connect(function() switchTab(6) end)
 switchTab(1)
 
--- ================= LOGIC CÀY CUỐC & BÁN CÁ =================
-local isServerDmgOn = true
+local isServerDmgOn = false
 local isSellingFish = false
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
@@ -837,7 +808,6 @@ local function clickBtn(keys)
 end
 
 local function solveMiniGameFast()
-    local inset = GuiService:GetGuiInset()
     pcall(function()
         for _, obj in pairs(PlayerGui:GetDescendants()) do
             if obj and obj.Parent and not obj:IsDescendantOf(ScreenGui) and obj.Visible then
@@ -852,13 +822,12 @@ local function solveMiniGameFast()
     end)
 end
 
--- VÒNG LẶP CHÍNH CÂY CẤU & TỰ ĐỘNG CÂU (THẢ CẦN ỔN ĐỊNH TRƯỚC -> MỚI SPAM ZXCV SAU)
 task.spawn(function()
     local skillsList = {
-        {key = Enum.KeyCode.Z, index = 1, name = "Z"},
-        {key = Enum.KeyCode.X, index = 2, name = "X"},
-        {key = Enum.KeyCode.C, index = 3, name = "C"},
-        {key = Enum.KeyCode.V, index = 4, name = "V"}
+        {key = Enum.KeyCode.Z, index = 1},
+        {key = Enum.KeyCode.X, index = 2},
+        {key = Enum.KeyCode.C, index = 3},
+        {key = Enum.KeyCode.V, index = 4}
     }
 
     while ScreenGui.Parent do
@@ -872,7 +841,6 @@ task.spawn(function()
                 
                 if not OriginalFishingSpotCFrame and not isSellingFish then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
@@ -939,58 +907,48 @@ task.spawn(function()
                     local vp = Workspace.CurrentCamera.ViewportSize
                     pcall(function() activeTool:Activate() end)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
-                    task.wait(2.2) -- ⏱️ Dừng chờ hoàn tất thả cần trước
+                    task.wait(2.2)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
 
-                    -- BẮT ĐẦU VÒNG CHỜ CÂU VÀ KÍCH HOẠT SPAM ZXCV SAU KHI THẢ CẦN XONG
                     local initialFishCount = getFishToSellCount()
                     local aStart = tick()
 
                     while tick() - aStart < 60 and isRunning and not isSellingFish do
                         solveMiniGameFast()
                         
-                        -- SPAM Z, X, C, V SAU KHI ĐÃ HOÀN TẤT THẢ CẦN
                         if isAutoSkillOn then
                             pcall(function()
                                 for _, skill in ipairs(skillsList) do
                                     if not isAutoSkillOn or not isRunning or isSellingFish then break end
                                     
                                     VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                                    task.wait(0.04)
+                                    task.wait(0.12)
                                     VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
+                                    task.wait(0.15)
                                     
                                     local btn = markerButtons[skill.index]
                                     local inset = GuiService:GetGuiInset()
-                                    local finalX, finalY
-                                    
-                                    if btn then
+                                    if btn and MarkersGui.Enabled then
                                         local pos = btn.AbsolutePosition
                                         local sz = btn.AbsoluteSize
-                                        finalX = pos.X + sz.X / 2 + inset.X
-                                        finalY = pos.Y + sz.Y / 2 + inset.Y
-                                    else
-                                        local vps = Workspace.CurrentCamera.ViewportSize
-                                        finalX = vps.X / 2
-                                        finalY = vps.Y / 2
+                                        local finalX = pos.X + sz.X / 2 + inset.X
+                                        local finalY = pos.Y + sz.Y / 2 + inset.Y
+                                        
+                                        VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
+                                        task.wait(0.12)
+                                        VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
+                                        task.wait(0.15)
                                     end
-                                    
-                                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                                    task.wait(0.04)
-                                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
-                                    
-                                    SkillStatus.Text = "Đang dùng chiêu: " .. skill.name
                                 end
                             end)
                         end
                         
-                        -- NẾU NHẬN ĐƯỢC +1 CÁ THÌ TẠM NGƯNG SPAM CHIÊU 5 GIÂY (CẦN CÂU VẪN HOẠT ĐỘNG)
                         if getFishToSellCount() > initialFishCount then
-                            SkillStatus.Text = "Trạng thái: Đã nhận +1 cá! Ngưng spam chiêu 5 giây..."
                             task.wait(5)
                             break
                         end
                         
-                        task.wait(0.05)
+                        task.wait(0.2)
                     end
                 end
             end)
@@ -1005,5 +963,4 @@ LocalPlayer.CharacterAdded:Connect(function()
     originalRightHipC0 = nil
     originalLeftShoulderC0 = nil
     originalRightShoulderC0 = nil
-    if isHipSwayEnabled then updateHeadBillboard() end
 end)
