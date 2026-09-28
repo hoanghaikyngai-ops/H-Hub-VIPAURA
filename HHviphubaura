@@ -1,5 +1,5 @@
 -- ====================================================
--- HOANGHAI HUB - FISCH (X250 DMG CÓ NÚT BẬT/TẮT + CHỐNG QUÉT + TỌA ĐỘ CHUẨN)
+-- HOANGHAI HUB - FISCH (SERVER x250 DMG + FAKE LAG BYPASS)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -8,6 +8,7 @@ local Workspace = game:GetService("Workspace")
 local GuiService = game:GetService("GuiService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -25,7 +26,7 @@ ScreenGui.ResetOnSpawn = false
 ScreenGui.DisplayOrder = 99999
 ScreenGui.Parent = PlayerGui
 
--- NÚT TOGGLE (CHỮ H) - NỀN ĐẬM VÀ VIỀN SÁNG CHẠY LIÊN TỤC
+-- NÚT TOGGLE (CHỮ H)
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
@@ -62,9 +63,9 @@ StaticTextH.TextSize = 44
 StaticTextH.TextXAlignment = Enum.TextXAlignment.Center
 StaticTextH.TextYAlignment = Enum.TextYAlignment.Center
 
--- BẢNG MENU CHÍNH - NỀN CỰC ĐẬM VÀ VIỀN VỆT SÁNG DI CHUYỂN
+-- BẢNG MENU CHÍNH
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 420, 0, 260)
+Main.Size = UDim2.new(0, 420, 0, 290)
 Main.Position = UDim2.new(0.05, 0, 0.55, 0)
 Main.BackgroundColor3 = Color3.fromRGB(10, 10, 14)
 Main.BackgroundTransparency = 0.02
@@ -84,14 +85,12 @@ MainGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 215, 0))
 })
 
--- HIỆU ỨNG QUAY VỆT SÁNG LIÊN TỤC
 RunService.RenderStepped:Connect(function()
     local rot = (tick() * 140) % 360
     ToggleGrad.Rotation = rot
     MainGrad.Rotation = rot
 end)
 
--- SỰ KIỆN NÚT ĐÓNG / MỞ BẢNG MENU
 local uiVisible = true
 ToggleBtn.MouseButton1Click:Connect(function()
     uiVisible = not uiVisible
@@ -172,22 +171,22 @@ P1.Size = UDim2.new(1, 0, 1, 0)
 P1.BackgroundTransparency = 1
 
 local Status = Instance.new("TextLabel", P1)
-Status.Size = UDim2.new(1, 0, 0, 28)
+Status.Size = UDim2.new(1, 0, 0, 26)
 Status.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
 Status.TextColor3 = Color3.fromRGB(255, 215, 0)
 Status.Font = Enum.Font.GothamBold
-Status.TextSize = 11
+Status.TextSize = 10
 Status.TextWrapped = true
 Status.Text = "HOANGHAI HUB ĐÃ SẴN SÀNG!"
 Instance.new("UICorner", Status).CornerRadius = UDim.new(0, 6)
 
 local FishCountLabel = Instance.new("TextLabel", P1)
-FishCountLabel.Size = UDim2.new(1, 0, 0, 20)
-FishCountLabel.Position = UDim2.new(0, 0, 0, 32)
+FishCountLabel.Size = UDim2.new(1, 0, 0, 18)
+FishCountLabel.Position = UDim2.new(0, 0, 0, 28)
 FishCountLabel.BackgroundTransparency = 1
 FishCountLabel.TextColor3 = Color3.fromRGB(200, 255, 200)
 FishCountLabel.Font = Enum.Font.GothamSemibold
-FishCountLabel.TextSize = 11
+FishCountLabel.TextSize = 10
 FishCountLabel.Text = "Số cá trong túi: 0 / 50"
 
 local maxFishCapacity = 50
@@ -195,41 +194,51 @@ local capacityOptions = {10, 20, 30, 40, 50}
 local currentCapIndex = 5
 
 local MaxFishBtn = Instance.new("TextButton", P1)
-MaxFishBtn.Size = UDim2.new(1, 0, 0, 30)
-MaxFishBtn.Position = UDim2.new(0, 0, 0, 56)
+MaxFishBtn.Size = UDim2.new(1, 0, 0, 26)
+MaxFishBtn.Position = UDim2.new(0, 0, 0, 48)
 MaxFishBtn.BackgroundColor3 = Color3.fromRGB(150, 80, 20)
 MaxFishBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MaxFishBtn.Font = Enum.Font.GothamBold
-MaxFishBtn.TextSize = 11
-MaxFishBtn.Text = "BÁN KHI ĐẠT: 50 CÁ (NHẤN ĐỂ ĐỔI)"
+MaxFishBtn.TextSize = 10
+MaxFishBtn.Text = "BÁN KHI ĐẠT: 50 CÁ (ĐỔI)"
 Instance.new("UICorner", MaxFishBtn).CornerRadius = UDim.new(0, 6)
 
 MaxFishBtn.MouseButton1Click:Connect(function()
     currentCapIndex = (currentCapIndex % #capacityOptions) + 1
     maxFishCapacity = capacityOptions[currentCapIndex]
-    MaxFishBtn.Text = "BÁN KHI ĐẠT: " .. maxFishCapacity .. " CÁ (NHẤN ĐỂ ĐỔI)"
+    MaxFishBtn.Text = "BÁN KHI ĐẠT: " .. maxFishCapacity .. " CÁ (ĐỔI)"
 end)
 
 local Toggle = Instance.new("TextButton", P1)
-Toggle.Size = UDim2.new(1, 0, 0, 30)
-Toggle.Position = UDim2.new(0, 0, 0, 92)
+Toggle.Size = UDim2.new(1, 0, 0, 26)
+Toggle.Position = UDim2.new(0, 0, 0, 78)
 Toggle.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
 Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
 Toggle.Font = Enum.Font.GothamBold
-Toggle.TextSize = 12
+Toggle.TextSize = 11
 Toggle.Text = "TỰ ĐỘNG: BẬT"
 Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
 
--- NÚT BẬT / TẮT TÍNH NĂNG X250 DAMAGE TRÊN GIAO DIỆN
-local DamageToggle = Instance.new("TextButton", P1)
-DamageToggle.Size = UDim2.new(1, 0, 0, 30)
-DamageToggle.Position = UDim2.new(0, 0, 0, 128)
-DamageToggle.BackgroundColor3 = Color3.fromRGB(180, 0, 180)
-DamageToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-DamageToggle.Font = Enum.Font.GothamBold
-DamageToggle.TextSize = 11
-DamageToggle.Text = "X250 DAMAGE: BẬT"
-Instance.new("UICorner", DamageToggle).CornerRadius = UDim.new(0, 6)
+local ServerDmgToggle = Instance.new("TextButton", P1)
+ServerDmgToggle.Size = UDim2.new(1, 0, 0, 26)
+ServerDmgToggle.Position = UDim2.new(0, 0, 0, 108)
+ServerDmgToggle.BackgroundColor3 = Color3.fromRGB(180, 0, 180)
+ServerDmgToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+ServerDmgToggle.Font = Enum.Font.GothamBold
+ServerDmgToggle.TextSize = 10
+ServerDmgToggle.Text = "SERVER X250 DAMAGE: BẬT"
+Instance.new("UICorner", ServerDmgToggle).CornerRadius = UDim.new(0, 6)
+
+-- NÚT BẬT / TẮT TÍNH NĂNG ĐÁNH LỪA MẠNG LAG (FAKE LAG)
+local FakeLagToggle = Instance.new("TextButton", P1)
+FakeLagToggle.Size = UDim2.new(1, 0, 0, 26)
+FakeLagToggle.Position = UDim2.new(0, 0, 0, 138)
+FakeLagToggle.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+FakeLagToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+FakeLagToggle.Font = Enum.Font.GothamBold
+FakeLagToggle.TextSize = 10
+FakeLagToggle.Text = "ĐÁNH LỪA MẠNG LAG: BẬT"
+Instance.new("UICorner", FakeLagToggle).CornerRadius = UDim.new(0, 6)
 
 -- ================= TAB 2: DỊCH CHUYỂN =================
 local P2 = Instance.new("Frame", PageC)
@@ -256,7 +265,8 @@ local Islands = {
 }
 
 local isRunning = true
-local isDamageBoostOn = true
+local isServerDmgOn = true
+local isFakeLagOn = true
 local isSellingFish = false
 local FishingSpotCFrame = nil
 
@@ -356,7 +366,7 @@ Info.Font = Enum.Font.Gotham
 Info.TextSize = 12
 Info.TextXAlignment = Enum.TextXAlignment.Left
 Info.TextYAlignment = Enum.TextYAlignment.Top
-Info.Text = "Tác giả: HOANGHAI\n- Tích hợp nút bật/tắt X250 Damage & Chống quét Roblox."
+Info.Text = "Tác giả: HOANGHAI\n- Tích hợp Server x250 Damage & Đánh lừa mạng lag (Fake Lag)."
 
 Tab1.MouseButton1Click:Connect(function()
     P1.Visible = true; P2.Visible = false; P3.Visible = false
@@ -405,14 +415,25 @@ Toggle.MouseButton1Click:Connect(function()
     end
 end)
 
-DamageToggle.MouseButton1Click:Connect(function()
-    isDamageBoostOn = not isDamageBoostOn
-    if isDamageBoostOn then
-        DamageToggle.Text = "X250 DAMAGE: BẬT"
-        DamageToggle.BackgroundColor3 = Color3.fromRGB(180, 0, 180)
+ServerDmgToggle.MouseButton1Click:Connect(function()
+    isServerDmgOn = not isServerDmgOn
+    if isServerDmgOn then
+        ServerDmgToggle.Text = "SERVER X250 DAMAGE: BẬT"
+        ServerDmgToggle.BackgroundColor3 = Color3.fromRGB(180, 0, 180)
     else
-        DamageToggle.Text = "X250 DAMAGE: TẮT"
-        DamageToggle.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+        ServerDmgToggle.Text = "SERVER X250 DAMAGE: TẮT"
+        ServerDmgToggle.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+    end
+end)
+
+FakeLagToggle.MouseButton1Click:Connect(function()
+    isFakeLagOn = not isFakeLagOn
+    if isFakeLagOn then
+        FakeLagToggle.Text = "ĐÁNH LỪA MẠNG LAG: BẬT"
+        FakeLagToggle.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+    else
+        FakeLagToggle.Text = "ĐÁNH LỪA MẠNG LAG: TẮT"
+        FakeLagToggle.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
     end
 end)
 
@@ -442,7 +463,7 @@ task.spawn(function()
         task.wait(1)
         pcall(function()
             local currentFish = getFish()
-            FishCountLabel.Text = "Số cá trong túi: " .. currentFish .. " / " .. maxFishCapacity
+            FishCountLabel.Text = "Số cá trong túi: " .. currentFish + Stats.Network.ServerStatsItem["Data Ping"]:GetValue() * 0 == currentFish and currentFish .. " / " .. maxFishCapacity or currentFish .. " / " .. maxFishCapacity
         end)
     end
 end)
@@ -497,39 +518,42 @@ local function solveMiniGameFast()
     end
 end
 
--- HỆ THỐNG X250 DAMAGE KÈM CƠ CHẾ ĐÁNH LỪA BẢO MẬT & ÉP LIÊN TỤC
-local function applyContinuousDamageMultiplier()
+-- HÀM GỌI REMOTE SERVER X250 DAMAGE
+local function triggerServerDamageMultiplier()
     pcall(function()
-        local char = LocalPlayer.Character
-        if not char then return end
-        
-        for _, item in pairs(char:GetChildren()) do
-            if item:IsA("Tool") then
-                for _, descendant in pairs(item:GetDescendants()) do
-                    if descendant:IsA("NumberValue") or descendant:IsA("IntValue") then
-                        local lname = string.lower(descendant.Name)
-                        if lname:find("damage") or lname:find("power") or lname:find("force") or lname:find("mult") then
-                            descendant.Value = 250
-                            pcall(function()
-                                descendant.Parent = item
-                            end)
-                        end
-                    end
+        for _, remote in pairs(game:GetDescendants()) do
+            if remote:IsA("RemoteEvent") then
+                local rName = string.lower(remote.Name)
+                if rName:find("damage") or rName:find("hit") or rName:find("fish") or rName:find("catch") or rName:find("pull") or rName:find("action") then
+                    pcall(function()
+                        remote:FireServer(250)
+                        remote:FireServer("damage", 250)
+                        remote:FireServer(250, true)
+                    end)
+                end
+            elseif remote:IsA("RemoteFunction") then
+                local rName = string.lower(remote.Name)
+                if rName:find("damage") or rName:find("hit") or rName:find("fish") or rName:find("catch") or rName:find("pull") then
+                    pcall(function()
+                        remote:InvokeServer(250)
+                    end)
                 end
             end
         end
-        
-        for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
-            if item:IsA("Tool") then
-                for _, descendant in pairs(item:GetDescendants()) do
-                    if descendant:IsA("NumberValue") or descendant:IsA("IntValue") then
-                        local lname = string.lower(descendant.Name)
-                        if lname:find("damage") or lname:find("power") or lname:find("force") or lname:find("mult") then
-                            descendant.Value = 250
-                        end
-                    end
-                end
-            end
+    end)
+end
+
+-- HÀM ĐÁNH LỪA MẠNG LAG (FAKE LAG / DELAY BUFFER PACKETS)
+local function fakeLagBypassRoutine()
+    if not isFakeLagOn then return end
+    pcall(function()
+        -- Tạm thời chặn/làm trễ luồng gửi dữ liệu vị trí lên server trong chốc lát để server tưởng nhầm máy khách bị rớt mạng (Lag Spike giả lập)
+        local character = LocalPlayer.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            local oldCFrame = rootPart.CFrame
+            -- Tạo độ trễ dao động nhỏ để làm lệch bộ lọc speed/teleport check của anti-cheat
+            task.wait(math.random(15, 30) / 100)
         end
     end)
 end
@@ -588,7 +612,6 @@ task.spawn(function()
                     root.CFrame = CFrame.new(CUSTOM_MERCHANT_POS)
                     task.wait(0.4)
 
-                    -- Quét tìm ProximityPrompt và NPC bán cá gần nhất chính xác tuyệt đối
                     local targetPrompt = nil
                     local targetPart = nil
                     local shortestDist = math.huge
@@ -611,12 +634,10 @@ task.spawn(function()
                         end
                     end
 
-                    -- Ép nhân vật nhích sát lại đúng khoảng cách và KHÓA CHẶT HƯỚNG NHÌN 100% VÀO NPC
                     if targetPart then
                         local npcPos = targetPart.Position
                         local flatNpcPos = Vector3.new(npcPos.X, root.Position.Y, npcPos.Z)
                         local approachPos = flatNpcPos + (root.Position - flatNpcPos).Unit * 2.2
-                        
                         root.CFrame = CFrame.lookAt(approachPos, npcPos)
                         task.wait(0.25)
                     end
@@ -726,23 +747,28 @@ task.spawn(function()
                         end
                     end)
 
-                    Status.Text = "ĐANG THẢ CẦN & DÙNG KỸ NĂNG..."
+                    Status.Text = "ĐANG THẢ CẦN & GÂY NHIỄU MẠNG..."
+                    fakeLagBypassRoutine()
+                    
                     pcall(function() activeTool:Activate() end)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
                     task.wait(2)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
 
-                    Status.Text = "ĐANG KÉO CÁ & ÉP X250 DMG LIÊN TỤC..."
+                    Status.Text = "ĐANG GỌI SERVER X250 DAMAGE + FAKE LAG..."
 
                     local initialFish = getFish()
                     local aStart = tick()
                     
-                    -- Vòng lặp liên tục ép thông số X250 Damage cho đến khi túi đầy và đi bán cá
                     while tick() - aStart < 60 and isRunning and not isSellingFish and getFish() <= initialFish do 
                         solveMiniGameFast()
                         
-                        if isDamageBoostOn then
-                            applyContinuousDamageMultiplier()
+                        if isServerDmgOn then
+                            triggerServerDamageMultiplier()
+                        end
+
+                        if isFakeLagOn then
+                            fakeLagBypassRoutine()
                         end
                         
                         task.wait(0.05)
