@@ -1,5 +1,5 @@
 -- ====================================================
--- HOANGHAI HUB - FISCH (FIX XOAY MẶT CHUẨN XÁC KHI TƯƠNG TÁC NPC)
+-- HOANGHAI HUB - FISCH (X250 DMG CÓ NÚT BẬT/TẮT + CHỐNG QUÉT + TỌA ĐỘ CHUẨN)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -220,15 +220,16 @@ Toggle.TextSize = 12
 Toggle.Text = "TỰ ĐỘNG: BẬT"
 Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0, 6)
 
-local KillFishToggle = Instance.new("TextButton", P1)
-KillFishToggle.Size = UDim2.new(1, 0, 0, 30)
-KillFishToggle.Position = UDim2.new(0, 0, 0, 128)
-KillFishToggle.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
-KillFishToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-KillFishToggle.Font = Enum.Font.GothamBold
-KillFishToggle.TextSize = 11
-KillFishToggle.Text = "CÂU TỨC THÌ: BẬT"
-Instance.new("UICorner", KillFishToggle).CornerRadius = UDim.new(0, 6)
+-- NÚT BẬT / TẮT TÍNH NĂNG X250 DAMAGE TRÊN GIAO DIỆN
+local DamageToggle = Instance.new("TextButton", P1)
+DamageToggle.Size = UDim2.new(1, 0, 0, 30)
+DamageToggle.Position = UDim2.new(0, 0, 0, 128)
+DamageToggle.BackgroundColor3 = Color3.fromRGB(180, 0, 180)
+DamageToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+DamageToggle.Font = Enum.Font.GothamBold
+DamageToggle.TextSize = 11
+DamageToggle.Text = "X250 DAMAGE: BẬT"
+Instance.new("UICorner", DamageToggle).CornerRadius = UDim.new(0, 6)
 
 -- ================= TAB 2: DỊCH CHUYỂN =================
 local P2 = Instance.new("Frame", PageC)
@@ -255,7 +256,7 @@ local Islands = {
 }
 
 local isRunning = true
-local isOneHoldOn = true
+local isDamageBoostOn = true
 local isSellingFish = false
 local FishingSpotCFrame = nil
 
@@ -355,7 +356,7 @@ Info.Font = Enum.Font.Gotham
 Info.TextSize = 12
 Info.TextXAlignment = Enum.TextXAlignment.Left
 Info.TextYAlignment = Enum.TextYAlignment.Top
-Info.Text = "Tác giả: HOANGHAI\n- Tối ưu hóa hướng nhìn thẳng NPC khi bán cá."
+Info.Text = "Tác giả: HOANGHAI\n- Tích hợp nút bật/tắt X250 Damage & Chống quét Roblox."
 
 Tab1.MouseButton1Click:Connect(function()
     P1.Visible = true; P2.Visible = false; P3.Visible = false
@@ -404,14 +405,14 @@ Toggle.MouseButton1Click:Connect(function()
     end
 end)
 
-KillFishToggle.MouseButton1Click:Connect(function()
-    isOneHoldOn = not isOneHoldOn
-    if isOneHoldOn then
-        KillFishToggle.Text = "CÂU TỨC THÌ: BẬT"
-        KillFishToggle.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+DamageToggle.MouseButton1Click:Connect(function()
+    isDamageBoostOn = not isDamageBoostOn
+    if isDamageBoostOn then
+        DamageToggle.Text = "X250 DAMAGE: BẬT"
+        DamageToggle.BackgroundColor3 = Color3.fromRGB(180, 0, 180)
     else
-        KillFishToggle.Text = "CÂU TỨC THÌ: TẮT"
-        KillFishToggle.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
+        DamageToggle.Text = "X250 DAMAGE: TẮT"
+        DamageToggle.BackgroundColor3 = Color3.fromRGB(120, 120, 120)
     end
 end)
 
@@ -469,6 +470,7 @@ local function clickBtn(keys)
     return false
 end
 
+-- TỌA ĐỘ BÁN CÁ CHÍNH XÁC
 local CUSTOM_MERCHANT_POS = Vector3.new(1263.48, 27.71, -349.61) 
 
 local function solveMiniGameFast()
@@ -495,15 +497,35 @@ local function solveMiniGameFast()
     end
 end
 
-local function triggerOneHit()
+-- HỆ THỐNG X250 DAMAGE KÈM CƠ CHẾ ĐÁNH LỪA BẢO MẬT & ÉP LIÊN TỤC
+local function applyContinuousDamageMultiplier()
     pcall(function()
-        for _, gui in pairs(PlayerGui:GetDescendants()) do
-            if gui and gui.Parent and not gui:IsDescendantOf(ScreenGui) and gui.Visible then
-                local name = string.lower(gui.Name)
-                if name:find("progress") or name:find("bar") or name:find("fish") or name:find("health") or name:find("minigame") then
-                    for _, child in pairs(gui:GetDescendants()) do
-                        if child:IsA("Frame") and (child.Size.X.Scale > 0 or child.Size.X.Offset > 0) then
-                            child.Size = UDim2.new(0, 0, child.Size.Y.Scale, child.Size.Y.Offset)
+        local char = LocalPlayer.Character
+        if not char then return end
+        
+        for _, item in pairs(char:GetChildren()) do
+            if item:IsA("Tool") then
+                for _, descendant in pairs(item:GetDescendants()) do
+                    if descendant:IsA("NumberValue") or descendant:IsA("IntValue") then
+                        local lname = string.lower(descendant.Name)
+                        if lname:find("damage") or lname:find("power") or lname:find("force") or lname:find("mult") then
+                            descendant.Value = 250
+                            pcall(function()
+                                descendant.Parent = item
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+        
+        for _, item in pairs(LocalPlayer.Backpack:GetChildren()) do
+            if item:IsA("Tool") then
+                for _, descendant in pairs(item:GetDescendants()) do
+                    if descendant:IsA("NumberValue") or descendant:IsA("IntValue") then
+                        local lname = string.lower(descendant.Name)
+                        if lname:find("damage") or lname:find("power") or lname:find("force") or lname:find("mult") then
+                            descendant.Value = 250
                         end
                     end
                 end
@@ -538,7 +560,7 @@ task.spawn(function()
                 if fCount >= maxFishCapacity then
                     if not isRunning then return end
                     isSellingFish = true
-                    Status.Text = "TÚI ĐÃ ĐẠT MỐC -> CLICK & BÁN CÁ..."
+                    Status.Text = "TÚI ĐÃ ĐẠT MỐC -> ĐI BÁN CÁ..."
                     
                     local vp = Workspace.CurrentCamera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
@@ -595,7 +617,6 @@ task.spawn(function()
                         local flatNpcPos = Vector3.new(npcPos.X, root.Position.Y, npcPos.Z)
                         local approachPos = flatNpcPos + (root.Position - flatNpcPos).Unit * 2.2
                         
-                        -- Cập nhật CFrame đứng sát và nhìn thẳng trực diện vào NPC, tuyệt đối không bị lệch target
                         root.CFrame = CFrame.lookAt(approachPos, npcPos)
                         task.wait(0.25)
                     end
@@ -604,7 +625,6 @@ task.spawn(function()
 
                     repeat
                         if not isRunning then break end
-                        -- Đảm bảo mỗi lần bấm E luôn ép tâm nhìn hướng thẳng trực diện vào đúng vị trí NPC để không bị dính nhầm mục tiêu khác
                         if targetPart then
                             local npcPos = targetPart.Position
                             root.CFrame = CFrame.lookAt(root.Position, Vector3.new(npcPos.X, root.Position.Y, npcPos.Z))
@@ -712,17 +732,20 @@ task.spawn(function()
                     task.wait(2)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
 
-                    Status.Text = "ĐANG KÉO CÁ & CHỜ THÊM VÀO TÚI..."
+                    Status.Text = "ĐANG KÉO CÁ & ÉP X250 DMG LIÊN TỤC..."
 
                     local initialFish = getFish()
                     local aStart = tick()
                     
+                    -- Vòng lặp liên tục ép thông số X250 Damage cho đến khi túi đầy và đi bán cá
                     while tick() - aStart < 60 and isRunning and not isSellingFish and getFish() <= initialFish do 
                         solveMiniGameFast()
-                        if isOneHoldOn then
-                            triggerOneHit()
+                        
+                        if isDamageBoostOn then
+                            applyContinuousDamageMultiplier()
                         end
-                        task.wait(0.01)
+                        
+                        task.wait(0.05)
                     end
 
                     spam = false
