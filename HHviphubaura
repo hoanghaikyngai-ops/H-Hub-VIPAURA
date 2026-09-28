@@ -713,7 +713,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống thông minh tự động.\n- Tác giả: HOANGHAI\n- Hướng dẫn: Khi đi bán cá hoặc tắt tự động câu, hệ thống sẽ tự động ngắt spam và ẩn các vòng tâm ngắm để màn hình gọn gàng, không bị lỗi."
+titleP6.Text = "Hệ thống thông minh tự động.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Hướng dẫn: Khi đi bán cá hoặc tắt tự động câu, hệ thống sẽ tự động mở khóa chân, ngắt spam và ẩn các vòng tâm ngắm để màn hình gọn gàng, không bị lỗi."
 
 -- CHUYỂN TAB
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
@@ -751,15 +751,25 @@ local OriginalFishingSpotCFrame = nil
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+
     if isRunning then
         AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (BẬT)"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         if root then OriginalFishingSpotCFrame = root.CFrame end
     else
         AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (TẮT)"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        OriginalFishingSpotCFrame = nil; isSellingFish = false
+        OriginalFishingSpotCFrame = nil 
+        isSellingFish = false
+        
+        -- 🔓 MỞ KHÓA TRẠNG THÁI NHÂN VẬT NGAY LẬP TỨC KHI TẮT
+        pcall(function()
+            if root then root.Anchored = false end
+            if hum then hum.WalkSpeed = 16 end
+        end)
         
         -- TỰ ĐỘNG TẮT SPAM CHIÊU VÀ ẨN TÂM KHI TẮT CÂU
         if isAutoSkillOn then
