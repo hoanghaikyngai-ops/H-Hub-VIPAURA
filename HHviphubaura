@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - CHUẨN MẪU GIAO DIỆN + TAB ÂM NHẠC RIÊNG
+-- H-HUB VIPAURA - TỰ ĐỘNG ẨN TÂM KHI BÁN CÁ & TẮT CÂU
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -16,9 +16,10 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 -- 🛡️ Chống trùng lặp UI cũ
 pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
+    if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
--- ================= GIAO DIỆN CHÍNH =================
+-- ================= GIAO DIỆN CHÍNH (METALLIC & GLOW EFFECT) =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HHubVipUI"
 ScreenGui.ResetOnSpawn = false
@@ -27,69 +28,100 @@ ScreenGui.Parent = PlayerGui
 
 -- NÚT TOGGLE (MỞ/ĐÓNG BẢNG)
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
-ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
+ToggleBtn.Size = UDim2.new(0, 46, 0, 46)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 38, 48)
 ToggleBtn.BackgroundTransparency = 0.1
 ToggleBtn.Text = "H"
-ToggleBtn.TextColor3 = Color3.fromRGB(0, 220, 255)
+ToggleBtn.TextColor3 = Color3.fromRGB(150, 240, 255)
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextSize = 26
+ToggleBtn.TextSize = 22
 ToggleBtn.AutoButtonColor = false
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1, 0)
 
+local ToggleGradient = Instance.new("UIGradient", ToggleBtn)
+ToggleGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 90, 110)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(200, 220, 240)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 45, 55))
+})
+ToggleGradient.Rotation = 45
+
 local ToggleStroke = Instance.new("UIStroke", ToggleBtn)
 ToggleStroke.Color = Color3.fromRGB(0, 220, 255)
-ToggleStroke.Thickness = 2.5
+ToggleStroke.Thickness = 2
 
--- BẢNG MENU CHÍNH (CHUẨN MẪU ẢNH)
+-- BẢNG MENU CHÍNH
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 640, 0, 380)
-Main.Position = UDim2.new(0.5, -320, 0.5, -190)
-Main.BackgroundColor3 = Color3.fromRGB(16, 16, 24)
-Main.BackgroundTransparency = 0.05
+Main.Size = UDim2.new(0, 520, 0, 340)
+Main.Position = UDim2.new(0.5, -260, 0.5, -170)
+Main.BackgroundColor3 = Color3.fromRGB(24, 26, 34)
+Main.BackgroundTransparency = 0.03
 Main.BorderSizePixel = 0
 Main.Active = true
 Main.Visible = true
-Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+Main.ClipsDescendants = true
+local MainGradient = Instance.new("UIGradient", Main)
+MainGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 55, 70)),
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(25, 27, 36)),
+    ColorSequenceKeypoint.new(0.7, Color3.fromRGB(20, 22, 28)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(45, 50, 65))
+})
+MainGradient.Rotation = 35
 
 local MainStroke = Instance.new("UIStroke", Main)
-MainStroke.Color = Color3.fromRGB(70, 70, 100)
-MainStroke.Thickness = 1.5
+MainStroke.Color = Color3.fromRGB(0, 200, 255)
+MainStroke.Thickness = 1.8
 
--- THANH TIÊU ĐỀ (TOPBAR)
+-- HIỆU ỨNG VIỀN PHÁT SÁNG NHẤP NHÁY TUẦN HOÀN
+task.spawn(function()
+    while ScreenGui.Parent do
+        local tweenUp = TweenService:Create(MainStroke, TweenInfo.new(1.0, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
+            Transparency = 0,
+            Color = Color3.fromRGB(0, 255, 255)
+        })
+        tweenUp:Play()
+        task.wait(1.0)
+        
+        local tweenDown = TweenService:Create(MainStroke, TweenInfo.new(1.0, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
+            Transparency = 0.6,
+            Color = Color3.fromRGB(0, 120, 180)
+        })
+        tweenDown:Play()
+        task.wait(1.0)
+    end
+end)
+
+-- THANH TIÊU ĐỀ
 local TopBar = Instance.new("Frame", Main)
-TopBar.Size = UDim2.new(1, 0, 0, 42)
+TopBar.Size = UDim2.new(1, 0, 0, 38)
 TopBar.BackgroundTransparency = 1
 
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "  H-Hub VIPAURA"
-LogoText.TextColor3 = Color3.fromRGB(255, 255, 255)
+LogoText.Text = "  H-Hub VIPAURA [TỰ ẨN KHI ĐI BÁN CÁ]"
+LogoText.TextColor3 = Color3.fromRGB(220, 245, 255)
 LogoText.Font = Enum.Font.GothamBold
-LogoText.TextSize = 14
+LogoText.TextSize = 13
 LogoText.TextXAlignment = Enum.TextXAlignment.Center
 
--- Nút Đóng (X)
 local CloseBtn = Instance.new("TextButton", TopBar)
-CloseBtn.Size = UDim2.new(0, 32, 0, 32)
-CloseBtn.Position = UDim2.new(1, -38, 0, 5)
+CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+CloseBtn.Position = UDim2.new(1, -34, 0, 5)
 CloseBtn.BackgroundTransparency = 1
 CloseBtn.Text = "✕"
 CloseBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
 CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.TextSize = 16
+CloseBtn.TextSize = 14
 
-CloseBtn.MouseButton1Click:Connect(function()
-    Main.Visible = false
-end)
-
-ToggleBtn.MouseButton1Click:Connect(function()
-    Main.Visible = not Main.Visible
-end)
+CloseBtn.MouseButton1Click:Connect(function() Main.Visible = false end)
+ToggleBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
 
 -- KÉO THẢ BẢNG
 local dragging, dragStart, startPos
@@ -108,38 +140,37 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- THANH MENU TRÁI (TAB LIST)
+-- THANH MENU TRÁI (TAB)
 local MenuContainer = Instance.new("ScrollingFrame", Main)
-MenuContainer.Size = UDim2.new(0, 175, 1, -52)
-MenuContainer.Position = UDim2.new(0, 10, 0, 46)
+MenuContainer.Size = UDim2.new(0, 145, 1, -44)
+MenuContainer.Position = UDim2.new(0, 8, 0, 40)
 MenuContainer.BackgroundTransparency = 1
 MenuContainer.CanvasSize = UDim2.new(0, 0, 0, 260)
 MenuContainer.ScrollBarThickness = 2
 
 local MenuLayout = Instance.new("UIListLayout", MenuContainer)
 MenuLayout.SortOrder = Enum.SortOrder.LayoutOrder
-MenuLayout.Padding = UDim.new(0, 8)
+MenuLayout.Padding = UDim.new(0, 6)
 
--- KHUNG NỘI DUNG BÊN PHẢI (PAGES)
 local ContentContainer = Instance.new("Frame", Main)
-ContentContainer.Size = UDim2.new(1, -200, 1, -52)
-ContentContainer.Position = UDim2.new(0, 190, 0, 46)
+ContentContainer.Size = UDim2.new(1, -165, 1, -44)
+ContentContainer.Position = UDim2.new(0, 160, 0, 40)
 ContentContainer.BackgroundTransparency = 1
 
 local function createTabButton(name, order)
     local btn = Instance.new("TextButton", MenuContainer)
-    btn.Size = UDim2.new(1, -5, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(22, 22, 32)
-    btn.TextColor3 = Color3.fromRGB(160, 160, 180)
+    btn.Size = UDim2.new(1, -4, 0, 34)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 32, 42)
+    btn.TextColor3 = Color3.fromRGB(160, 175, 195)
     btn.Font = Enum.Font.GothamSemibold
     btn.Text = "   " .. name
-    btn.TextSize = 12
+    btn.TextSize = 11
     btn.TextXAlignment = Enum.TextXAlignment.Left
     btn.LayoutOrder = order
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     
     local stroke = Instance.new("UIStroke", btn)
-    stroke.Color = Color3.fromRGB(45, 45, 65)
+    stroke.Color = Color3.fromRGB(60, 70, 95)
     stroke.Thickness = 1
     stroke.Transparency = 1
     return btn
@@ -148,41 +179,41 @@ end
 local Tab1 = createTabButton("Dịch chuyển", 1)
 local Tab2 = createTabButton("Tự động câu", 2)
 local Tab3 = createTabButton("Bán cá", 3)
-local Tab4 = createTabButton("Thông tin", 4)
+local Tab4 = createTabButton("Kỹ năng ⚡", 4)
 local Tab5 = createTabButton("Âm nhạc 🎵", 5)
+local Tab6 = createTabButton("Thông tin", 6)
 
--- ================= KHỞI TẠO CÁC TRANG (PAGES) =================
 local function createPage()
     local p = Instance.new("ScrollingFrame", ContentContainer)
     p.Size = UDim2.new(1, 0, 1, 0)
     p.BackgroundTransparency = 1
-    p.CanvasSize = UDim2.new(0, 0, 0, 350)
+    p.CanvasSize = UDim2.new(0, 0, 0, 340)
     p.ScrollBarThickness = 3
     p.Visible = false
     return p
 end
 
-local P1 = createPage() -- Dịch chuyển
-local P2 = createPage() -- Tự động câu
-local P3 = createPage() -- Bán cá
-local P4 = createPage() -- Thông tin
-local P5 = createPage() -- Âm nhạc
-
+local P1 = createPage()
+local P2 = createPage()
+local P3 = createPage()
+local P4 = createPage()
+local P5 = createPage()
+local P6 = createPage()
 P1.Visible = true
 
--- ---------------- TRANG 1: DỊCH CHUYỂN ----------------
+-- TRANG 1: DỊCH CHUYỂN
 local titleP1 = Instance.new("TextLabel", P1)
-titleP1.Size = UDim2.new(1, 0, 0, 24)
+titleP1.Size = UDim2.new(1, 0, 0, 20)
 titleP1.BackgroundTransparency = 1
 titleP1.Text = "Vị trí phổ biến"
 titleP1.TextColor3 = Color3.fromRGB(220, 220, 240)
 titleP1.Font = Enum.Font.GothamBold
-titleP1.TextSize = 12
+titleP1.TextSize = 11
 titleP1.TextXAlignment = Enum.TextXAlignment.Left
 
 local gridP1 = Instance.new("UIGridLayout", P1)
-gridP1.CellSize = UDim2.new(0, 98, 0, 36)
-gridP1.CellPadding = UDim2.new(0, 8, 0, 8)
+gridP1.CellSize = UDim2.new(0, 82, 0, 32)
+gridP1.CellPadding = UDim2.new(0, 6, 0, 6)
 gridP1.SortOrder = Enum.SortOrder.LayoutOrder
 
 local Islands = {
@@ -240,78 +271,75 @@ end
 
 for i, island in ipairs(Islands) do
     local btn = Instance.new("TextButton", P1)
-    btn.BackgroundColor3 = Color3.fromRGB(24, 24, 35)
+    btn.BackgroundColor3 = Color3.fromRGB(32, 35, 45)
     btn.TextColor3 = Color3.fromRGB(220, 220, 220)
     btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 10
+    btn.TextSize = 9
     btn.Text = island.Name
     btn.LayoutOrder = i
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    
-    btn.MouseButton1Click:Connect(function()
-        task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end)
-    end)
+    btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
 
--- ---------------- TRANG 2: TỰ ĐỘNG CÂU ----------------
+-- TRANG 2: TỰ ĐỘNG CÂU
 local titleP2 = Instance.new("TextLabel", P2)
-titleP2.Size = UDim2.new(1, 0, 0, 24)
+titleP2.Size = UDim2.new(1, 0, 0, 20)
 titleP2.BackgroundTransparency = 1
 titleP2.Text = "Hệ thống Cày Cuốc & Tự Động"
 titleP2.TextColor3 = Color3.fromRGB(220, 220, 240)
 titleP2.Font = Enum.Font.GothamBold
-titleP2.TextSize = 12
+titleP2.TextSize = 11
 titleP2.TextXAlignment = Enum.TextXAlignment.Left
 
 local AutoToggleBtn = Instance.new("TextButton", P2)
-AutoToggleBtn.Size = UDim2.new(1, 0, 0, 35)
-AutoToggleBtn.Position = UDim2.new(0, 0, 0, 30)
+AutoToggleBtn.Size = UDim2.new(1, 0, 0, 32)
+AutoToggleBtn.Position = UDim2.new(0, 0, 0, 25)
 AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
 AutoToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoToggleBtn.Font = Enum.Font.GothamBold
-AutoToggleBtn.TextSize = 11
+AutoToggleBtn.TextSize = 10
 AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (BẬT)"
-Instance.new("UICorner", AutoToggleBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", AutoToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local ServerDmgBtn = Instance.new("TextButton", P2)
-ServerDmgBtn.Size = UDim2.new(1, 0, 0, 35)
-ServerDmgBtn.Position = UDim2.new(0, 0, 0, 75)
+ServerDmgBtn.Size = UDim2.new(1, 0, 0, 32)
+ServerDmgBtn.Position = UDim2.new(0, 0, 0, 65)
 ServerDmgBtn.BackgroundColor3 = Color3.fromRGB(140, 0, 160)
 ServerDmgBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ServerDmgBtn.Font = Enum.Font.GothamBold
-ServerDmgBtn.TextSize = 11
+ServerDmgBtn.TextSize = 10
 ServerDmgBtn.Text = "SERVER X250 DAMAGE: BẬT"
-Instance.new("UICorner", ServerDmgBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", ServerDmgBtn).CornerRadius = UDim.new(0, 6)
 
--- ---------------- TRANG 3: BÁN CÁ ----------------
+-- TRANG 3: BÁN CÁ
 local titleP3 = Instance.new("TextLabel", P3)
-titleP3.Size = UDim2.new(1, 0, 0, 24)
+titleP3.Size = UDim2.new(1, 0, 0, 20)
 titleP3.BackgroundTransparency = 1
-titleP3.Text = "Cài đặt tự động bán"
+titleP3.Text = "Cài đặt tự động bán (Giữ cá hiếm)"
 titleP3.TextColor3 = Color3.fromRGB(220, 220, 240)
 titleP3.Font = Enum.Font.GothamBold
-titleP3.TextSize = 12
+titleP3.TextSize = 11
 titleP3.TextXAlignment = Enum.TextXAlignment.Left
 
 local FishStatus = Instance.new("TextLabel", P3)
-FishStatus.Size = UDim2.new(1, 0, 0, 30)
-FishStatus.Position = UDim2.new(0, 0, 0, 30)
+FishStatus.Size = UDim2.new(1, 0, 0, 26)
+FishStatus.Position = UDim2.new(0, 0, 0, 25)
 FishStatus.BackgroundTransparency = 1
 FishStatus.TextColor3 = Color3.fromRGB(0, 255, 200)
 FishStatus.Font = Enum.Font.GothamSemibold
-FishStatus.TextSize = 11
-FishStatus.Text = "Số cá trong túi: 0 / 50"
+FishStatus.TextSize = 10
+FishStatus.Text = "Cá cần bán: 0 / Ngưỡng: 50"
 FishStatus.TextXAlignment = Enum.TextXAlignment.Left
 
 local MaxFishCapBtn = Instance.new("TextButton", P3)
-MaxFishCapBtn.Size = UDim2.new(1, 0, 0, 35)
-MaxFishCapBtn.Position = UDim2.new(0, 0, 0, 70)
+MaxFishCapBtn.Size = UDim2.new(1, 0, 0, 32)
+MaxFishCapBtn.Position = UDim2.new(0, 0, 0, 60)
 MaxFishCapBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
 MaxFishCapBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 MaxFishCapBtn.Font = Enum.Font.GothamBold
-MaxFishCapBtn.TextSize = 11
-MaxFishCapBtn.Text = "NGƯỠNG BÁN: 50 CÁ (NHẤN ĐỂ ĐỔI)"
-Instance.new("UICorner", MaxFishCapBtn).CornerRadius = UDim.new(0, 8)
+MaxFishCapBtn.TextSize = 10
+MaxFishCapBtn.Text = "NGƯỠNG BÁN: 50 (ĐỔI)"
+Instance.new("UICorner", MaxFishCapBtn).CornerRadius = UDim.new(0, 6)
 
 local maxFishCapacity = 50
 local capacityOptions = {10, 20, 30, 40, 50}
@@ -320,140 +348,388 @@ local currentCapIndex = 5
 MaxFishCapBtn.MouseButton1Click:Connect(function()
     currentCapIndex = (currentCapIndex % #capacityOptions) + 1
     maxFishCapacity = capacityOptions[currentCapIndex]
-    MaxFishCapBtn.Text = "NGƯỠNG BÁN: " .. maxFishCapacity .. " CÁ (NHẤN ĐỂ ĐỔI)"
+    MaxFishCapBtn.Text = "NGƯỠNG BÁN: " .. maxFishCapacity .. " (ĐỔI)"
 end)
 
--- ---------------- TRANG 4: THÔNG TIN ----------------
+-- ---------------- TRANG 4: 4 TÂM NGẮM + NÚT KHÓA + TỰ ẨN KHI TẮT/BÁN ----------------
 local titleP4 = Instance.new("TextLabel", P4)
-titleP4.Size = UDim2.new(1, 0, 1, 0)
+titleP4.Size = UDim2.new(1, 0, 0, 20)
 titleP4.BackgroundTransparency = 1
-titleP4.TextColor3 = Color3.fromRGB(200, 200, 220)
-titleP4.Font = Enum.Font.Gotham
-titleP4.TextSize = 12
+titleP4.Text = "4 Tâm Ngắm & Khóa Vị Trí"
+titleP4.TextColor3 = Color3.fromRGB(0, 220, 255)
+titleP4.Font = Enum.Font.GothamBold
+titleP4.TextSize = 11
 titleP4.TextXAlignment = Enum.TextXAlignment.Left
-titleP4.TextYAlignment = Enum.TextYAlignment.Top
-titleP4.Text = "Giao diện H-Hub VIPAURA chuẩn mẫu.\n- Tác giả: HOANGHAI\n- Hỗ trợ câu cá tự động, né quét, x250 Damage và nghe nhạc trực tuyến."
 
--- ---------------- TRANG 5: ÂM NHẠC (TÍCH HỢP ĐÚNG YÊU CẦU) ----------------
+local AutoSkillToggle = Instance.new("TextButton", P4)
+AutoSkillToggle.Size = UDim2.new(1, 0, 0, 28)
+AutoSkillToggle.Position = UDim2.new(0, 0, 0, 22)
+AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+AutoSkillToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoSkillToggle.Font = Enum.Font.GothamBold
+AutoSkillToggle.TextSize = 10
+AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
+Instance.new("UICorner", AutoSkillToggle).CornerRadius = UDim.new(0, 6)
+
+local ShowMarkersBtn = Instance.new("TextButton", P4)
+ShowMarkersBtn.Size = UDim2.new(0.48, 0, 0, 26)
+ShowMarkersBtn.Position = UDim2.new(0, 0, 0, 54)
+ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
+ShowMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ShowMarkersBtn.Font = Enum.Font.GothamBold
+ShowMarkersBtn.TextSize = 9
+ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+Instance.new("UICorner", ShowMarkersBtn).CornerRadius = UDim.new(0, 6)
+
+-- NÚT KHÓA / MỞ KHÓA VỊ TRÍ TÂM NGẮM
+local LockMarkersBtn = Instance.new("TextButton", P4)
+LockMarkersBtn.Size = UDim2.new(0.48, 0, 0, 26)
+LockMarkersBtn.Position = UDim2.new(0.52, 0, 0, 54)
+LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LockMarkersBtn.Font = Enum.Font.GothamBold
+LockMarkersBtn.TextSize = 9
+LockMarkersBtn.Text = "KHÓA TÂM: MỞ"
+Instance.new("UICorner", LockMarkersBtn).CornerRadius = UDim.new(0, 6)
+
+local SkillStatus = Instance.new("TextLabel", P4)
+SkillStatus.Size = UDim2.new(1, 0, 0, 22)
+SkillStatus.Position = UDim2.new(0, 0, 0, 84)
+SkillStatus.BackgroundTransparency = 1
+SkillStatus.TextColor3 = Color3.fromRGB(180, 180, 200)
+SkillStatus.Font = Enum.Font.GothamSemibold
+SkillStatus.TextSize = 10
+SkillStatus.Text = "Trạng thái: Chưa bật tâm"
+SkillStatus.TextXAlignment = Enum.TextXAlignment.Left
+
+-- TẠO 4 GUI TÂM NGẮM RIÊNG BIỆT (Z, X, C, V)
+local MarkersGui = Instance.new("ScreenGui")
+MarkersGui.Name = "SkillMarkersUI"
+MarkersGui.ResetOnSpawn = false
+MarkersGui.DisplayOrder = 10000
+MarkersGui.Parent = PlayerGui
+MarkersGui.Enabled = false
+
+local markerColors = {Color3.fromRGB(255, 50, 50), Color3.fromRGB(50, 255, 50), Color3.fromRGB(50, 150, 255), Color3.fromRGB(255, 200, 0)}
+local markerNames = {"Z", "X", "C", "V"}
+local markerButtons = {}
+
+for i = 1, 4 do
+    local mBtn = Instance.new("TextButton", MarkersGui)
+    mBtn.Size = UDim2.new(0, 38, 0, 38)
+    mBtn.Position = UDim2.new(0.6 + (i * 0.08), 0, 0.5, 0)
+    mBtn.BackgroundColor3 = markerColors[i]
+    mBtn.BackgroundTransparency = 0.3
+    mBtn.Text = markerNames[i]
+    mBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    mBtn.TextSize = 16
+    mBtn.Font = Enum.Font.GothamBold
+    mBtn.Active = true
+    mBtn.Draggable = true
+    Instance.new("UICorner", mBtn).CornerRadius = UDim.new(1, 0)
+    local stroke = Instance.new("UIStroke", mBtn)
+    stroke.Color = Color3.fromRGB(255, 255, 255)
+    stroke.Thickness = 2
+    table.insert(markerButtons, mBtn)
+end
+
+ShowMarkersBtn.MouseButton1Click:Connect(function()
+    MarkersGui.Enabled = not MarkersGui.Enabled
+    if MarkersGui.Enabled then
+        ShowMarkersBtn.Text = "HIỆN 4 VÒNG: BẬT"
+        ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 80)
+    else
+        ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+        ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
+    end
+end)
+
+local isMarkersLocked = false
+LockMarkersBtn.MouseButton1Click:Connect(function()
+    isMarkersLocked = not isMarkersLocked
+    for _, btn in ipairs(markerButtons) do
+        btn.Draggable = not isMarkersLocked
+    end
+    if isMarkersLocked then
+        LockMarkersBtn.Text = "KHÓA TÂM: ĐÃ KHÓA 🔒"
+        LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+        SkillStatus.Text = "Trạng thái: Vị trí tâm đã được cố định!"
+    else
+        LockMarkersBtn.Text = "KHÓA TÂM: MỞ 🔓"
+        LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+        SkillStatus.Text = "Trạng thái: Đang mở khóa kéo thả."
+    end
+end)
+
+local isAutoSkillOn = false
+AutoSkillToggle.MouseButton1Click:Connect(function()
+    isAutoSkillOn = not isAutoSkillOn
+    if isAutoSkillOn then
+        AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): BẬT"
+        AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
+        SkillStatus.Text = "Trạng thái: Đang chạy vòng lặp 4 chiêu (2s/chiêu)..."
+    else
+        AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
+        AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+        SkillStatus.Text = "Trạng thái: Đã tắt"
+        MarkersGui.Enabled = false
+        ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+        ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
+    end
+end)
+
+-- THỰC THI 4 CHIÊU TUẦN TỰ + NGHỈ 2 GIÂY MỖI VÒNG CLICK
+task.spawn(function()
+    local skillsList = {
+        {key = Enum.KeyCode.Z, index = 1, name = "Z"},
+        {key = Enum.KeyCode.X, index = 2, name = "X"},
+        {key = Enum.KeyCode.C, index = 3, name = "C"},
+        {key = Enum.KeyCode.V, index = 4, name = "V"}
+    }
+    
+    while ScreenGui.Parent do
+        task.wait(0.2)
+        if isAutoSkillOn then
+            pcall(function()
+                for _, skill in ipairs(skillsList) do
+                    if not isAutoSkillOn then break end
+                    
+                    VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
+                    task.wait(0.04)
+                    VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
+                    
+                    local btn = markerButtons[skill.index]
+                    local inset = GuiService:GetGuiInset()
+                    local finalX, finalY
+                    
+                    if btn then
+                        local pos = btn.AbsolutePosition
+                        local sz = btn.AbsoluteSize
+                        finalX = pos.X + sz.X / 2 + inset.X
+                        finalY = pos.Y + sz.Y / 2 + inset.Y
+                    else
+                        local vp = Workspace.CurrentCamera.ViewportSize
+                        finalX = vp.X / 2
+                        finalY = vp.Y / 2
+                    end
+                    
+                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
+                    task.wait(0.04)
+                    VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
+                    
+                    SkillStatus.Text = "Đang dùng chiêu: " .. skill.name .. " -> Chờ 2 giây..."
+                    
+                    local waitStart = tick()
+                    while tick() - waitStart < 2.0 and isAutoSkillOn do
+                        task.wait(0.1)
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- TRANG 5: ÂM NHẠC
 local titleP5 = Instance.new("TextLabel", P5)
-titleP5.Size = UDim2.new(1, 0, 0, 24)
+titleP5.Size = UDim2.new(1, 0, 0, 20)
 titleP5.BackgroundTransparency = 1
-titleP5.Text = "Hệ thống Phát Nhạc Trực Tuyến"
+titleP5.Text = "Hệ thống Nhạc & Playlist"
 titleP5.TextColor3 = Color3.fromRGB(0, 220, 255)
 titleP5.Font = Enum.Font.GothamBold
-titleP5.TextSize = 12
+titleP5.TextSize = 11
 titleP5.TextXAlignment = Enum.TextXAlignment.Left
 
 local MusicInput = Instance.new("TextBox", P5)
-MusicInput.Size = UDim2.new(1, 0, 0, 32)
-MusicInput.Position = UDim2.new(0, 0, 0, 30)
-MusicInput.BackgroundColor3 = Color3.fromRGB(22, 22, 32)
+MusicInput.Size = UDim2.new(1, 0, 0, 26)
+MusicInput.Position = UDim2.new(0, 0, 0, 22)
+MusicInput.BackgroundColor3 = Color3.fromRGB(30, 32, 42)
 MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255)
-MusicInput.PlaceholderText = "Nhập Sound ID Roblox (VD: 1848354536)..."
+MusicInput.PlaceholderText = "Nhập Sound ID..."
 MusicInput.Font = Enum.Font.Gotham
-MusicInput.TextSize = 11
-Instance.new("UICorner", MusicInput).CornerRadius = UDim.new(0, 8)
+MusicInput.TextSize = 10
+Instance.new("UICorner", MusicInput).CornerRadius = UDim.new(0, 6)
 
--- KHUNG VÀ NÚT VOLUME (ĐÃ TÍCH HỢP THEO MÃ CỦA BẠN)
+local savedLastID = ""
+MusicInput.FocusLost:Connect(function(enterPressed) if enterPressed then savedLastID = MusicInput.Text end end)
+
 local MusicRow = Instance.new("Frame", P5)
-MusicRow.Size = UDim2.new(1, 0, 0, 32)
-MusicRow.Position = UDim2.new(0, 0, 0, 72) 
+MusicRow.Size = UDim2.new(1, 0, 0, 26)
+MusicRow.Position = UDim2.new(0, 0, 0, 52) 
 MusicRow.BackgroundTransparency = 1
 
 local BtnVolDown = Instance.new("TextButton", MusicRow)
-BtnVolDown.Size = UDim2.new(0, 32, 1, 0)
-BtnVolDown.Position = UDim2.new(0, 0, 0, 0)
-BtnVolDown.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+BtnVolDown.Size = UDim2.new(0, 26, 1, 0)
+BtnVolDown.BackgroundColor3 = Color3.fromRGB(40, 45, 60)
 BtnVolDown.Text = "🔉"
 BtnVolDown.TextColor3 = Color3.fromRGB(0, 255, 255)
-BtnVolDown.Font = Enum.Font.SourceSansBold
-Instance.new("UICorner", BtnVolDown).CornerRadius = UDim.new(0, 6)
+Instance.new("UICorner", BtnVolDown).CornerRadius = UDim.new(0, 5)
 
 local BtnVolUp = Instance.new("TextButton", MusicRow)
-BtnVolUp.Size = UDim2.new(0, 32, 1, 0)
-BtnVolUp.Position = UDim2.new(1, -32, 0, 0)
-BtnVolUp.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+BtnVolUp.Size = UDim2.new(0, 26, 1, 0)
+BtnVolUp.Position = UDim2.new(1, -26, 0, 0)
+BtnVolUp.BackgroundColor3 = Color3.fromRGB(40, 45, 60)
 BtnVolUp.Text = "🔊"
 BtnVolUp.TextColor3 = Color3.fromRGB(0, 255, 255)
-BtnVolUp.Font = Enum.Font.SourceSansBold
-Instance.new("UICorner", BtnVolUp).CornerRadius = UDim.new(0, 6)
+Instance.new("UICorner", BtnVolUp).CornerRadius = UDim.new(0, 5)
 
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
-PlayMusicBtn.Size = UDim2.new(0.5, -40, 1, 0)
-PlayMusicBtn.Position = UDim2.new(0, 38, 0, 0)
+PlayMusicBtn.Size = UDim2.new(0.5, -30, 1, 0)
+PlayMusicBtn.Position = UDim2.new(0, 30, 0, 0)
 PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
 PlayMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 PlayMusicBtn.Font = Enum.Font.GothamBold
-PlayMusicBtn.TextSize = 10
-PlayMusicBtn.Text = "PHÁT NHẠC"
-Instance.new("UICorner", PlayMusicBtn).CornerRadius = UDim.new(0, 6)
+PlayMusicBtn.TextSize = 9
+PlayMusicBtn.Text = "PHÁT ID"
+Instance.new("UICorner", PlayMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local StopMusicBtn = Instance.new("TextButton", MusicRow)
-StopMusicBtn.Size = UDim2.new(0.5, -40, 1, 0)
-StopMusicBtn.Position = UDim2.new(0.5, 6, 0, 0)
+StopMusicBtn.Size = UDim2.new(0.5, -30, 1, 0)
+StopMusicBtn.Position = UDim2.new(0.5, 2, 0, 0)
 StopMusicBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 StopMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 StopMusicBtn.Font = Enum.Font.GothamBold
-StopMusicBtn.TextSize = 10
-StopMusicBtn.Text = "DỪNG NHẠC"
-Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 6)
+StopMusicBtn.TextSize = 9
+StopMusicBtn.Text = "DỪNG"
+Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 5)
+
+local PlaylistRow = Instance.new("Frame", P5)
+PlaylistRow.Size = UDim2.new(1, 0, 0, 26)
+PlaylistRow.Position = UDim2.new(0, 0, 0, 82)
+PlaylistRow.BackgroundTransparency = 1
+
+local AddPlaylistBtn = Instance.new("TextButton", PlaylistRow)
+AddPlaylistBtn.Size = UDim2.new(0.5, -2, 1, 0)
+AddPlaylistBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
+AddPlaylistBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AddPlaylistBtn.Font = Enum.Font.GothamBold
+AddPlaylistBtn.TextSize = 9
+AddPlaylistBtn.Text = "+ THÊM PLAYLIST"
+Instance.new("UICorner", AddPlaylistBtn).CornerRadius = UDim.new(0, 5)
+
+local LoopToggleBtn = Instance.new("TextButton", PlaylistRow)
+LoopToggleBtn.Size = UDim2.new(0.5, -2, 1, 0)
+LoopToggleBtn.Position = UDim2.new(0.5, 2, 0, 0)
+LoopToggleBtn.BackgroundColor3 = Color3.fromRGB(90, 60, 140)
+LoopToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoopToggleBtn.Font = Enum.Font.GothamBold
+LoopToggleBtn.TextSize = 9
+LoopToggleBtn.Text = "LẶP LẠI: TẮT"
+Instance.new("UICorner", LoopToggleBtn).CornerRadius = UDim.new(0, 5)
+
+local PlaylistContainer = Instance.new("ScrollingFrame", P5)
+PlaylistContainer.Size = UDim2.new(1, 0, 0, 95)
+PlaylistContainer.Position = UDim2.new(0, 0, 0, 112)
+PlaylistContainer.BackgroundColor3 = Color3.fromRGB(16, 18, 26)
+PlaylistContainer.BorderSizePixel = 0
+PlaylistContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+PlaylistContainer.ScrollBarThickness = 2
+Instance.new("UICorner", PlaylistContainer).CornerRadius = UDim.new(0, 6)
+
+local PlaylistLayout = Instance.new("UIListLayout", PlaylistContainer)
+PlaylistLayout.SortOrder = Enum.SortOrder.LayoutOrder
+PlaylistLayout.Padding = UDim.new(0, 3)
 
 local MusicStatus = Instance.new("TextLabel", P5)
-MusicStatus.Size = UDim2.new(1, 0, 0, 25)
-MusicStatus.Position = UDim2.new(0, 0, 0, 114)
+MusicStatus.Size = UDim2.new(1, 0, 0, 20)
+MusicStatus.Position = UDim2.new(0, 0, 0, 210)
 MusicStatus.BackgroundTransparency = 1
 MusicStatus.TextColor3 = Color3.fromRGB(180, 180, 200)
 MusicStatus.Font = Enum.Font.GothamSemibold
-MusicStatus.TextSize = 11
-MusicStatus.Text = "Âm lượng: 100% | Đang tắt"
+MusicStatus.TextSize = 9
+MusicStatus.Text = "Vol: 100% | Playlist: 0 bài"
 MusicStatus.TextXAlignment = Enum.TextXAlignment.Left
 
 local bgSound = Instance.new("Sound")
 bgSound.Name = "HHubMusic"
-bgSound.Looped = true
+bgSound.Looped = false
 bgSound.Volume = 1.0
 bgSound.Parent = SoundService
 
+local playlistIDs = {}
+local currentPlaylistIndex = 1
+local isLoopEnabled = false
+
+local function updatePlaylistUI()
+    for _, child in pairs(PlaylistContainer:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    for i, id in ipairs(playlistIDs) do
+        local itemBtn = Instance.new("TextButton", PlaylistContainer)
+        itemBtn.Size = UDim2.new(1, -4, 0, 22)
+        itemBtn.BackgroundColor3 = (i == currentPlaylistIndex) and Color3.fromRGB(0, 100, 150) or Color3.fromRGB(25, 28, 38)
+        itemBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        itemBtn.Font = Enum.Font.Gotham
+        itemBtn.TextSize = 9
+        itemBtn.Text = "  Bài " .. i .. ": ID " .. id
+        itemBtn.TextXAlignment = Enum.TextXAlignment.Left
+        Instance.new("UICorner", itemBtn).CornerRadius = UDim.new(0, 4)
+        itemBtn.MouseButton1Click:Connect(function()
+            currentPlaylistIndex = i
+            bgSound.SoundId = "rbxassetid://" .. id
+            bgSound:Play()
+            MusicStatus.Text = "Đang phát bài " .. i .. " (ID: " .. id .. ")"
+            updatePlaylistUI()
+        end)
+    end
+    PlaylistContainer.CanvasSize = UDim2.new(0, 0, 0, #playlistIDs * 25)
+end
+
+AddPlaylistBtn.MouseButton1Click:Connect(function()
+    local idNum = tonumber(MusicInput.Text)
+    if idNum then table.insert(playlistIDs, idNum); updatePlaylistUI(); MusicStatus.Text = "Đã thêm ID " .. idNum else MusicStatus.Text = "ID không hợp lệ!" end
+end)
+
+LoopToggleBtn.MouseButton1Click:Connect(function()
+    isLoopEnabled = not isLoopEnabled
+    LoopToggleBtn.Text = isLoopEnabled and "LẶP LẠI: BẬT" or "LẶP LẠI: TẮT"
+    LoopToggleBtn.BackgroundColor3 = isLoopEnabled and Color3.fromRGB(0, 160, 80) or Color3.fromRGB(90, 60, 140)
+end)
+
 PlayMusicBtn.MouseButton1Click:Connect(function()
     local idNum = tonumber(MusicInput.Text)
-    if idNum then
-        bgSound.SoundId = "rbxassetid://" .. idNum
-        bgSound:Play()
-        MusicStatus.Text = "Âm lượng: " .. math.floor(bgSound.Volume * 100) .."% | Phát ID: " .. idNum
-    else
-        MusicStatus.Text = "ID âm thanh không hợp lệ!"
+    if idNum then savedLastID = tostring(idNum); bgSound.SoundId = "rbxassetid://" .. idNum; bgSound:Play(); MusicStatus.Text = "Phát ID: " .. idNum else MusicStatus.Text = "ID không hợp lệ!" end
+end)
+
+StopMusicBtn.MouseButton1Click:Connect(function() bgSound:Stop(); MusicStatus.Text = "Đã dừng nhạc." end)
+BtnVolDown.MouseButton1Click:Connect(function() bgSound.Volume = math.clamp(bgSound.Volume - 0.1, 0, 1); MusicStatus.Text = "Vol: " .. math.floor(bgSound.Volume * 100 + 0.5) .."%" end)
+BtnVolUp.MouseButton1Click:Connect(function() bgSound.Volume = math.clamp(bgSound.Volume + 0.1, 0, 1); MusicStatus.Text = "Vol: " .. math.floor(bgSound.Volume * 100 + 0.5) .."%" end)
+
+bgSound.Ended:Connect(function()
+    if isLoopEnabled and bgSound.SoundId ~= "" then bgSound:Play(); return end
+    if #playlistIDs > 0 then
+        currentPlaylistIndex = currentPlaylistIndex + 1
+        if currentPlaylistIndex > #playlistIDs then currentPlaylistIndex = 1 end
+        local nextID = playlistIDs[currentPlaylistIndex]
+        if nextID then bgSound.SoundId = "rbxassetid://" .. nextID; bgSound:Play(); updatePlaylistUI() end
     end
 end)
 
-StopMusicBtn.MouseButton1Click:Connect(function()
-    bgSound:Stop()
-    MusicStatus.Text = "Trạng thái: Đã dừng nhạc"
-end)
+-- TRANG 6: THÔNG TIN
+local titleP6 = Instance.new("TextLabel", P6)
+titleP6.Size = UDim2.new(1, 0, 1, 0)
+titleP6.BackgroundTransparency = 1
+titleP6.TextColor3 = Color3.fromRGB(200, 200, 220)
+titleP6.Font = Enum.Font.Gotham
+titleP6.TextSize = 10
+titleP6.TextXAlignment = Enum.TextXAlignment.Left
+titleP6.TextYAlignment = Enum.TextYAlignment.Top
+titleP6.Text = "Hệ thống thông minh tự động.\n- Tác giả: HOANGHAI\n- Hướng dẫn: Khi đi bán cá hoặc tắt tự động câu, hệ thống sẽ tự động ngắt spam và ẩn các vòng tâm ngắm để màn hình gọn gàng, không bị lỗi."
 
-BtnVolDown.MouseButton1Click:Connect(function()
-    bgSound.Volume = math.clamp(bgSound.Volume - 0.1, 0, 1)
-    MusicStatus.Text = "Âm lượng: " .. math.floor(bgSound.Volume * 100 + 0.5) .."%"
-end)
-
-BtnVolUp.MouseButton1Click:Connect(function()
-    bgSound.Volume = math.clamp(bgSound.Volume + 0.1, 0, 1)
-    MusicStatus.Text = "Âm lượng: " .. math.floor(bgSound.Volume * 100 + 0.5) .."%"
-end)
-
--- ================= CHUYỂN TAB MƯỢT MÀ =================
-local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5}
-local pages = {P1, P2, P3, P4, P5}
+-- CHUYỂN TAB
+local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
+local pages = {P1, P2, P3, P4, P5, P6}
 
 local function switchTab(index)
     for i, page in ipairs(pages) do
         page.Visible = (i == index)
         if i == index then
-            tabs[i].BackgroundColor3 = Color3.fromRGB(35, 35, 55)
+            tabs[i].BackgroundColor3 = Color3.fromRGB(45, 50, 70)
             tabs[i].TextColor3 = Color3.fromRGB(0, 220, 255)
             tabs[i].UIStroke.Transparency = 0
+            if i == 5 and savedLastID ~= "" and MusicInput.Text == "" then MusicInput.Text = savedLastID end
         else
-            tabs[i].BackgroundColor3 = Color3.fromRGB(22, 22, 32)
-            tabs[i].TextColor3 = Color3.fromRGB(160, 160, 180)
+            tabs[i].BackgroundColor3 = Color3.fromRGB(30, 32, 42)
+            tabs[i].TextColor3 = Color3.fromRGB(160, 175, 195)
             tabs[i].UIStroke.Transparency = 1
         end
     end
@@ -464,14 +740,14 @@ Tab2.MouseButton1Click:Connect(function() switchTab(2) end)
 Tab3.MouseButton1Click:Connect(function() switchTab(3) end)
 Tab4.MouseButton1Click:Connect(function() switchTab(4) end)
 Tab5.MouseButton1Click:Connect(function() switchTab(5) end)
-
+Tab6.MouseButton1Click:Connect(function() switchTab(6) end)
 switchTab(1)
 
--- ================= LOGIC TỰ ĐỘNG CÂU & BÁN CÁ =================
+-- ================= LOGIC CÀY CUỐC & BẢO VỆ CÁ HIẾM =================
 local isRunning = true
 local isServerDmgOn = true
 local isSellingFish = false
-local FishingSpotCFrame = nil
+local OriginalFishingSpotCFrame = nil 
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
@@ -479,11 +755,21 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
         AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (BẬT)"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
         local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-        if root then FishingSpotCFrame = root.CFrame end
+        if root then OriginalFishingSpotCFrame = root.CFrame end
     else
         AutoToggleBtn.Text = "TRẠNG THÁI: TỰ ĐỘNG CÂU (TẮT)"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        FishingSpotCFrame = nil; isSellingFish = false
+        OriginalFishingSpotCFrame = nil; isSellingFish = false
+        
+        -- TỰ ĐỘNG TẮT SPAM CHIÊU VÀ ẨN TÂM KHI TẮT CÂU
+        if isAutoSkillOn then
+            isAutoSkillOn = false
+            AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
+            AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+        end
+        MarkersGui.Enabled = false
+        ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+        ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
     end
 end)
 
@@ -493,16 +779,20 @@ ServerDmgBtn.MouseButton1Click:Connect(function()
     ServerDmgBtn.BackgroundColor3 = isServerDmgOn and Color3.fromRGB(140, 0, 160) or Color3.fromRGB(100, 100, 100)
 end)
 
-local function getFish()
+local ProtectedItems = {"rod", "cần", "bait", "mồi", "potion", "license", "cá hiếm", "legendary", "mythical"}
+
+local function getFishToSellCount()
     local count = 0
     local function check(cont)
         if cont then
             for _, i in ipairs(cont:GetChildren()) do
                 if i:IsA("Tool") then
                     local n = string.lower(i.Name)
-                    if not (n:find("rod") or n:find("cần") or n:find("bait") or n:find("mồi") or n:find("potion") or n:find("license")) then
-                        count = count + 1
+                    local isProtected = false
+                    for _, keyword in ipairs(ProtectedItems) do
+                        if n:find(keyword) then isProtected = true; break end
                     end
+                    if not isProtected then count = count + 1 end
                 end
             end
         end
@@ -515,13 +805,22 @@ end
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(1)
-        pcall(function()
-            FishStatus.Text = "Số cá trong túi: " .. getFish() .. " / " .. maxFishCapacity
-        end)
+        pcall(function() FishStatus.Text = "Cá cần bán: " .. getFishToSellCount() .. " / Ngưỡng: " .. maxFishCapacity end)
     end
 end)
 
-local CUSTOM_MERCHANT_POS = Vector3.new(1263.48, 27.71, -349.61)
+local function getMerchantPosition()
+    local targetName = "merchant fish"
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj and (obj:IsA("Model") or obj:IsA("Part")) then
+            if string.lower(obj.Name):find(targetName) then
+                local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
+                if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
+            end
+        end
+    end
+    return Vector3.new(1263.48, 27.71, -349.61)
+end
 
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
@@ -591,44 +890,65 @@ task.spawn(function()
                 local root = char and char:FindFirstChild("HumanoidRootPart")
                 local hum = char and char:FindFirstChildOfClass("Humanoid")
                 if not root or not hum then return end
-                if not FishingSpotCFrame then FishingSpotCFrame = root.CFrame end
+                
+                if not OriginalFishingSpotCFrame and not isSellingFish then OriginalFishingSpotCFrame = root.CFrame end
 
-                if getFish() >= maxFishCapacity then
+                if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
+                    
+                    -- ✨ TỰ ĐỘNG TẮT SPAM CHIÊU VÀ ẨN TÂM KHI BẮT ĐẦU ĐI BÁN CÁ
+                    if isAutoSkillOn then
+                        isAutoSkillOn = false
+                        AutoSkillToggle.Text = "SPAM 4 CHIÊU (PC + MOBILE): TẮT"
+                        AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+                    end
+                    MarkersGui.Enabled = false
+                    ShowMarkersBtn.Text = "HIỆN 4 VÒNG: TẮT"
+                    ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
+
                     local vp = Workspace.CurrentCamera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
                     task.wait(0.08)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1)
                     task.wait(0.4)
 
-                    hum.WalkSpeed = 16; root.Anchored = true
-                    local dist = (root.Position - CUSTOM_MERCHANT_POS).Magnitude
-                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(CUSTOM_MERCHANT_POS + Vector3.new(0, 3, 0))})
+                    local dynamicMerchantPos = getMerchantPosition()
+                    hum.WalkSpeed = 16
+                    root.Anchored = true
+                    local dist = (root.Position - dynamicMerchantPos).Magnitude
+                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 0))})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.1) end
-                    root.CFrame = CFrame.new(CUSTOM_MERCHANT_POS)
+                    
+                    root.CFrame = CFrame.lookAt(dynamicMerchantPos + Vector3.new(0, 2, 0), dynamicMerchantPos)
                     task.wait(0.4)
 
                     repeat
                         if not isRunning then break end
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                        task.wait(0.05)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                         clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
                         task.wait(1.5)
-                    until getFish() == 0 or not isRunning
+                    until getFishToSellCount() == 0 or not isRunning
 
-                    root.Anchored = true; hum.WalkSpeed = 16
-                    local dBack = (root.Position - FishingSpotCFrame.Position).Magnitude
-                    if dBack > 3 then
-                        local backTween = TweenService:Create(root, TweenInfo.new(dBack / 60, Enum.EasingStyle.Linear), {CFrame = FishingSpotCFrame})
+                    root.Anchored = true
+                    hum.WalkSpeed = 16
+                    if OriginalFishingSpotCFrame then
+                        local dBack = (root.Position - OriginalFishingSpotCFrame.Position).Magnitude
+                        local backTween = TweenService:Create(root, TweenInfo.new(dBack / 60, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
                         backTween:Play()
                         while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.1) end
+                        root.CFrame = OriginalFishingSpotCFrame
                     end
-                    root.Anchored = false; isSellingFish = false
+                    isSellingFish = false 
                 end
 
                 if not isRunning or isSellingFish then return end
 
-                root.CFrame = FishingSpotCFrame
-                root.Anchored = true; hum.WalkSpeed = 0
+                if OriginalFishingSpotCFrame then root.CFrame = OriginalFishingSpotCFrame end
+                root.Anchored = true
+                hum.WalkSpeed = 0
 
                 local activeTool = char and char:FindFirstChildOfClass("Tool")
                 local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
@@ -649,10 +969,10 @@ task.spawn(function()
                     task.wait(2)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
 
-                    local initialFish = getFish()
+                    local initialFish = getFishToSellCount()
                     local aStart = tick()
 
-                    while tick() - aStart < 60 and isRunning and not isSellingFish and getFish() <= initialFish do
+                    while tick() - aStart < 60 and isRunning and not isSellingFish and getFishToSellCount() <= initialFish do
                         solveMiniGameFast()
                         if isServerDmgOn then triggerServerDamageMultiplier() end
                         task.wait(0.05)
