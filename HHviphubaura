@@ -1,5 +1,5 @@
 -- ====================================================
--- HOANGHAI HUB - FISCH (SÁNG BÓNG DI CHUYỂN LIÊN TỤC & FULL TÍNH NĂNG)
+-- HOANGHAI HUB - FISCH (FIX TRIỆT ĐỂ: VIỀN SÁNG LẤP LÁNH & NÚT ĐÓNG MỞ)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -13,47 +13,19 @@ local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 -- 🛡️ Chống trùng lặp UI cũ
-if PlayerGui:FindFirstChild("HHubUI") then
-    pcall(function() PlayerGui.HHubUI:Destroy() end)
-end
-if PlayerGui:FindFirstChild("HHubLoadingUI") then
-    pcall(function() PlayerGui.HHubLoadingUI:Destroy() end)
-end
-
--- ================= BẢNG ĐANG TẢI (LOADING SCREEN) =================
-local LoadingGui = Instance.new("ScreenGui")
-LoadingGui.Name = "HHubLoadingUI"
-LoadingGui.ResetOnSpawn = false
-LoadingGui.Parent = PlayerGui
-
-local LoadFrame = Instance.new("Frame", LoadingGui)
-LoadFrame.Size = UDim2.new(0, 280, 0, 70)
-LoadFrame.Position = UDim2.new(0.5, -140, 0.44, 0)
-LoadFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-LoadFrame.BorderSizePixel = 0
-Instance.new("UICorner", LoadFrame).CornerRadius = UDim.new(0, 8)
-
-local LoadStroke = Instance.new("UIStroke", LoadFrame)
-LoadStroke.Thickness = 3.5
-LoadStroke.Color = Color3.fromRGB(255, 215, 0)
-
-local LoadText = Instance.new("TextLabel", LoadFrame)
-LoadText.Size = UDim2.new(1, 0, 1, 0)
-LoadText.BackgroundTransparency = 1
-LoadText.Text = "HOANGHAI HUB ĐANG TẢI..."
-LoadText.TextColor3 = Color3.fromRGB(255, 215, 0)
-LoadText.Font = Enum.Font.GothamBold
-LoadText.TextSize = 13
-
-task.wait(1.2)
+pcall(function()
+    if PlayerGui:FindFirstChild("HHubUI") then PlayerGui.HHubUI:Destroy() end
+    if PlayerGui:FindFirstChild("HHubLoadingUI") then PlayerGui.HHubLoadingUI:Destroy() end
+end)
 
 -- ================= GIAO DIỆN CHÍNH =================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HHubUI"
 ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 99999
 ScreenGui.Parent = PlayerGui
 
--- NÚT TOGGLE (ĐÓNG/MỞ TAB) - HIỆU ỨNG SÁNG BÓNG DI CHUYỂN LIÊN TỤC (TỐC ĐỘ CAO)
+-- NÚT TOGGLE (CHỮ H) - ĐÓNG/MỞ MENU
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
@@ -73,16 +45,10 @@ ToggleStrokeGold.Thickness = 4.0
 local ToggleGrad = Instance.new("UIGradient", ToggleStrokeGold)
 ToggleGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(255, 255, 255)), -- Điểm sáng lướt qua
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(255, 255, 255)),
     ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 180, 0)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 215, 0))
 })
-task.spawn(function()
-    while ScreenGui.Parent do
-        ToggleGrad.Rotation = (ToggleGrad.Rotation + 12) % 360 -- Tăng tốc độ quay để màu sáng di chuyển liên tục rực rỡ hơn
-        task.wait(0.03)
-    end
-end)
 
 local StaticTextH = Instance.new("TextLabel", ToggleBtn)
 StaticTextH.Size = UDim2.new(1, 0, 1, 0)
@@ -94,14 +60,14 @@ StaticTextH.TextSize = 44
 StaticTextH.TextXAlignment = Enum.TextXAlignment.Center
 StaticTextH.TextYAlignment = Enum.TextYAlignment.Center
 
--- BẢNG MENU CHÍNH - HIỆU ỨNG SÁNG BÓNG DI CHUYỂN LIÊN TỤC
+-- BẢNG MENU CHÍNH
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0, 420, 0, 260)
 Main.Position = UDim2.new(0.05, 0, 0.55, 0)
 Main.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 Main.BorderSizePixel = 0
 Main.Active = true
-Main.Visible = true -- Ép buộc hiển thị ngay lập tức
+Main.Visible = true
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
 
 local MainStroke = Instance.new("UIStroke", Main)
@@ -109,19 +75,19 @@ MainStroke.Thickness = 4.0
 local MainGrad = Instance.new("UIGradient", MainStroke)
 MainGrad.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),
-    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(255, 255, 255)), -- Điểm sáng lướt qua viền menu
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(255, 255, 255)),
     ColorSequenceKeypoint.new(0.6, Color3.fromRGB(255, 180, 0)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 215, 0))
 })
-task.spawn(function()
-    while ScreenGui.Parent do
-        MainGrad.Rotation = (MainGrad.Rotation + 10) % 360 -- Tốc độ di chuyển sáng bóng mượt mà liên tục
-        task.wait(0.03)
-    end
+
+-- HIỆU ỨNG SÁNG LẤP LÁNH XOAY LIÊN TỤC (Dùng RenderStepped siêu mượt)
+RunService.RenderStepped:Connect(function()
+    local rot = (tick() * 120) % 360
+    ToggleGrad.Rotation = rot
+    MainGrad.Rotation = rot
 end)
 
-pcall(function() LoadingGui:Destroy() end)
-
+-- SỰ KIỆN NÚT ĐÓNG / MỞ BẢNG MENU
 local uiVisible = true
 ToggleBtn.MouseButton1Click:Connect(function()
     uiVisible = not uiVisible
@@ -322,12 +288,10 @@ local function teleportAndRespawnAtIsland(targetPos)
                 
                 if newRoot and newHum then
                     Status.Text = "HỒI SINH - ÉP TỌA ĐỘ VÀ KÈM LAG CHỐNG QUÉT..."
-                    
                     newRoot.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
                     simulateHeavyLagSpike(1.0)
                     
                     Status.Text = "ĐANG KHÓA CỨNG ĐỨNG YÊN ĐỦ 17 GIÂY..."
-                    
                     local lockStart = tick()
                     while tick() - lockStart < 17 do
                         pcall(function()
@@ -387,7 +351,7 @@ Info.Font = Enum.Font.Gotham
 Info.TextSize = 12
 Info.TextXAlignment = Enum.TextXAlignment.Left
 Info.TextYAlignment = Enum.TextYAlignment.Top
-Info.Text = "Tác giả: HOANGHAI\n- Hiệu ứng sáng bóng di chuyển liên tục rực rỡ."
+Info.Text = "Tác giả: HOANGHAI\n- Fix viền sáng lấp lánh & nút đóng mở hoàn hảo."
 
 Tab1.MouseButton1Click:Connect(function()
     P1.Visible = true; P2.Visible = false; P3.Visible = false
@@ -572,7 +536,6 @@ task.spawn(function()
                     isSellingFish = true
                     Status.Text = "TÚI ĐÃ ĐẠT MỐC -> CLICK & BÁN CÁ..."
                     
-                    -- Click 1 cái vào màn hình trước khi bay
                     local vp = Workspace.CurrentCamera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
                     task.wait(0.08)
@@ -599,9 +562,10 @@ task.spawn(function()
                     root.CFrame = CFrame.new(CUSTOM_MERCHANT_POS)
                     task.wait(0.4)
 
-                    -- Quét tìm NPC và ProximityPrompt
+                    -- Quét tìm ProximityPrompt và NPC bán cá ở gần nhất
                     local targetPrompt = nil
                     local targetPart = nil
+                    local shortestDist = math.huge
                     
                     for _, obj in pairs(Workspace:GetDescendants()) do
                         if obj:IsA("ProximityPrompt") then
@@ -609,18 +573,23 @@ task.spawn(function()
                             if parent and parent:IsA("BasePart") then
                                 local parentName = string.lower(parent.Name)
                                 local distanceToMerchant = (parent.Position - CUSTOM_MERCHANT_POS).Magnitude
-                                local distanceToPlayer = (parent.Position - root.Position).Magnitude
-                                if (parentName:find("merchant") or parentName:find("fish") or parentName:find("sell") or parentName:find("fishmonger")) and distanceToMerchant < 25 and distanceToPlayer < 6 then
-                                    targetPrompt = obj; targetPart = parent; break
+                                if (parentName:find("merchant") or parentName:find("fish") or parentName:find("sell") or parentName:find("fishmonger")) and distanceToMerchant < 25 then
+                                    local dToPlayer = (parent.Position - root.Position).Magnitude
+                                    if dToPlayer < shortestDist then
+                                        shortestDist = dToPlayer
+                                        targetPrompt = obj
+                                        targetPart = parent
+                                    end
                                 end
                             end
                         end
                     end
 
-                    -- Tiến lại gần hơn một chút và xoay mặt chính diện thẳng vào NPC
+                    -- Tiến lại gần hơn một chút & xoay thẳng mặt trực diện vào NPC
                     if targetPart then
                         local npcPos = targetPart.Position
-                        root.CFrame = CFrame.new(npcPos + Vector3.new(0, 0, 2), npcPos)
+                        local directionPos = Vector3.new(npcPos.X, root.Position.Y, npcPos.Z)
+                        root.CFrame = CFrame.lookAt(directionPos + (root.Position - directionPos).Unit * 2.5, npcPos)
                         task.wait(0.2)
                     end
 
