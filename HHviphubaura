@@ -25,14 +25,14 @@ ScreenGui.DisplayOrder = 99999
 ScreenGui.Parent = PlayerGui
 
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
-ToggleBtn.Size = UDim2.new(0, 46, 0, 46)
+ToggleBtn.Size = UDim2.new(0, 52, 0, 52)
 ToggleBtn.Position = UDim2.new(0, 20, 0.45, 0)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(35, 38, 48)
 ToggleBtn.BackgroundTransparency = 0.1
 ToggleBtn.Text = "H"
 ToggleBtn.TextColor3 = Color3.fromRGB(0, 255, 150)
 ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextSize = 22
+ToggleBtn.TextSize = 24
 ToggleBtn.AutoButtonColor = false
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
@@ -42,9 +42,22 @@ local ToggleStroke = Instance.new("UIStroke", ToggleBtn)
 ToggleStroke.Color = Color3.fromRGB(0, 255, 128)
 ToggleStroke.Thickness = 2
 
+-- Vòng tròn cảm biến nhạc (Audio Reactive Ring)
+local MusicRing = Instance.new("Frame", ToggleBtn)
+MusicRing.Size = UDim2.new(1, 14, 1, 14)
+MusicRing.Position = UDim2.new(0, -7, 0, -7)
+MusicRing.BackgroundTransparency = 1
+MusicRing.ZIndex = ToggleBtn.ZIndex - 1
+Instance.new("UICorner", MusicRing).CornerRadius = UDim.new(1, 0)
+
+local MusicRingStroke = Instance.new("UIStroke", MusicRing)
+MusicRingStroke.Color = Color3.fromRGB(0, 255, 200)
+MusicRingStroke.Thickness = 2.5
+MusicRingStroke.Transparency = 0.2
+
 local Main = Instance.new("Frame", ScreenGui)
-Main.Size = UDim2.new(0, 520, 0, 350)
-Main.Position = UDim2.new(0.5, -260, 0.5, -175)
+Main.Size = UDim2.new(0, 520, 0, 380)
+Main.Position = UDim2.new(0.5, -260, 0.5, -190)
 Main.BackgroundColor3 = Color3.fromRGB(15, 18, 24)
 Main.BackgroundTransparency = 0.05
 Main.Active = true
@@ -159,7 +172,7 @@ local function createPage()
     local p = Instance.new("ScrollingFrame", ContentContainer)
     p.Size = UDim2.new(1, 0, 1, 0)
     p.BackgroundTransparency = 1
-    p.CanvasSize = UDim2.new(0, 0, 0, 350)
+    p.CanvasSize = UDim2.new(0, 0, 0, 480)
     p.ScrollBarThickness = 3
     p.Visible = false
     return p
@@ -381,7 +394,7 @@ GuideLabel.TextSize = 9.5
 GuideLabel.TextWrapped = true
 GuideLabel.TextXAlignment = Enum.TextXAlignment.Left
 GuideLabel.TextYAlignment = Enum.TextYAlignment.Top
-GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật nút 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định vị trí.\n4. Khi Auto Câu bật, hệ thống tự động chạm vào 4 ô này để xả chiêu!"
+GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật nút 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định vị trí.\n4. Khi Auto Câu bật, hệ thống tự động chạm vào 4 ô này để xả chiêu sau khi thả cần!"
 
 local MarkersGui = Instance.new("ScreenGui")
 MarkersGui.Name = "SkillMarkersUI"
@@ -481,12 +494,22 @@ DefaultMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
 DefaultMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 DefaultMusicBtn.Font = Enum.Font.GothamBold
 DefaultMusicBtn.TextSize = 9
-DefaultMusicBtn.Text = "🎵 PHÁT NHẠC CHILL MẶC ĐỊNH (110919391228823)"
+DefaultMusicBtn.Text = "🎵 PHÁT NHẠC CHILL (110919391228823)"
 Instance.new("UICorner", DefaultMusicBtn).CornerRadius = UDim.new(0, 5)
+
+local NewMusicBtn = Instance.new("TextButton", P5)
+NewMusicBtn.Size = UDim2.new(1, 0, 0, 26)
+NewMusicBtn.Position = UDim2.new(0, 0, 0, 72)
+NewMusicBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 180)
+NewMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+NewMusicBtn.Font = Enum.Font.GothamBold
+NewMusicBtn.TextSize = 9
+NewMusicBtn.Text = "🎶 PHÁT BÀI MỚI (124915036011783)"
+Instance.new("UICorner", NewMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local MusicInput = Instance.new("TextBox", P5)
 MusicInput.Size = UDim2.new(1, 0, 0, 24)
-MusicInput.Position = UDim2.new(0, 0, 0, 72)
+MusicInput.Position = UDim2.new(0, 0, 0, 102)
 MusicInput.BackgroundColor3 = Color3.fromRGB(30, 32, 42)
 MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 MusicInput.PlaceholderText = "Nhập Sound ID tùy chỉnh tại đây..."
@@ -497,7 +520,7 @@ Instance.new("UICorner", MusicInput).CornerRadius = UDim.new(0, 5)
 
 local MusicRow = Instance.new("Frame", P5)
 MusicRow.Size = UDim2.new(1, 0, 0, 26)
-MusicRow.Position = UDim2.new(0, 0, 0, 100) 
+MusicRow.Position = UDim2.new(0, 0, 0, 130) 
 MusicRow.BackgroundTransparency = 1
 
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
@@ -521,7 +544,7 @@ Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local ChillRow = Instance.new("Frame", P5)
 ChillRow.Size = UDim2.new(1, 0, 0, 28)
-ChillRow.Position = UDim2.new(0, 0, 0, 132)
+ChillRow.Position = UDim2.new(0, 0, 0, 162)
 ChillRow.BackgroundTransparency = 1
 
 local HipSwayToggleBtn = Instance.new("TextButton", ChillRow)
@@ -533,13 +556,132 @@ HipSwayToggleBtn.TextSize = 9.5
 HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: TẮT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
+-- Bảng Chọn Bài Theo ID Tổng Hợp (Preset List)
+local PresetTitle = Instance.new("TextLabel", P5)
+PresetTitle.Size = UDim2.new(1, 0, 0, 20)
+PresetTitle.Position = UDim2.new(0, 0, 0, 196)
+PresetTitle.BackgroundTransparency = 1
+PresetTitle.Text = "📂 DANH SÁCH BÀI HÁT TỔNG HỢP (Preset):"
+PresetTitle.TextColor3 = Color3.fromRGB(0, 220, 255)
+PresetTitle.Font = Enum.Font.GothamBold
+PresetTitle.TextSize = 10
+PresetTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local PresetContainer = Instance.new("ScrollingFrame", P5)
+PresetContainer.Size = UDim2.new(1, 0, 0, 110)
+PresetContainer.Position = UDim2.new(0, 0, 0, 220)
+PresetContainer.BackgroundColor3 = Color3.fromRGB(22, 26, 35)
+PresetContainer.BackgroundTransparency = 0.5
+PresetContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+PresetContainer.ScrollBarThickness = 3
+Instance.new("UICorner", PresetContainer).CornerRadius = UDim.new(0, 6)
+
+local PresetLayout = Instance.new("UIListLayout", PresetContainer)
+PresetLayout.SortOrder = Enum.SortOrder.LayoutOrder
+PresetLayout.Padding = UDim.new(0, 4)
+
+-- Bảng Lịch sử ID Bài Hát
+local HistoryTitle = Instance.new("TextLabel", P5)
+HistoryTitle.Size = UDim2.new(1, 0, 0, 20)
+HistoryTitle.Position = UDim2.new(0, 0, 0, 336)
+HistoryTitle.BackgroundTransparency = 1
+HistoryTitle.Text = "📜 LỊCH SỬ ID ĐÃ PHÁT:"
+HistoryTitle.TextColor3 = Color3.fromRGB(200, 220, 255)
+HistoryTitle.Font = Enum.Font.GothamBold
+HistoryTitle.TextSize = 10
+HistoryTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local HistoryContainer = Instance.new("ScrollingFrame", P5)
+HistoryContainer.Size = UDim2.new(1, 0, 0, 110)
+HistoryContainer.Position = UDim2.new(0, 0, 0, 360)
+HistoryContainer.BackgroundColor3 = Color3.fromRGB(20, 24, 32)
+HistoryContainer.BackgroundTransparency = 0.5
+HistoryContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+HistoryContainer.ScrollBarThickness = 3
+Instance.new("UICorner", HistoryContainer).CornerRadius = UDim.new(0, 6)
+
+local HistoryLayout = Instance.new("UIListLayout", HistoryContainer)
+HistoryLayout.SortOrder = Enum.SortOrder.LayoutOrder
+HistoryLayout.Padding = UDim.new(0, 4)
+
+local playedIdHistory = {}
+
 local DEFAULT_SOUND_ID = "110919391228823"
+local NEW_SOUND_ID = "124915036011783"
+
+-- Danh sách tổng hợp các bài hát mẫu
+local PresetSongs = {
+    {Name = "🎵 Nhạc Chill Mặc Định", Id = DEFAULT_SOUND_ID},
+    {Name = "🎶 Bài Hát Mới Cập Nhật", Id = NEW_SOUND_ID},
+    {Name = "🔥 Nhạc Sôi Động Cuốn Hút", Id = "1848354536"},
+    {Name = "✨ Nhạc Lofi Thư Giãn", Id = "1423760883"}
+}
+
 local bgSound = Instance.new("Sound")
 bgSound.Name = "HHubMusic"
 bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
 bgSound.Looped = true
 bgSound.Volume = 1.0
 bgSound.Parent = SoundService
+
+local function addIdToHistory(idStr)
+    if not idStr or idStr == "" then return end
+    for i, v in ipairs(playedIdHistory) do
+        if v == idStr then
+            table.remove(playedIdHistory, i)
+            break
+        end
+    end
+    table.insert(playedIdHistory, 1, idStr)
+    
+    for _, child in ipairs(HistoryContainer:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    
+    HistoryContainer.CanvasSize = UDim2.new(0, 0, 0, #playedIdHistory * 28)
+    
+    for i, id in ipairs(playedIdHistory) do
+        local histBtn = Instance.new("TextButton", HistoryContainer)
+        histBtn.Size = UDim2.new(1, -6, 0, 24)
+        histBtn.BackgroundColor3 = Color3.fromRGB(30, 36, 48)
+        histBtn.TextColor3 = Color3.fromRGB(0, 255, 180)
+        histBtn.Font = Enum.Font.GothamSemibold
+        histBtn.TextSize = 9.5
+        histBtn.Text = "🎵 ID: " .. id
+        histBtn.LayoutOrder = i
+        Instance.new("UICorner", histBtn).CornerRadius = UDim.new(0, 4)
+        
+        histBtn.MouseButton1Click:Connect(function()
+            MusicInput.Text = id
+            bgSound.SoundId = "rbxassetid://" .. id
+            bgSound:Play()
+        end)
+    end
+end
+
+-- Tạo danh sách bài hát tổng hợp (Preset)
+PresetContainer.CanvasSize = UDim2.new(0, 0, 0, #PresetSongs * 28)
+for i, song in ipairs(PresetSongs) do
+    local pBtn = Instance.new("TextButton", PresetContainer)
+    pBtn.Size = UDim2.new(1, -6, 0, 24)
+    pBtn.BackgroundColor3 = Color3.fromRGB(35, 42, 55)
+    pBtn.TextColor3 = Color3.fromRGB(220, 240, 255)
+    pBtn.Font = Enum.Font.GothamSemibold
+    pBtn.TextSize = 9.5
+    pBtn.Text = song.Name .. " (" .. song.Id .. ")"
+    pBtn.LayoutOrder = i
+    Instance.new("UICorner", pBtn).CornerRadius = UDim.new(0, 4)
+    
+    pBtn.MouseButton1Click:Connect(function()
+        MusicInput.Text = song.Id
+        bgSound.SoundId = "rbxassetid://" .. song.Id
+        bgSound:Play()
+        addIdToHistory(song.Id)
+    end)
+end
+
+addIdToHistory(NEW_SOUND_ID)
+addIdToHistory(DEFAULT_SOUND_ID)
 
 local isHipSwayEnabled = false
 local originalRootC0 = nil
@@ -593,7 +735,26 @@ end
 DefaultMusicBtn.MouseButton1Click:Connect(function()
     bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
     bgSound:Play()
+    addIdToHistory(DEFAULT_SOUND_ID)
 end)
+
+NewMusicBtn.MouseButton1Click:Connect(function()
+    bgSound.SoundId = "rbxassetid://" .. NEW_SOUND_ID
+    bgSound:Play()
+    addIdToHistory(NEW_SOUND_ID)
+end)
+
+PlayMusicBtn.MouseButton1Click:Connect(function()
+    local idNum = tonumber(MusicInput.Text)
+    if idNum then
+        local idStr = tostring(idNum)
+        bgSound.SoundId = "rbxassetid://" .. idStr
+        bgSound:Play()
+        addIdToHistory(idStr)
+    end
+end)
+
+StopMusicBtn.MouseButton1Click:Connect(function() bgSound:Stop() end)
 
 HipSwayToggleBtn.MouseButton1Click:Connect(function()
     isHipSwayEnabled = not isHipSwayEnabled
@@ -609,6 +770,27 @@ HipSwayToggleBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Vòng tròn cảm biến nhạc (Audio Reactive Ring Animation)
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local t = tick()
+        if bgSound.IsPlaying then
+            local pulse = math.sin(t * 12) * 8
+            local alphaPulse = 0.2 + math.abs(math.sin(t * 6)) * 0.5
+            MusicRing.Size = UDim2.new(1, 14 + pulse, 1, 14 + pulse)
+            MusicRing.Position = UDim2.new(0, -(7 + pulse/2), 0, -(7 + pulse/2))
+            MusicRingStroke.Transparency = alphaPulse
+            MusicRingStroke.Color = Color3.fromHSV((t * 0.3) % 1, 1, 1)
+        else
+            MusicRing.Size = UDim2.new(1, 14, 1, 14)
+            MusicRing.Position = UDim2.new(0, -7, 0, -7)
+            MusicRingStroke.Transparency = 0.6
+            MusicRingStroke.Color = Color3.fromRGB(0, 255, 200)
+        end
+    end)
+end)
+
+-- Xử lý chuyển động lắc hông nhân vật
 RunService.RenderStepped:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
@@ -629,17 +811,14 @@ RunService.RenderStepped:Connect(function()
             if rightShoulder and not originalRightShoulderC0 then originalRightShoulderC0 = rightShoulder.C0 end
             
             if isHipSwayEnabled then
-                local t = tick() * 6.5 -- Tăng tốc độ nhịp nhảy cực sung
-                
-                -- Biên độ lắc hông và đánh người cực mạnh
+                local t = tick() * 6.5
                 local bodySwayX = math.sin(t * 2) * 0.25
-                local bodySwayY = math.cos(t) * 0.35 -- Nhún nhảy lên xuống rõ rệt
-                local bodySwayZ = math.sin(t) * 0.75 -- Lắc hông sang hai bên cực rộng
+                local bodySwayY = math.cos(t) * 0.35
+                local bodySwayZ = math.sin(t) * 0.75
                 
                 local swayCFrame = originalRootC0 * CFrame.new(0, bodySwayY, 0) * CFrame.Angles(math.rad(bodySwayX * 20), 0, bodySwayZ)
                 rootJoint.C0 = rootJoint.C0:Lerp(swayCFrame, 0.4)
                 
-                -- Giải phóng phần chân để chân uốn lượn, bước uyển chuyển không còn cứng đơ
                 if leftHip and originalLeftHipC0 then
                     local legSwayL = originalLeftHipC0 * CFrame.Angles(math.sin(t) * 0.65, 0, -math.sin(t) * 0.5)
                     leftHip.C0 = leftHip.C0:Lerp(legSwayL, 0.4)
@@ -668,13 +847,6 @@ RunService.RenderStepped:Connect(function()
     end)
 end)
 
-PlayMusicBtn.MouseButton1Click:Connect(function()
-    local idNum = tonumber(MusicInput.Text)
-    if idNum then bgSound.SoundId = "rbxassetid://" .. idNum; bgSound:Play() end
-end)
-
-StopMusicBtn.MouseButton1Click:Connect(function() bgSound:Stop() end)
-
 local titleP6 = Instance.new("TextLabel", P6)
 titleP6.Size = UDim2.new(1, 0, 1, 0)
 titleP6.BackgroundTransparency = 1
@@ -683,7 +855,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã sửa lỗi cứng chân, tăng biên độ lắc hông cực mạnh và hiển thị chuẩn ảnh đồng hồ Cortisol."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Tích hợp danh sách bài hát tổng hợp (Preset) và lịch sử ID."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -836,7 +1008,7 @@ task.spawn(function()
     }
 
     while ScreenGui.Parent do
-        task.wait(0.4)
+        task.wait(0.2)
         if isRunning then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -905,14 +1077,15 @@ task.spawn(function()
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game)
                     task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game)
-                    task.wait(0.5)
+                    task.wait(0.3)
                 end
 
                 if isHoldingRod and isRunning and not isSellingFish then
                     local vp = Workspace.CurrentCamera.ViewportSize
                     pcall(function() activeTool:Activate() end)
+                    
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
-                    task.wait(2.2)
+                    task.wait(0.2)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
 
                     local initialFishCount = getFishToSellCount()
@@ -949,11 +1122,11 @@ task.spawn(function()
                         end
                         
                         if getFishToSellCount() > initialFishCount then
-                            task.wait(5)
+                            task.wait(0.1)
                             break
                         end
                         
-                        task.wait(0.2)
+                        task.wait(0.1)
                     end
                 end
             end)
