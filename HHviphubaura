@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - BÁN CÁ GIẢM > 2 CON -> BẤM TẠM BIỆT (FIXED)
+-- H-HUB VIPAURA - THẢ CẦN XONG SPAM ZXCV TỐC ĐỘ CHUẨN (FINAL V6)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -588,7 +588,7 @@ local PresetSongs = {
     {Name = "🎵 Ai đưa em về", Id = "110919391228823"}
 }
 
-local DEFAULT_SOUND_ID = "113675312413032"
+local DEFAULT_SOUND_ID = "110919391228823"
 
 local bgSound = Instance.new("Sound")
 bgSound.Name = "HHubMusic"
@@ -815,7 +815,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: cook bản quá cháy🔥\n- Hỗ trợ đầy đủ nhạc và auto câu cá mượt mà."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Hỗ trợ đầy đủ nhạc và auto câu cá mượt mà."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -934,10 +934,11 @@ local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
         if obj and obj.Parent and not obj:IsDescendantOf(ScreenGui) then
-            if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
+            if (obj:IsA("TextButton") or obj:IsA("TextLabel") or obj:IsA("ImageButton")) and obj.Visible then
                 local txt = string.lower(obj.Text or "")
+                local name = string.lower(obj.Name or "")
                 for _, kw in ipairs(keys) do
-                    if txt:find(kw) then
+                    if txt:find(kw) or name:find(kw) then
                         local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
                         local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
                         VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
@@ -1032,10 +1033,14 @@ task.spawn(function()
                         end
                     until (tick() - sellStartTime > 8) or not isRunning
 
-                    task.wait(0.3)
+                    task.wait(0.4)
 
-                    clickBtn({"tạm biệt", "tam biet", "bye", "goodbye", "thoát", "close", "đóng", "x"})
-                    task.wait(0.5)
+                    for i = 1, 4 do
+                        local clicked = clickBtn({"tạm biệt", "tam biet", "goodbye", "thoát", "close", "đóng", "x", "back", "leave", "exit"})
+                        if clicked then break end
+                        task.wait(0.25)
+                    end
+                    task.wait(0.6)
 
                     if merchantLockConnection then
                         merchantLockConnection:Disconnect()
@@ -1083,15 +1088,17 @@ task.spawn(function()
                         task.wait(0.05)
                     end
                     
+                    -- THẢ CẦN RA
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
-                    task.wait(0.1)
+                    task.wait(0.05)
 
+                    -- SPAM ZXCV VỚI ĐỘ TRỄ CHUẨN ĐỂ GAME NHẬN DIỆN MƯỢT MÀ
                     if isRunning and not isSellingFish then
                         for _, skill in ipairs(skillsList) do
                             if not isRunning or isSellingFish then break end
                             
                             VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                            task.wait(0.05)
+                            task.wait(0.08)
                             VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
                             task.wait(0.05)
                             
@@ -1104,7 +1111,7 @@ task.spawn(function()
                                 local finalY = pos.Y + sz.Y / 2 + inset.Y
                                 
                                 VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                                task.wait(0.05)
+                                task.wait(0.08)
                                 VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
                                 task.wait(0.05)
                             end
