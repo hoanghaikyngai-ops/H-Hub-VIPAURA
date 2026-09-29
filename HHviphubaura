@@ -556,7 +556,7 @@ HipSwayToggleBtn.TextSize = 9.5
 HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: TẮT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
--- Bảng Chọn Bài Theo ID Tổng Hợp (Preset với ID mới)
+-- Bảng Chọn Bài Theo ID Tổng Hợp (Preset)
 local PresetTitle = Instance.new("TextLabel", P5)
 PresetTitle.Size = UDim2.new(1, 0, 0, 20)
 PresetTitle.Position = UDim2.new(0, 0, 0, 196)
@@ -609,7 +609,6 @@ local playedIdHistory = {}
 local DEFAULT_SOUND_ID = "110919391228823"
 local NEW_SOUND_ID = "1841542996"
 
--- Cập nhật danh sách bài hát với ID mới
 local PresetSongs = {
     {Name = "🎵 Nhạc Chill Mặc Định", Id = DEFAULT_SOUND_ID},
     {Name = "🎶 Bài Hát Mới Cập Nhật", Id = NEW_SOUND_ID}
@@ -624,6 +623,9 @@ bgSound.Parent = SoundService
 
 local function addIdToHistory(idStr)
     if not idStr or idStr == "" then return end
+    idStr = idStr:match("^%s*(.-)%s*$") -- Xóa khoảng trắng thừa
+    if idStr == "" then return end
+    
     for i, v in ipairs(playedIdHistory) do
         if v == idStr then
             table.remove(playedIdHistory, i)
@@ -731,24 +733,25 @@ local function updateHeadBillboard()
 end
 
 DefaultMusicBtn.MouseButton1Click:Connect(function()
+    MusicInput.Text = DEFAULT_SOUND_ID
     bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
     bgSound:Play()
     addIdToHistory(DEFAULT_SOUND_ID)
 end)
 
 NewMusicBtn.MouseButton1Click:Connect(function()
+    MusicInput.Text = NEW_SOUND_ID
     bgSound.SoundId = "rbxassetid://" .. NEW_SOUND_ID
     bgSound:Play()
     addIdToHistory(NEW_SOUND_ID)
 end)
 
 PlayMusicBtn.MouseButton1Click:Connect(function()
-    local idNum = tonumber(MusicInput.Text)
-    if idNum then
-        local idStr = tostring(idNum)
-        bgSound.SoundId = "rbxassetid://" .. idStr
+    local rawText = MusicInput.Text:match("^%s*(.-)%s*$")
+    if rawText ~= "" then
+        bgSound.SoundId = "rbxassetid://" .. rawText
         bgSound:Play()
-        addIdToHistory(idStr)
+        addIdToHistory(rawText)
     end
 end)
 
@@ -853,7 +856,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã thay ID bài hát mới (1841542996)."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã sửa lỗi nút phát ID tùy chỉnh."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
