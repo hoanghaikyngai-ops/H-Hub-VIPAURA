@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB VIPAURA - SPAM GIỮ CẦN LIÊN TỤC & LOW CORTISOL
--- (TÍCH HỢP TỰ ĐỘNG XOAY KHÓA MẶT NPC KHI ĐI BÁN CÁ)
+-- H-HUB VIPAURA - BÁN CÁ GIẢM > 2 CON -> BẤM TẠM BIỆT
+-- (CẬP NHẬT TÊN NHẠC: AI ĐƯA EM VỀ)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -93,7 +93,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [SPAM CẦN LIÊN TỤC]"
+LogoText.Text = "🌿 H-HUB VIPAURA [AI ĐƯA EM VỀ EDITION]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 13
@@ -469,7 +469,7 @@ DefaultMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
 DefaultMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 DefaultMusicBtn.Font = Enum.Font.GothamBold
 DefaultMusicBtn.TextSize = 9
-DefaultMusicBtn.Text = "🎵 PHÁT NHẠC CHILL (110919391228823)"
+DefaultMusicBtn.Text = "🎵 PHÁT NHẠC: AI ĐƯA EM VỀ (110919391228823)"
 Instance.new("UICorner", DefaultMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local NewMusicBtn = Instance.new("TextButton", P5)
@@ -583,7 +583,7 @@ local DEFAULT_SOUND_ID = "110919391228823"
 local NEW_SOUND_ID = "1841542996"
 
 local PresetSongs = {
-    {Name = "🎵 Nhạc Chill Mặc Định", Id = DEFAULT_SOUND_ID},
+    {Name = "🎵 Ai Đưa Em Về", Id = DEFAULT_SOUND_ID},
     {Name = "🎶 Bài Hát Mới Cập Nhật", Id = NEW_SOUND_ID}
 }
 
@@ -827,7 +827,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tính năng: Tự động khóa góc nhìn & quay 100% mặt vào NPC Fish Merchant khi đi bán cá."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Bài hát: Ai Đưa Em Về (ID: 110919391228823)"
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -928,14 +928,13 @@ task.spawn(function()
 end)
 
 local function getMerchantPosition()
-    local targetNames = {"merchant fish", "fish merchant", "merchant"}
     for _, obj in pairs(Workspace:GetDescendants()) do
         if obj and (obj:IsA("Model") or obj:IsA("Part")) then
             local objName = string.lower(obj.Name)
-            for _, name in ipairs(targetNames) do
-                if objName:find(name) then
-                    local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
-                    if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
+            if objName:find("fish") and objName:find("merchant") then
+                local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
+                if primaryPart and primaryPart:IsA("BasePart") then 
+                    return primaryPart.Position 
                 end
             end
         end
@@ -1001,7 +1000,7 @@ task.spawn(function()
                     local dynamicMerchantPos = getMerchantPosition()
                     local dist = (root.Position - dynamicMerchantPos).Magnitude
                     
-                    -- KHÓA GÓC NHÌN VÀ XOAY CẢ CAMERA LẪN NHÂN VẬT VÀO NPC BÁN CÁ ĐIÊN CUỒNG LIÊN TỤC
+                    -- KHÓA GÓC NHÌN VÀ QUAY MẶT VÀO FISH MERCHANT
                     local camera = Workspace.CurrentCamera
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
                     
@@ -1011,9 +1010,7 @@ task.spawn(function()
                                 local currentChar = LocalPlayer.Character
                                 local currentRoot = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
                                 if currentRoot and dynamicMerchantPos then
-                                    -- Ép Camera nhìn thẳng tắp vào NPC
                                     camera.CFrame = CFrame.lookAt(camera.CFrame.Position, dynamicMerchantPos)
-                                    -- Ép Nhân vật vặn người đối diện trực diện 100% vào NPC
                                     local lookPos = Vector3.new(dynamicMerchantPos.X, currentRoot.Position.Y, dynamicMerchantPos.Z)
                                     currentRoot.CFrame = CFrame.lookAt(currentRoot.Position, lookPos)
                                 end
@@ -1027,23 +1024,42 @@ task.spawn(function()
                     
                     task.wait(0.3)
 
+                    -- MỞ GIAO DIỆN HỘI THOẠI BẰNG PHÍM E
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                     task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                    task.wait(0.4)
+                    task.wait(0.5)
+
+                    -- BÁN CÁ: GIẢM TRÊN 2 CON LÀ BẤM "TẠM BIỆT"
+                    local initialFishCount = getFishToSellCount()
+                    local sellStartTime = tick()
 
                     repeat
                         if not isRunning then break end
                         clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
                         task.wait(0.8)
-                    until getFishToSellCount() == 0 or not isRunning
 
-                    -- TẮT KHÓA GÓC NHÌN SAU KHI BÁN CÁ XONG
+                        local currentFish = getFishToSellCount()
+                        local fishSold = initialFishCount - currentFish
+
+                        if fishSold > 2 or currentFish == 0 then
+                            break
+                        end
+                    until (tick() - sellStartTime > 10) or not isRunning
+
+                    task.wait(0.4)
+
+                    -- BẤM "TẠM BIỆT" ĐỂ KẾT THÚC CỬA SỔ HỘI THOẠI
+                    clickBtn({"tạm biệt", "tam biet", "bye", "goodbye", "thoát", "close", "đóng"})
+                    task.wait(0.5)
+
+                    -- NHẢ KHÓA GÓC NHÌN SAU KHI TẠM BIỆT
                     if merchantLockConnection then
                         merchantLockConnection:Disconnect()
                         merchantLockConnection = nil
                     end
 
+                    -- BAY VỀ VỊ TRÍ CÂU CŨ
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false
                         hum.WalkSpeed = 16
@@ -1079,7 +1095,7 @@ task.spawn(function()
                     local vp = Workspace.CurrentCamera.ViewportSize
                     if activeTool then pcall(function() activeTool:Activate() end) end
                     
-                    -- SPAM GIỮ MÀN HÌNH CHÍNH XÁC 2 GIÂY KHÔNG NGỪNG NGHỈ
+                    -- SPAM GIỮ MÀN HÌNH CHÍNH XÁC 2 GIÂY
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
                     
                     local holdStart = tick()
