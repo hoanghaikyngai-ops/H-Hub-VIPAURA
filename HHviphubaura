@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - TỐI ƯU GỌN GÀNG (FINAL V21)
+-- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V22)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -93,7 +93,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V21]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V22]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -562,7 +562,7 @@ local playedIdHistory = {}
 
 local PresetSongs = {
     {Name = "💔 DJ Hối Hận Trong Anh", Id = "80415307715259"},
-    {Name = "⏳ Thế Gian Xوay Vòng – Không Thời Gian Remix", Id = "113675312413032"},
+    {Name = "⏳ Thế Gian Xoay Vòng – Không Thời Gian Remix", Id = "113675312413032"},
     {Name = "💔 Phía Sau 1 Cô Gái Remix", Id = "109743636792463"},
     {Name = "🌸 Khuê Mộc Lan", Id = "98361989582185"},
     {Name = "🌙 Chỉ Còn Là Giấc Mơ – ID music remix nhạc Việt", Id = "121051113937228"},
@@ -816,7 +816,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Đã loại bỏ đếm ngược 10s, quét cá tức thì cực mượt."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tích hợp lia chuột mượt mà, không khựng."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -971,53 +971,52 @@ local function findActiveFishTarget()
 end
 
 -- ====================================================
--- LUỒNG RIÊNG: LIA CHUỘT & SPAM BÀO MÁU NGAY KHI CÁ XUẤT HIỆN
+-- LUỒNG RIÊNG: LIA CHUỘT & SPAM BÀO MÁU MƯỢT MÀ (KHÔNG KHỰNG)
 -- ====================================================
 local isFightingFish = false
 
 task.spawn(function()
     while ScreenGui.Parent do
-        task.wait(0.03)
+        task.wait(0.02)
         if isRunning and not isSellingFish and not isFightingFish then
             local fishPart = findActiveFishTarget()
             if fishPart then
                 isFightingFish = true
                 task.spawn(function()
                     local fishFightStart = tick()
-                    local offsetDistance = 22
-                    local initialInventoryCount = getFishToSellCount()
+                    local offsetDistance = 20
+                    local lastValidX, lastValidY = Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2
                     
                     while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
-                        if getFishToSellCount() > initialInventoryCount then
-                            break
+                        fishPart = findActiveFishTarget()
+                        if not fishPart then 
+                            task.wait(0.05)
+                            fishPart = findActiveFishTarget()
+                            if not fishPart then break end
                         end
 
-                        fishPart = findActiveFishTarget()
-                        if fishPart then
-                            local screenPos, onScreen = Camera:WorldToViewportPoint(fishPart.Position)
-                            if onScreen then
-                                local cx, cy = screenPos.X, screenPos.Y
-                                
-                                VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
-                                
-                                local trackingPoints = {
-                                    {x = cx, y = cy - offsetDistance},           -- Trên
-                                    {x = cx - offsetDistance, y = cy},           -- Trái
-                                    {x = cx + offsetDistance, y = cy}            -- Phải
-                                }
-                                
-                                for _, pt in ipairs(trackingPoints) do
-                                    if not isRunning or isSellingFish or (getFishToSellCount() > initialInventoryCount) then break end
-                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
-                                    task.wait(0.01)
-                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
-                                    task.wait(0.01)
-                                end
-                            else
-                                break
-                            end
-                        else
-                            break
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(fishPart.Position)
+                        if onScreen then
+                            lastValidX, lastValidY = screenPos.X, screenPos.Y
+                        end
+
+                        local cx, cy = lastValidX, lastValidY
+                        
+                        VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
+                        
+                        local attackOffsets = {
+                            {x = cx, y = cy - offsetDistance},
+                            {x = cx - offsetDistance, y = cy},
+                            {x = cx + offsetDistance, y = cy},
+                            {x = cx, y = cy + offsetDistance}
+                        }
+                        
+                        for _, pt in ipairs(attackOffsets) do
+                            if not isRunning or isSellingFish then break end
+                            VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
+                            task.wait(0.005)
+                            VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
+                            task.wait(0.005)
                         end
                     end
                     isFightingFish = false
@@ -1183,7 +1182,6 @@ task.spawn(function()
                     local vp = Camera.ViewportSize
                     if activeTool then pcall(function() activeTool:Activate() end) end
                     
-                    -- THẢ CÂU (GIỮ 2S)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
                     
                     local holdStart = tick()
