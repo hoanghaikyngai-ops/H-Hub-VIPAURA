@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - THẢ CẦN XONG SPAM ZXCV NGAY LẬP TỨC (FINAL V6)
+-- H-HUB VIPAURA - THẢ CẦN XONG SPAM ZXCV NGAY LẬP TỨC (FINAL V7)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -92,7 +92,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI OPTIMIZED]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FINAL EDITION]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -931,7 +931,7 @@ local function getMerchantPosition()
 end
 
 -- ====================================================
--- HÀM clickBtn TỐI ƯU CỦA BẠN
+-- HÀM clickBtn CHUẨN XÁC CỦA BẠN (GIỮ NGUYÊN 100%)
 -- ====================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
@@ -1020,7 +1020,7 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- Vòng lặp bán cá tích hợp kiểm tra kho đồ: cá giảm > 2 con hoặc hết sạch -> bay về ngay
+                    -- BƯỚC 1: Bấm "bán tất cả" cho đến khi cá vơi đi hoặc hết sạch
                     repeat
                         if not isRunning then break end
                         
@@ -1037,25 +1037,26 @@ task.spawn(function()
 
                     task.wait(0.4)
 
-                    -- Vòng lặp tìm và bấm nút "tạm biệt." trong 5 giây
+                    -- BƯỚC 2: BẮT BUỘC TÌM VÀ BẤM NÚT "TẠM BIỆT." NGAY SAU KHI BÁN XONG
                     local byeStartTime = tick()
                     repeat
                         if not isRunning then break end
                         local clicked = clickBtn({"tạm biệt.", "tam biet.", "tạm biệt", "tam biet", "goodbye", "thoát", "close", "đóng", "x"})
                         if clicked then 
+                            task.wait(0.3)
                             break 
                         end
                         task.wait(0.25)
                     until (tick() - byeStartTime > 5.0) or not isRunning
 
-                    task.wait(0.6)
+                    task.wait(0.4)
 
                     if merchantLockConnection then
                         merchantLockConnection:Disconnect()
                         merchantLockConnection = nil
                     end
 
-                    -- Tự động bay về vị trí câu ban đầu mượt mà
+                    -- BƯỚC 3: TỰ ĐỘNG BAY VỀ VỊ TRÍ CÂU BAN ĐẦU MƯỢT MÀ
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false
                         hum.WalkSpeed = 16
