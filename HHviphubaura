@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V22)
+-- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V22 - HOANG HAI)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -971,11 +971,19 @@ local function findActiveFishTarget()
 end
 
 -- ====================================================
--- LUỒNG RIÊNG: LIA CHUỘT & SPAM BÀO MÁU MƯỢT MÀ (KHÔNG KHỰNG)
+-- LUỒNG GỘP: LIA CHUỘT BĂM CÁ & XẢ KỸ NĂNG (NHỊP VỪA ĐỦ ĐỂ GAME NHẬN)
 -- ====================================================
 local isFightingFish = false
 
 task.spawn(function()
+    local skillsList = {
+        {key = Enum.KeyCode.Z, index = 1},
+        {key = Enum.KeyCode.X, index = 2},
+        {key = Enum.KeyCode.C, index = 3},
+        {key = Enum.KeyCode.V, index = 4}
+    }
+    local lastSkillTick = 0
+
     while ScreenGui.Parent do
         task.wait(0.02)
         if isRunning and not isSellingFish and not isFightingFish then
@@ -1002,6 +1010,7 @@ task.spawn(function()
 
                         local cx, cy = lastValidX, lastValidY
                         
+                        -- Lia chuột tấn công (băm cá tốc độ cao)
                         VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
                         
                         local attackOffsets = {
@@ -1018,6 +1027,35 @@ task.spawn(function()
                             VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
                             task.wait(0.005)
                         end
+
+                        -- Xả kỹ năng với độ trễ vừa phải (1.5 giây giữa các lần tung trọn bộ Z-X-C-V) 
+                        if tick() - lastSkillTick > 1.5 then
+                            lastSkillTick = tick()
+                            pcall(function()
+                                for _, skill in ipairs(skillsList) do
+                                    if not isRunning or isSellingFish then break end
+                                    
+                                    VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
+                                    task.wait(0.08)
+                                    VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
+                                    task.wait(0.08)
+                                    
+                                    local btn = markerButtons[skill.index]
+                                    local inset = GuiService:GetGuiInset()
+                                    if btn and MarkersGui.Enabled then
+                                        local pos = btn.AbsolutePosition
+                                        local sz = btn.AbsoluteSize
+                                        local finalX = pos.X + sz.X / 2 + inset.X
+                                        local finalY = pos.Y + sz.Y / 2 + inset.Y
+                                        
+                                        VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
+                                        task.wait(0.08)
+                                        VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
+                                        task.wait(0.08)
+                                    end
+                                end
+                            end)
+                        end
                     end
                     isFightingFish = false
                 end)
@@ -1027,16 +1065,9 @@ task.spawn(function()
 end)
 
 -- ====================================================
--- LUỒNG CHÍNH: QUĂNG CẦN & XẢ KỸ NĂNG LIÊN TỤC
+-- LUỒNG CHÍNH: QUĂNG CẦN & BÁN CÁ TỰ ĐỘNG
 -- ====================================================
 task.spawn(function()
-    local skillsList = {
-        {key = Enum.KeyCode.Z, index = 1},
-        {key = Enum.KeyCode.X, index = 2},
-        {key = Enum.KeyCode.C, index = 3},
-        {key = Enum.KeyCode.V, index = 4}
-    }
-
     while ScreenGui.Parent do
         task.wait(0.1)
         if isRunning then
@@ -1191,31 +1222,6 @@ task.spawn(function()
                     
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
                     task.wait(0.05)
-
-                    if isRunning and not isSellingFish and not isFightingFish then
-                        for _, skill in ipairs(skillsList) do
-                            if not isRunning or isSellingFish or isFightingFish then break end
-                            
-                            VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                            task.wait(0.03)
-                            VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
-                            task.wait(0.03)
-                            
-                            local btn = markerButtons[skill.index]
-                            local inset = GuiService:GetGuiInset()
-                            if btn and MarkersGui.Enabled then
-                                local pos = btn.AbsolutePosition
-                                local sz = btn.AbsoluteSize
-                                local finalX = pos.X + sz.X / 2 + inset.X
-                                local finalY = pos.Y + sz.Y / 2 + inset.Y
-                                
-                                VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                                task.wait(0.03)
-                                VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
-                                task.wait(0.03)
-                            end
-                        end
-                    end
                 end
             end)
         end
