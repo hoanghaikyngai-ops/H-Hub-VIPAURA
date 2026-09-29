@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V23 - HOANG HAI)
+-- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V24 - HOANG HAI)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -94,7 +94,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V23]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V24]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -1041,6 +1041,9 @@ end
 
 local isFightingFish = false
 
+-- ====================================================
+-- LUỒNG PHỤ: LIA CHUỘT BĂM CÁ & XẢ KỸ NĂNG (ĐÃ SỬA LỖI KẸT CỜ 100%)
+-- ====================================================
 task.spawn(function()
     local skillsList = {
         {key = Enum.KeyCode.Z, index = 1},
@@ -1056,12 +1059,14 @@ task.spawn(function()
             local fishPart = findActiveFishTarget()
             if fishPart then
                 isFightingFish = true
-                task.spawn(function()
+                
+                -- Đảm bảo bọc toàn bộ logic chiến đấu và luôn giải phóng cờ ở cuối vòng đời
+                pcall(function()
                     local fishFightStart = tick()
                     local offsetDistance = 20
                     local lastValidX, lastValidY = Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2
                     
-                    while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
+                    while isRunning and not isSellingFish and (tick() - fishFightStart < 12) do
                         fishPart = findActiveFishTarget()
                         if not fishPart then 
                             task.wait(0.05)
@@ -1093,16 +1098,16 @@ task.spawn(function()
                             task.wait(0.005)
                         end
 
-                        if tick() - lastSkillTick > 1.5 then
+                        if tick() - lastSkillTick > 1.2 then
                             lastSkillTick = tick()
                             pcall(function()
                                 for _, skill in ipairs(skillsList) do
                                     if not isRunning or isSellingFish then break end
                                     
                                     VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                                    task.wait(0.08)
+                                    task.wait(0.06)
                                     VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
-                                    task.wait(0.08)
+                                    task.wait(0.06)
                                     
                                     local btn = markerButtons[skill.index]
                                     local inset = GuiService:GetGuiInset()
@@ -1113,16 +1118,19 @@ task.spawn(function()
                                         local finalY = pos.Y + sz.Y / 2 + inset.Y
                                         
                                         VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                                        task.wait(0.08)
+                                        task.wait(0.06)
                                         VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
-                                        task.wait(0.08)
+                                        task.wait(0.06)
                                     end
                                 end
                             end)
                         end
+                        task.wait(0.02)
                     end
-                    isFightingFish = false
                 end)
+                
+                -- Reset trạng thái ngay lập tức để vòng lặp tiếp theo chạy mượt mà
+                isFightingFish = false
             end
         end
     end
