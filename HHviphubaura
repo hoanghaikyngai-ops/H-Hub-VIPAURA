@@ -930,21 +930,26 @@ local function getMerchantPosition()
     return Vector3.new(1263.48, 27.71, -349.61)
 end
 
+-- ====================================================
+-- HÀM clickBtn ĐƯỢC ĐẶT LÊN TRÊN ĐỂ ĐẢM BẢO THỰC THI CHUẨN
+-- ====================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
         if obj and obj.Parent and not obj:IsDescendantOf(ScreenGui) then
-            if (obj:IsA("TextButton") or obj:IsA("TextLabel") or obj:IsA("ImageButton")) and obj.Visible then
+            if (obj:IsA("TextButton") or obj:IsA("TextLabel") or obj:IsA("ImageButton")) then
                 local txt = string.lower(obj.Text or "")
                 local name = string.lower(obj.Name or "")
                 for _, kw in ipairs(keys) do
                     if txt:find(kw) or name:find(kw) then
                         local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
-                        local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
-                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
-                        task.wait(0.05)
-                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                        return true
+                        if sz.X > 2 and sz.Y > 2 then
+                            local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
+                            task.wait(0.05)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                            return true
+                        end
                     end
                 end
             end
@@ -1022,7 +1027,17 @@ task.spawn(function()
 
                     repeat
                         if not isRunning then break end
-                        clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
+                        
+                        -- Tự động tìm và ấn "bán tất cả" (có hỗ trợ cả dạng không dấu phòng hờ game lỗi font)
+                        local success = clickBtn({"bán tất cả", "ban tat ca", "bán hết", "ban het", "sell all", "bán", "sell"})
+                        
+                        -- Dự phòng click giữa màn hình nếu UI text không phản hồi
+                        if not success then
+                            VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 + 50, 0, true, game, 1)
+                            task.wait(0.05)
+                            VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 + 50, 0, false, game, 1)
+                        end
+                        
                         task.wait(0.6)
 
                         local currentFish = getFishToSellCount()
@@ -1035,11 +1050,11 @@ task.spawn(function()
 
                     task.wait(0.4)
 
-                    -- Tự động tìm và bấm nút "tạm biệt." (có dấu chấm) liên tục trong 5 giây
+                    -- Tự động tìm và bấm nút "tạm biệt." trong vòng 5 giây
                     local byeStartTime = tick()
                     repeat
                         if not isRunning then break end
-                        local clicked = clickBtn({"tạm biệt.", "tam biet.", "tạm biệt", "tam biet", "goodbye", "thoát", "close", "đóng", "x", "back", "leave", "exit"})
+                        local clicked = clickBtn({"tạm biệt.", "tam biet.", "tạm biệt", "tam biet", "goodbye", "thoát", "close", "đóng", "x"})
                         if clicked then 
                             break 
                         end
@@ -1053,6 +1068,7 @@ task.spawn(function()
                         merchantLockConnection = nil
                     end
 
+                    -- Tự động bay về vị trí câu ban đầu
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false
                         hum.WalkSpeed = 16
