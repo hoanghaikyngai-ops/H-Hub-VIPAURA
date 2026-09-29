@@ -1,5 +1,6 @@
 -- ====================================================
 -- H-HUB VIPAURA - SPAM GIỮ CẦN LIÊN TỤC & LOW CORTISOL
+-- (TÍCH HỢP TỰ ĐỘNG XOAY KHÓA MẶT NPC KHI ĐI BÁN CÁ)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -826,7 +827,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tính năng: Spam giữ cần 2 giây liên tục đến khi đầy kho cá."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tính năng: Tự động khóa góc nhìn & quay 100% mặt vào NPC Fish Merchant khi đi bán cá."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -856,6 +857,7 @@ switchTab(1)
 
 local isServerDmgOn = false
 local isSellingFish = false
+local merchantLockConnection = nil
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
@@ -876,6 +878,11 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
         OriginalFishingSpotCFrame = nil 
         isSellingFish = false
+        
+        if merchantLockConnection then
+            merchantLockConnection:Disconnect()
+            merchantLockConnection = nil
+        end
         
         pcall(function()
             if root then root.Anchored = false end
@@ -921,12 +928,15 @@ task.spawn(function()
 end)
 
 local function getMerchantPosition()
-    local targetName = "merchant fish"
+    local targetNames = {"merchant fish", "fish merchant", "merchant"}
     for _, obj in pairs(Workspace:GetDescendants()) do
         if obj and (obj:IsA("Model") or obj:IsA("Part")) then
-            if string.lower(obj.Name):find(targetName) then
-                local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
-                if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
+            local objName = string.lower(obj.Name)
+            for _, name in ipairs(targetNames) do
+                if objName:find(name) then
+                    local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
+                    if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
+                end
             end
         end
     end
@@ -990,11 +1000,31 @@ task.spawn(function()
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local dist = (root.Position - dynamicMerchantPos).Magnitude
+                    
+                    -- KHÓA GÓC NHÌN VÀ XOAY CẢ CAMERA LẪN NHÂN VẬT VÀO NPC BÁN CÁ ĐIÊN CUỒNG LIÊN TỤC
+                    local camera = Workspace.CurrentCamera
+                    if merchantLockConnection then merchantLockConnection:Disconnect() end
+                    
+                    merchantLockConnection = RunService.RenderStepped:Connect(function()
+                        if isSellingFish then
+                            pcall(function()
+                                local currentChar = LocalPlayer.Character
+                                local currentRoot = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+                                if currentRoot and dynamicMerchantPos then
+                                    -- Ép Camera nhìn thẳng tắp vào NPC
+                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, dynamicMerchantPos)
+                                    -- Ép Nhân vật vặn người đối diện trực diện 100% vào NPC
+                                    local lookPos = Vector3.new(dynamicMerchantPos.X, currentRoot.Position.Y, dynamicMerchantPos.Z)
+                                    currentRoot.CFrame = CFrame.lookAt(currentRoot.Position, lookPos)
+                                end
+                            end)
+                        end
+                    end)
+
                     local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 3))})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
-                    root.CFrame = CFrame.lookAt(dynamicMerchantPos + Vector3.new(0, 2, 3), dynamicMerchantPos)
                     task.wait(0.3)
 
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
@@ -1007,6 +1037,12 @@ task.spawn(function()
                         clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
                         task.wait(0.8)
                     until getFishToSellCount() == 0 or not isRunning
+
+                    -- TẮT KHÓA GÓC NHÌN SAU KHI BÁN CÁ XONG
+                    if merchantLockConnection then
+                        merchantLockConnection:Disconnect()
+                        merchantLockConnection = nil
+                    end
 
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false
