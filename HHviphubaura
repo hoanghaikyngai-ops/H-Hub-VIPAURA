@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - THẢ CẦN XONG SPAM ZXCV TỐC ĐỘ CHUẨN (FINAL V6)
+-- H-HUB VIPAURA - FULL FIX BÁN TẤT CẢ & SPAM ZXCV (FINAL V7)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -383,7 +383,7 @@ GuideLabel.TextSize = 9.5
 GuideLabel.TextWrapped = true
 GuideLabel.TextXAlignment = Enum.TextXAlignment.Left
 GuideLabel.TextYAlignment = Enum.TextYAlignment.Top
-GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định.\n4. Khi Auto Câu bật, hệ thống sẽ thực hiện giữ cần 2s liên tục rồi xả chiêu qua các ô này!"
+GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định.\n4. Khi Auto Câu bật, hệ thống sẽ giữ cần 2s rồi xả chiêu qua các ô này!"
 
 local MarkersGui = Instance.new("ScreenGui")
 MarkersGui.Name = "SkillMarkersUI"
@@ -1022,7 +1022,8 @@ task.spawn(function()
 
                     repeat
                         if not isRunning then break end
-                        clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
+                        -- KHÔI PHỤC ĐẦY ĐỦ TỪ KHÓA BÁN TẤT CẢ ƯU TIÊN SỐ 1
+                        clickBtn({"bán tất cả", "sell all", "bán hết", "ban tat ca", "bán", "sell", "confirm", "đồng ý"})
                         task.wait(0.6)
 
                         local currentFish = getFishToSellCount()
