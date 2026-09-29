@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V24 - HOANG HAI)
+-- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V26 - HOANG HAI)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -94,7 +94,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V24]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V26]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -844,13 +844,25 @@ local function createFixLagButton(name, yPos, colorOn, colorOff, callback)
     return btn
 end
 
-createFixLagButton("XÓA HIỆU ỨNG & ĐỔ BÓNG (SHADOWS)", 25, Color3.fromRGB(0, 160, 80), Color3.fromRGB(100, 100, 100), function(enabled)
+createFixLagButton("XÓA HIỆU ỨNG & DẢI MÀU CẦN CÂU", 25, Color3.fromRGB(0, 160, 80), Color3.fromRGB(100, 100, 100), function(enabled)
     pcall(function()
         Lighting.GlobalShadows = not enabled
         Lighting.Brightness = enabled and 2 or 1
+        
+        -- Xóa các hiệu ứng thời tiết, hạt (tuyết, mưa) và dải màu quấn cần (Trail, Beam, ParticleEmitter, Sparkles, Fire, Smoke, Highlight)
         for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") or v:IsA("Highlight") then
                 v.Enabled = not enabled
+            end
+        end
+        
+        -- Theo dõi thêm các vật phẩm trên nhân vật (cần câu đang cầm)
+        local char = LocalPlayer.Character
+        if char then
+            for _, v in pairs(char:GetDescendants()) do
+                if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Sparkles") or v:IsA("Highlight") then
+                    v.Enabled = not enabled
+                end
             end
         end
     end)
@@ -884,7 +896,7 @@ titleP7.Font = Enum.Font.Gotham
 titleP7.TextSize = 10
 titleP7.TextXAlignment = Enum.TextXAlignment.Left
 titleP7.TextYAlignment = Enum.TextYAlignment.Top
-titleP7.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tích hợp lia chuột mượt mà, không khựng."
+titleP7.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tích hợp lia chuột mượt mà, xóa tuyết và dải màu cần câu chống giật lag."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6, Tab7}
 local pages = {P1, P2, P3, P4, P5, P6, P7}
@@ -1042,7 +1054,7 @@ end
 local isFightingFish = false
 
 -- ====================================================
--- LUỒNG PHỤ: LIA CHUỘT BĂM CÁ & XẢ KỸ NĂNG (ĐÃ SỬA LỖI KẸT CỜ 100%)
+-- LUỒNG PHỤ: LIA CHUỘT BĂM CÁ & XẢ KỸ NĂNG (TỐI ƯU MƯỢT MÀ)
 -- ====================================================
 task.spawn(function()
     local skillsList = {
@@ -1054,13 +1066,12 @@ task.spawn(function()
     local lastSkillTick = 0
 
     while ScreenGui.Parent do
-        task.wait(0.02)
+        task.wait(0.04) 
         if isRunning and not isSellingFish and not isFightingFish then
             local fishPart = findActiveFishTarget()
             if fishPart then
                 isFightingFish = true
                 
-                -- Đảm bảo bọc toàn bộ logic chiến đấu và luôn giải phóng cờ ở cuối vòng đời
                 pcall(function()
                     local fishFightStart = tick()
                     local offsetDistance = 20
@@ -1093,9 +1104,9 @@ task.spawn(function()
                         for _, pt in ipairs(attackOffsets) do
                             if not isRunning or isSellingFish then break end
                             VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
-                            task.wait(0.005)
+                            task.wait(0.008)
                             VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
-                            task.wait(0.005)
+                            task.wait(0.008)
                         end
 
                         if tick() - lastSkillTick > 1.2 then
@@ -1105,9 +1116,9 @@ task.spawn(function()
                                     if not isRunning or isSellingFish then break end
                                     
                                     VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                                    task.wait(0.06)
+                                    task.wait(0.05)
                                     VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
-                                    task.wait(0.06)
+                                    task.wait(0.05)
                                     
                                     local btn = markerButtons[skill.index]
                                     local inset = GuiService:GetGuiInset()
@@ -1118,24 +1129,26 @@ task.spawn(function()
                                         local finalY = pos.Y + sz.Y / 2 + inset.Y
                                         
                                         VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                                        task.wait(0.06)
+                                        task.wait(0.05)
                                         VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
-                                        task.wait(0.06)
+                                        task.wait(0.05)
                                     end
                                 end
                             end)
                         end
-                        task.wait(0.02)
+                        task.wait(0.03)
                     end
                 end)
                 
-                -- Reset trạng thái ngay lập tức để vòng lặp tiếp theo chạy mượt mà
                 isFightingFish = false
             end
         end
     end
 end)
 
+-- ====================================================
+-- LUỒNG CHÍNH: QUĂNG CẦN & GIỮ CẦN (ĐÃ FIX XUNG ĐỘT)
+-- ====================================================
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(0.1)
