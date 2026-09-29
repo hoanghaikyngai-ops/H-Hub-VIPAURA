@@ -1,6 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - BÁN CÁ GIẢM > 2 CON -> BẤM TẠM BIỆT
--- (CẬP NHẬT FULL 17 PRESET MỚI NHẤT)
+-- H-HUB VIPAURA - BÁN CÁ GIẢM > 2 CON -> BẤM TẠM BIỆT (FIXED)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -579,6 +578,7 @@ local PresetSongs = {
     {Name = "💞 Người Đến Sau", Id = "114580872442958"},
     {Name = "💎 Vạn Vật Thay Đổi Vật Chất Lên Ngôi", Id = "108477308631109"},
     {Name = "🏃 ID nhạc Thắng Ngọt Roblox – Chạy Về Với Anh", Id = "127667093795280"},
+    {Name = "🇻🇳 Remix nhạc Việt – Cùng Anh", Id = "71716020610625"},
     {Name = "🇻🇳 Quốc ca Việt Nam", Id = "1845922899"},
     {Name = "🎶 See Tình", Id = "121242950842428"},
     {Name = "🎶 Trả Lại Cho Anh Remix", Id = "110396752508363"},
@@ -588,7 +588,7 @@ local PresetSongs = {
     {Name = "🎵 Ai đưa em về", Id = "110919391228823"}
 }
 
-local DEFAULT_SOUND_ID = "110919391228823"
+local DEFAULT_SOUND_ID = "113675312413032"
 
 local bgSound = Instance.new("Sound")
 bgSound.Name = "HHubMusic"
@@ -815,7 +815,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Hỗ trợ đầy đủ nhạc và auto câu cá mượt mà."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: cook bản quá cháy🔥\n- Hỗ trợ đầy đủ nhạc và auto câu cá mượt mà."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -985,7 +985,8 @@ task.spawn(function()
                     task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
-                    local dist = (root.Position - dynamicMerchantPos).Magnitude
+                    local safeTargetPos = dynamicMerchantPos + Vector3.new(0, 3, 4)
+                    local dist = (root.Position - safeTargetPos).Magnitude
                     
                     local camera = Workspace.CurrentCamera
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
@@ -1004,7 +1005,7 @@ task.spawn(function()
                         end
                     end)
 
-                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 3))})
+                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 55, Enum.EasingStyle.Linear), {CFrame = CFrame.new(safeTargetPos)})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
@@ -1021,7 +1022,7 @@ task.spawn(function()
                     repeat
                         if not isRunning then break end
                         clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
-                        task.wait(0.8)
+                        task.wait(0.6)
 
                         local currentFish = getFishToSellCount()
                         local fishSold = initialFishCount - currentFish
@@ -1029,11 +1030,11 @@ task.spawn(function()
                         if fishSold > 2 or currentFish == 0 then
                             break
                         end
-                    until (tick() - sellStartTime > 10) or not isRunning
+                    until (tick() - sellStartTime > 8) or not isRunning
 
-                    task.wait(0.4)
+                    task.wait(0.3)
 
-                    clickBtn({"tạm biệt", "tam biet", "bye", "goodbye", "thoát", "close", "đóng"})
+                    clickBtn({"tạm biệt", "tam biet", "bye", "goodbye", "thoát", "close", "đóng", "x"})
                     task.wait(0.5)
 
                     if merchantLockConnection then
@@ -1045,7 +1046,7 @@ task.spawn(function()
                         root.Anchored = false
                         hum.WalkSpeed = 16
                         local dBack = (root.Position - OriginalFishingSpotCFrame.Position).Magnitude
-                        local backTween = TweenService:Create(root, TweenInfo.new(dBack / 60, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
+                        local backTween = TweenService:Create(root, TweenInfo.new(dBack / 55, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
                         backTween:Play()
                         while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                         root.CFrame = OriginalFishingSpotCFrame
