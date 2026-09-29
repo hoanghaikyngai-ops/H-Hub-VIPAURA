@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - AUTO CLICK TRÊN - TRÁI - PHẢI QUANH TÂM CÁ (FINAL V15 - FAST SPAM INTEGRATED)
+-- H-HUB VIPAURA - LIA CHUỘT THỜI GIAN THỰC THEO CÁ & SPAM CLICK (FINAL V17 - TRUE MOUSE TRACKING)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -93,7 +93,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V15]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V17]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -1158,13 +1158,13 @@ task.spawn(function()
                         end
                     end
 
-                    -- CƠ CHẾ SPAM CỰC NHANH TRÊN - TRÁI - PHẢI VỊ TRÍ CÁ (CHỈ CHẠY KHI CÁ CÒN XUẤT HIỆN)
+                    -- CƠ CHẾ LIA CHUỘT THẬT (REAL-TIME MOUSE TRACKING & SPAM) DÍ SÁT THEO ĐƯỜNG DI CHUYỂN CỦA CÁ
                     local fishFightStart = tick()
                     local offsetDistance = 22
                     local initialInventoryCount = getFishToSellCount()
                     
                     while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
-                        -- Kiểm tra nếu số cá trong kho tăng lên (+1), nghĩa là đã bắt xong -> Dừng ngay lập tức
+                        -- Dừng ngay lập tức khi bắt xong (+1 cá trong kho)
                         if getFishToSellCount() > initialInventoryCount then
                             break
                         end
@@ -1175,15 +1175,19 @@ task.spawn(function()
                             if onScreen then
                                 local cx, cy = screenPos.X, screenPos.Y
                                 
-                                local clickPoints = {
-                                    {x = cx, y = cy - offsetDistance},           -- Trên (Up)
-                                    {x = cx - offsetDistance, y = cy},           -- Trái (Left)
-                                    {x = cx + offsetDistance, y = cy}            -- Phải (Right)
+                                -- 1. Lia trỏ chuột thật bám dính sát theo tâm cá
+                                VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
+                                
+                                -- 2. Các điểm xoay quanh cá để spam click bào máu
+                                local trackingPoints = {
+                                    {x = cx, y = cy - offsetDistance},           -- Trên
+                                    {x = cx - offsetDistance, y = cy},           -- Trái
+                                    {x = cx + offsetDistance, y = cy}            -- Phải
                                 }
                                 
-                                -- Tối ưu hóa tốc độ spam cực nhanh bằng vòng lặp nhỏ tối thiểu độ trễ
-                                for _, pt in ipairs(clickPoints) do
-                                    if not isRunning or isSellingFish then break end
+                                -- Spam cực nhanh xung quanh vị trí cá theo thời gian thực
+                                for _, pt in ipairs(trackingPoints) do
+                                    if not isRunning or isSellingFish or (getFishToSellCount() > initialInventoryCount) then break end
                                     VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
                                     task.wait(0.01)
                                     VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
@@ -1193,7 +1197,7 @@ task.spawn(function()
                                 break
                             end
                         else
-                            -- Nếu mất dấu hoặc cá chết (biến mất khỏi workspace), dừng spam vòng lặp đánh
+                            -- Nếu mất dấu hoặc cá biến mất, ngưng vòng lặp đánh
                             break
                         end
                     end
