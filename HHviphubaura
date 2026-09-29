@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB VIPAURA - BÁN CÁ GIẢM > 2 CON -> BẤM TẠM BIỆT
--- (CẬP NHẬT TÊN NHẠC: AI ĐƯA EM VỀ)
+-- (CẬP NHẬT FULL 17 PRESET MỚI NHẤT)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -93,10 +93,10 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [AI ĐƯA EM VỀ EDITION]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED EDITION]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
-LogoText.TextSize = 13
+LogoText.TextSize = 12
 
 local CloseBtn = Instance.new("TextButton", TopBar)
 CloseBtn.Size = UDim2.new(0, 28, 0, 28)
@@ -168,22 +168,22 @@ local Tab4 = createTabButton("Kỹ năng ⚡", 4)
 local Tab5 = createTabButton("Âm nhạc 🎵", 5)
 local Tab6 = createTabButton("Thông tin", 6)
 
-local function createPage()
+local function createPage(canvasH)
     local p = Instance.new("ScrollingFrame", ContentContainer)
     p.Size = UDim2.new(1, 0, 1, 0)
     p.BackgroundTransparency = 1
-    p.CanvasSize = UDim2.new(0, 0, 0, 480)
+    p.CanvasSize = UDim2.new(0, 0, 0, canvasH or 480)
     p.ScrollBarThickness = 3
     p.Visible = false
     return p
 end
 
-local P1 = createPage()
-local P2 = createPage()
-local P3 = createPage()
-local P4 = createPage()
-local P5 = createPage()
-local P6 = createPage()
+local P1 = createPage(480)
+local P2 = createPage(480)
+local P3 = createPage(480)
+local P4 = createPage(480)
+local P5 = createPage(520)
+local P6 = createPage(480)
 P1.Visible = true
 
 local titleP1 = Instance.new("TextLabel", P1)
@@ -437,6 +437,7 @@ LockMarkersBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- TAB 5: ÂM NHẠC
 local titleP5 = Instance.new("TextLabel", P5)
 titleP5.Size = UDim2.new(1, 0, 0, 20)
 titleP5.BackgroundTransparency = 1
@@ -462,29 +463,9 @@ for i = 1, 7 do
     table.insert(visualizerBars, bar)
 end
 
-local DefaultMusicBtn = Instance.new("TextButton", P5)
-DefaultMusicBtn.Size = UDim2.new(1, 0, 0, 26)
-DefaultMusicBtn.Position = UDim2.new(0, 0, 0, 42)
-DefaultMusicBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
-DefaultMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DefaultMusicBtn.Font = Enum.Font.GothamBold
-DefaultMusicBtn.TextSize = 9
-DefaultMusicBtn.Text = "🎵 PHÁT NHẠC: AI ĐƯA EM VỀ (110919391228823)"
-Instance.new("UICorner", DefaultMusicBtn).CornerRadius = UDim.new(0, 5)
-
-local NewMusicBtn = Instance.new("TextButton", P5)
-NewMusicBtn.Size = UDim2.new(1, 0, 0, 26)
-NewMusicBtn.Position = UDim2.new(0, 0, 0, 72)
-NewMusicBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 180)
-NewMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-NewMusicBtn.Font = Enum.Font.GothamBold
-NewMusicBtn.TextSize = 9
-NewMusicBtn.Text = "🎶 PHÁT BÀI MỚI (1841542996)"
-Instance.new("UICorner", NewMusicBtn).CornerRadius = UDim.new(0, 5)
-
 local MusicInput = Instance.new("TextBox", P5)
 MusicInput.Size = UDim2.new(1, 0, 0, 24)
-MusicInput.Position = UDim2.new(0, 0, 0, 102)
+MusicInput.Position = UDim2.new(0, 0, 0, 42)
 MusicInput.BackgroundColor3 = Color3.fromRGB(30, 32, 42)
 MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 MusicInput.PlaceholderText = "Nhập Sound ID tùy chỉnh tại đây..."
@@ -495,7 +476,7 @@ Instance.new("UICorner", MusicInput).CornerRadius = UDim.new(0, 5)
 
 local MusicRow = Instance.new("Frame", P5)
 MusicRow.Size = UDim2.new(1, 0, 0, 26)
-MusicRow.Position = UDim2.new(0, 0, 0, 130) 
+MusicRow.Position = UDim2.new(0, 0, 0, 72) 
 MusicRow.BackgroundTransparency = 1
 
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
@@ -519,7 +500,7 @@ Instance.new("UICorner", StopMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local ChillRow = Instance.new("Frame", P5)
 ChillRow.Size = UDim2.new(1, 0, 0, 28)
-ChillRow.Position = UDim2.new(0, 0, 0, 162)
+ChillRow.Position = UDim2.new(0, 0, 0, 104)
 ChillRow.BackgroundTransparency = 1
 
 local HipSwayToggleBtn = Instance.new("TextButton", ChillRow)
@@ -533,17 +514,17 @@ Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
 local PresetTitle = Instance.new("TextLabel", P5)
 PresetTitle.Size = UDim2.new(1, 0, 0, 20)
-PresetTitle.Position = UDim2.new(0, 0, 0, 196)
+PresetTitle.Position = UDim2.new(0, 0, 0, 138)
 PresetTitle.BackgroundTransparency = 1
-PresetTitle.Text = "📂 BÀI HÁT CỦA TÔI (Preset):"
+PresetTitle.Text = "📂 BÀI HÁT MẪU (Preset):"
 PresetTitle.TextColor3 = Color3.fromRGB(0, 220, 255)
 PresetTitle.Font = Enum.Font.GothamBold
 PresetTitle.TextSize = 10
 PresetTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 local PresetContainer = Instance.new("ScrollingFrame", P5)
-PresetContainer.Size = UDim2.new(1, 0, 0, 80)
-PresetContainer.Position = UDim2.new(0, 0, 0, 220)
+PresetContainer.Size = UDim2.new(1, 0, 0, 160)
+PresetContainer.Position = UDim2.new(0, 0, 0, 162)
 PresetContainer.BackgroundColor3 = Color3.fromRGB(22, 26, 35)
 PresetContainer.BackgroundTransparency = 0.5
 PresetContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -556,7 +537,7 @@ PresetLayout.Padding = UDim.new(0, 4)
 
 local HistoryTitle = Instance.new("TextLabel", P5)
 HistoryTitle.Size = UDim2.new(1, 0, 0, 20)
-HistoryTitle.Position = UDim2.new(0, 0, 0, 306)
+HistoryTitle.Position = UDim2.new(0, 0, 0, 330)
 HistoryTitle.BackgroundTransparency = 1
 HistoryTitle.Text = "📜 LỊCH SỬ ID ĐÃ PHÁT:"
 HistoryTitle.TextColor3 = Color3.fromRGB(200, 220, 255)
@@ -565,8 +546,8 @@ HistoryTitle.TextSize = 10
 HistoryTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 local HistoryContainer = Instance.new("ScrollingFrame", P5)
-HistoryContainer.Size = UDim2.new(1, 0, 0, 100)
-HistoryContainer.Position = UDim2.new(0, 0, 0, 330)
+HistoryContainer.Size = UDim2.new(1, 0, 0, 130)
+HistoryContainer.Position = UDim2.new(0, 0, 0, 354)
 HistoryContainer.BackgroundColor3 = Color3.fromRGB(20, 24, 32)
 HistoryContainer.BackgroundTransparency = 0.5
 HistoryContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -579,13 +560,35 @@ HistoryLayout.Padding = UDim.new(0, 4)
 
 local playedIdHistory = {}
 
-local DEFAULT_SOUND_ID = "110919391228823"
-local NEW_SOUND_ID = "1841542996"
-
 local PresetSongs = {
-    {Name = "🎵 Ai Đưa Em Về", Id = DEFAULT_SOUND_ID},
-    {Name = "🎶 Bài Hát Mới Cập Nhật", Id = NEW_SOUND_ID}
+    {Name = "💔 DJ Hối Hận Trong Anh", Id = "80415307715259"},
+    {Name = "⏳ Thế Gian Xoay Vòng – Không Thời Gian Remix", Id = "113675312413032"},
+    {Name = "💔 Phía Sau 1 Cô Gái Remix", Id = "109743636792463"},
+    {Name = "🌸 Khuê Mộc Lan", Id = "98361989582185"},
+    {Name = "🌙 Chỉ Còn Là Giấc Mơ – ID music remix nhạc Việt", Id = "121051113937228"},
+    {Name = "🏙️ Phố Cũ Còn Anh remix", Id = "107810773290624"},
+    {Name = "🍃 Lạc Chốn Hồng Trần – Cô Độc Vương & Gió Nổi Lên", Id = "116260601379194"},
+    {Name = "👑 Cô Độc Vương & Gió Nổi Lên (Bản 2)", Id = "89965851084527"},
+    {Name = "🥀 Mất Anh Rồi", Id = "118574601343022"},
+    {Name = "🎤 Katy Katy remix", Id = "95300067259927"},
+    {Name = "🌊 Sóng và Gió remix", Id = "90113853563664"},
+    {Name = "🇻🇳 Vietnamese song Roblox ID", Id = "110404768256690"},
+    {Name = "🚶 Anh Cứ Đi Đi", Id = "103475172398501"},
+    {Name = "🌧️ Mưa Đợi Chờ", Id = "82627558368623"},
+    {Name = "👰 Chuyện Nàng Trinh Nữ Tên Thi Remix", Id = "119526323504077"},
+    {Name = "💞 Người Đến Sau", Id = "114580872442958"},
+    {Name = "💎 Vạn Vật Thay Đổi Vật Chất Lên Ngôi", Id = "108477308631109"},
+    {Name = "🏃 ID nhạc Thắng Ngọt Roblox – Chạy Về Với Anh", Id = "127667093795280"},
+    {Name = "🇻🇳 Quốc ca Việt Nam", Id = "1845922899"},
+    {Name = "🎶 See Tình", Id = "121242950842428"},
+    {Name = "🎶 Trả Lại Cho Anh Remix", Id = "110396752508363"},
+    {Name = "⚡ Cứ Thế Mong Chờ Remix", Id = "73423580532746"},
+    {Name = "🔥 Tuyển Vợ - Remix", Id = "139968910103444"},
+    {Name = "🔥 2 phút hơn x mimimi - Remix", Id = "124166975687737"},
+    {Name = "🎵 Ai đưa em về", Id = "110919391228823"}
 }
+
+local DEFAULT_SOUND_ID = "110919391228823"
 
 local bgSound = Instance.new("Sound")
 bgSound.Name = "HHubMusic"
@@ -653,7 +656,6 @@ for i, song in ipairs(PresetSongs) do
     end)
 end
 
-addIdToHistory(NEW_SOUND_ID)
 addIdToHistory(DEFAULT_SOUND_ID)
 
 local isHipSwayEnabled = false
@@ -704,20 +706,6 @@ local function updateHeadBillboard()
         cortisolImage.Image = "rbxassetid://13835613385"
     end
 end
-
-DefaultMusicBtn.MouseButton1Click:Connect(function()
-    MusicInput.Text = DEFAULT_SOUND_ID
-    bgSound.SoundId = "rbxassetid://" .. DEFAULT_SOUND_ID
-    bgSound:Play()
-    addIdToHistory(DEFAULT_SOUND_ID)
-end)
-
-NewMusicBtn.MouseButton1Click:Connect(function()
-    MusicInput.Text = NEW_SOUND_ID
-    bgSound.SoundId = "rbxassetid://" .. NEW_SOUND_ID
-    bgSound:Play()
-    addIdToHistory(NEW_SOUND_ID)
-end)
 
 PlayMusicBtn.MouseButton1Click:Connect(function()
     local rawText = MusicInput.Text:match("^%s*(.-)%s*$")
@@ -827,7 +815,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Bài hát: Ai Đưa Em Về (ID: 110919391228823)"
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Hỗ trợ đầy đủ nhạc và auto câu cá mượt mà."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -983,7 +971,6 @@ task.spawn(function()
                 
                 if not OriginalFishingSpotCFrame and not isSellingFish then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- KIỂM TRA ĐẦY KHOÁNG CÁ ĐỂ ĐI BÁN
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
@@ -1000,7 +987,6 @@ task.spawn(function()
                     local dynamicMerchantPos = getMerchantPosition()
                     local dist = (root.Position - dynamicMerchantPos).Magnitude
                     
-                    -- KHÓA GÓC NHÌN VÀ QUAY MẶT VÀO FISH MERCHANT
                     local camera = Workspace.CurrentCamera
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
                     
@@ -1024,13 +1010,11 @@ task.spawn(function()
                     
                     task.wait(0.3)
 
-                    -- MỞ GIAO DIỆN HỘI THOẠI BẰNG PHÍM E
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                     task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                     task.wait(0.5)
 
-                    -- BÁN CÁ: GIẢM TRÊN 2 CON LÀ BẤM "TẠM BIỆT"
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
@@ -1049,17 +1033,14 @@ task.spawn(function()
 
                     task.wait(0.4)
 
-                    -- BẤM "TẠM BIỆT" ĐỂ KẾT THÚC CỬA SỔ HỘI THOẠI
                     clickBtn({"tạm biệt", "tam biet", "bye", "goodbye", "thoát", "close", "đóng"})
                     task.wait(0.5)
 
-                    -- NHẢ KHÓA GÓC NHÌN SAU KHI TẠM BIỆT
                     if merchantLockConnection then
                         merchantLockConnection:Disconnect()
                         merchantLockConnection = nil
                     end
 
-                    -- BAY VỀ VỊ TRÍ CÂU CŨ
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false
                         hum.WalkSpeed = 16
@@ -1079,7 +1060,6 @@ task.spawn(function()
                 root.Anchored = true
                 hum.WalkSpeed = 0
 
-                -- TRANG BỊ CẦN CÂU
                 local activeTool = char and char:FindFirstChildOfClass("Tool")
                 local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
 
@@ -1095,7 +1075,6 @@ task.spawn(function()
                     local vp = Workspace.CurrentCamera.ViewportSize
                     if activeTool then pcall(function() activeTool:Activate() end) end
                     
-                    -- SPAM GIỮ MÀN HÌNH CHÍNH XÁC 2 GIÂY
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
                     
                     local holdStart = tick()
@@ -1106,7 +1085,6 @@ task.spawn(function()
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
                     task.wait(0.1)
 
-                    -- XẢ KỸ NĂNG Z, X, C, V TỰ ĐỘNG
                     if isRunning and not isSellingFish then
                         for _, skill in ipairs(skillsList) do
                             if not isRunning or isSellingFish then break end
