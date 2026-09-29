@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - THẢ CẦN XONG SPAM ZXCV NGAY LẬP TỨC (FINAL V7)
+-- H-HUB VIPAURA - AUTO CLICK TRÊN - TRÁI - PHẢI QUANH TÂM CÁ (FINAL V13)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -12,6 +12,7 @@ local SoundService = game:GetService("SoundService")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Camera = Workspace.CurrentCamera
 
 pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
@@ -92,7 +93,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FINAL EDITION]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V13]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -930,9 +931,6 @@ local function getMerchantPosition()
     return Vector3.new(1263.48, 27.71, -349.61)
 end
 
--- ====================================================
--- HÀM clickBtn CHUẨN XÁC CỦA BẠN (GIỮ NGUYÊN 100%)
--- ====================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
@@ -951,6 +949,25 @@ local function clickBtn(keys)
         end
     end
     return false
+end
+
+local function findActiveFishTarget()
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj and (obj:IsA("Model") or obj:IsA("Part")) then
+            local name = string.lower(obj.Name)
+            if name:find("fish") or name:find("catch") or name:find("shark") or name:find("whale") or name:find("mob") then
+                local part = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
+                if part and part:IsA("BasePart") then
+                    local char = LocalPlayer.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root and (part.Position - root.Position).Magnitude < 40 then
+                        return part
+                    end
+                end
+            end
+        end
+    end
+    return nil
 end
 
 task.spawn(function()
@@ -975,21 +992,20 @@ task.spawn(function()
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
-                    local vp = Workspace.CurrentCamera.ViewportSize
+                    local vp = Camera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
                     task.wait(0.08)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1)
-                    task.wait(0.2)
+                    task.wait(0.25)
 
                     root.Anchored = false
                     hum.WalkSpeed = 16
                     task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
-                    local safeTargetPos = dynamicMerchantPos + Vector3.new(0, 3, 4)
+                    local safeTargetPos = Vector3.new(dynamicMerchantPos.X, dynamicMerchantPos.Y, dynamicMerchantPos.Z - 3.5)
                     local dist = (root.Position - safeTargetPos).Magnitude
                     
-                    local camera = Workspace.CurrentCamera
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
                     
                     merchantLockConnection = RunService.RenderStepped:Connect(function()
@@ -997,16 +1013,18 @@ task.spawn(function()
                             pcall(function()
                                 local currentChar = LocalPlayer.Character
                                 local currentRoot = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+                                local currentHum = currentChar and currentChar:FindFirstChildOfClass("Humanoid")
                                 if currentRoot and dynamicMerchantPos then
-                                    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, dynamicMerchantPos)
-                                    local lookPos = Vector3.new(dynamicMerchantPos.X, currentRoot.Position.Y, dynamicMerchantPos.Z)
-                                    currentRoot.CFrame = CFrame.lookAt(currentRoot.Position, lookPos)
+                                    currentRoot.Anchored = true
+                                    if currentHum then currentHum.WalkSpeed = 0 end
+                                    Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
+                                    currentRoot.CFrame = CFrame.lookAt(currentRoot.Position, dynamicMerchantPos)
                                 end
                             end)
                         end
                     end)
 
-                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 55, Enum.EasingStyle.Linear), {CFrame = CFrame.new(safeTargetPos)})
+                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 55, Enum.EasingStyle.Linear), {CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
@@ -1020,12 +1038,12 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- BƯỚC 1: Bấm "bán tất cả" cho đến khi cá vơi đi hoặc hết sạch
                     repeat
                         if not isRunning then break end
-                        
-                        clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
-                        task.wait(0.6)
+                        clickBtn({"bán tất cả", "sell all", "bán", "sell"})
+                        task.wait(0.25)
+                        clickBtn({"xác nhận", "confirm", "đồng ý", "yes", "ok"})
+                        task.wait(0.5)
 
                         local currentFish = getFishToSellCount()
                         local fishSold = initialFishCount - currentFish
@@ -1037,26 +1055,26 @@ task.spawn(function()
 
                     task.wait(0.4)
 
-                    -- BƯỚC 2: BẮT BUỘC TÌM VÀ BẤM NÚT "TẠM BIỆT." NGAY SAU KHI BÁN XONG
                     local byeStartTime = tick()
+                    local successfullyClosed = false
                     repeat
                         if not isRunning then break end
                         local clicked = clickBtn({"tạm biệt.", "tam biet.", "tạm biệt", "tam biet", "goodbye", "thoát", "close", "đóng", "x"})
                         if clicked then 
-                            task.wait(0.3)
+                            successfullyClosed = true
+                            task.wait(0.6)
                             break 
                         end
                         task.wait(0.25)
                     until (tick() - byeStartTime > 5.0) or not isRunning
 
-                    task.wait(0.4)
+                    if not successfullyClosed then task.wait(0.5) end
 
                     if merchantLockConnection then
                         merchantLockConnection:Disconnect()
                         merchantLockConnection = nil
                     end
 
-                    -- BƯỚC 3: TỰ ĐỘNG BAY VỀ VỊ TRÍ CÂU BAN ĐẦU MƯỢT MÀ
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false
                         hum.WalkSpeed = 16
@@ -1088,7 +1106,7 @@ task.spawn(function()
                 end
 
                 if isRunning and not isSellingFish then
-                    local vp = Workspace.CurrentCamera.ViewportSize
+                    local vp = Camera.ViewportSize
                     if activeTool then pcall(function() activeTool:Activate() end) end
                     
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
@@ -1098,11 +1116,9 @@ task.spawn(function()
                         task.wait(0.05)
                     end
                     
-                    -- NHẢ TRỤC / THẢ CẦN RA
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
                     task.wait(0.05)
 
-                    -- NGAY SAU KHI THẢ CẦN -> SPAM NGAY LẬP TỨC Z, X, C, V
                     if isRunning and not isSellingFish then
                         for _, skill in ipairs(skillsList) do
                             if not isRunning or isSellingFish then break end
@@ -1125,6 +1141,45 @@ task.spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
                                 task.wait(0.03)
                             end
+                        end
+                    end
+
+                    -- AUTO CLICK QUANH TÂM CÁ: TRÊN, TRÁI, PHẢI KHI CÁ XUẤT HIỆN
+                    local fishFightStart = tick()
+                    local offsetDistance = 22 -- Khoảng cách lệch từ tâm ra các hướng (pixel)
+                    
+                    while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
+                        local fishPart = findActiveFishTarget()
+                        if fishPart then
+                            local screenPos, onScreen = Camera:WorldToViewportPoint(fishPart.Position)
+                            if onScreen then
+                                local cx, cy = screenPos.X, screenPos.Y
+                                
+                                -- 1. CLICK HƯỚNG TRÊN (UP)
+                                local upX, upY = cx, cy - offsetDistance
+                                VirtualInputManager:SendMouseButtonEvent(upX, upY, 0, true, game, 1)
+                                task.wait(0.03)
+                                VirtualInputManager:SendMouseButtonEvent(upX, upY, 0, false, game, 1)
+                                task.wait(0.03)
+                                
+                                -- 2. CLICK HƯỚNG TRÁI (LEFT)
+                                local leftX, leftY = cx - offsetDistance, cy
+                                VirtualInputManager:SendMouseButtonEvent(leftX, leftY, 0, true, game, 1)
+                                task.wait(0.03)
+                                VirtualInputManager:SendMouseButtonEvent(leftX, leftY, 0, false, game, 1)
+                                task.wait(0.03)
+                                
+                                -- 3. CLICK HƯỚNG PHẢI (RIGHT)
+                                local rightX, rightY = cx + offsetDistance, cy
+                                VirtualInputManager:SendMouseButtonEvent(rightX, rightY, 0, true, game, 1)
+                                task.wait(0.03)
+                                VirtualInputManager:SendMouseButtonEvent(rightX, rightY, 0, false, game, 1)
+                                task.wait(0.03)
+                            else
+                                break
+                            end
+                        else
+                            break
                         end
                     end
                 end
