@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - LIA CHUỘT THỜI GIAN THỰC THEO CÁ & SPAM CLICK (FINAL V17 - TRUE MOUSE TRACKING)
+-- H-HUB VIPAURA - TỐI ƯU GỌN GÀNG (FINAL V21)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -93,7 +93,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V17]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V21]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -562,7 +562,7 @@ local playedIdHistory = {}
 
 local PresetSongs = {
     {Name = "💔 DJ Hối Hận Trong Anh", Id = "80415307715259"},
-    {Name = "⏳ Thế Gian Xoay Vòng – Không Thời Gian Remix", Id = "113675312413032"},
+    {Name = "⏳ Thế Gian Xوay Vòng – Không Thời Gian Remix", Id = "113675312413032"},
     {Name = "💔 Phía Sau 1 Cô Gái Remix", Id = "109743636792463"},
     {Name = "🌸 Khuê Mộc Lan", Id = "98361989582185"},
     {Name = "🌙 Chỉ Còn Là Giấc Mơ – ID music remix nhạc Việt", Id = "121051113937228"},
@@ -816,7 +816,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Hỗ trợ đầy đủ nhạc và auto câu cá mượt mà."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Đã loại bỏ đếm ngược 10s, quét cá tức thì cực mượt."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -970,6 +970,66 @@ local function findActiveFishTarget()
     return nil
 end
 
+-- ====================================================
+-- LUỒNG RIÊNG: LIA CHUỘT & SPAM BÀO MÁU NGAY KHI CÁ XUẤT HIỆN
+-- ====================================================
+local isFightingFish = false
+
+task.spawn(function()
+    while ScreenGui.Parent do
+        task.wait(0.03)
+        if isRunning and not isSellingFish and not isFightingFish then
+            local fishPart = findActiveFishTarget()
+            if fishPart then
+                isFightingFish = true
+                task.spawn(function()
+                    local fishFightStart = tick()
+                    local offsetDistance = 22
+                    local initialInventoryCount = getFishToSellCount()
+                    
+                    while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
+                        if getFishToSellCount() > initialInventoryCount then
+                            break
+                        end
+
+                        fishPart = findActiveFishTarget()
+                        if fishPart then
+                            local screenPos, onScreen = Camera:WorldToViewportPoint(fishPart.Position)
+                            if onScreen then
+                                local cx, cy = screenPos.X, screenPos.Y
+                                
+                                VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
+                                
+                                local trackingPoints = {
+                                    {x = cx, y = cy - offsetDistance},           -- Trên
+                                    {x = cx - offsetDistance, y = cy},           -- Trái
+                                    {x = cx + offsetDistance, y = cy}            -- Phải
+                                }
+                                
+                                for _, pt in ipairs(trackingPoints) do
+                                    if not isRunning or isSellingFish or (getFishToSellCount() > initialInventoryCount) then break end
+                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
+                                    task.wait(0.01)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
+                                    task.wait(0.01)
+                                end
+                            else
+                                break
+                            end
+                        else
+                            break
+                        end
+                    end
+                    isFightingFish = false
+                end)
+            end
+        end
+    end
+end)
+
+-- ====================================================
+-- LUỒNG CHÍNH: QUĂNG CẦN & XẢ KỸ NĂNG LIÊN TỤC
+-- ====================================================
 task.spawn(function()
     local skillsList = {
         {key = Enum.KeyCode.Z, index = 1},
@@ -1102,7 +1162,7 @@ task.spawn(function()
                     isSellingFish = false 
                 end
 
-                if not isRunning or isSellingFish then return end
+                if not isRunning or isSellingFish or isFightingFish then return end
 
                 if OriginalFishingSpotCFrame then root.CFrame = OriginalFishingSpotCFrame end
                 root.Anchored = true
@@ -1119,23 +1179,24 @@ task.spawn(function()
                     activeTool = char and char:FindFirstChildOfClass("Tool")
                 end
 
-                if isRunning and not isSellingFish then
+                if isRunning and not isSellingFish and not isFightingFish then
                     local vp = Camera.ViewportSize
                     if activeTool then pcall(function() activeTool:Activate() end) end
                     
+                    -- THẢ CÂU (GIỮ 2S)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
                     
                     local holdStart = tick()
-                    while tick() - holdStart < 2.0 and isRunning and not isSellingFish do
+                    while tick() - holdStart < 2.0 and isRunning and not isSellingFish and not isFightingFish do
                         task.wait(0.05)
                     end
                     
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
                     task.wait(0.05)
 
-                    if isRunning and not isSellingFish then
+                    if isRunning and not isSellingFish and not isFightingFish then
                         for _, skill in ipairs(skillsList) do
-                            if not isRunning or isSellingFish then break end
+                            if not isRunning or isSellingFish or isFightingFish then break end
                             
                             VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
                             task.wait(0.03)
@@ -1155,50 +1216,6 @@ task.spawn(function()
                                 VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
                                 task.wait(0.03)
                             end
-                        end
-                    end
-
-                    -- CƠ CHẾ LIA CHUỘT THẬT (REAL-TIME MOUSE TRACKING & SPAM) DÍ SÁT THEO ĐƯỜNG DI CHUYỂN CỦA CÁ
-                    local fishFightStart = tick()
-                    local offsetDistance = 22
-                    local initialInventoryCount = getFishToSellCount()
-                    
-                    while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
-                        -- Dừng ngay lập tức khi bắt xong (+1 cá trong kho)
-                        if getFishToSellCount() > initialInventoryCount then
-                            break
-                        end
-
-                        local fishPart = findActiveFishTarget()
-                        if fishPart then
-                            local screenPos, onScreen = Camera:WorldToViewportPoint(fishPart.Position)
-                            if onScreen then
-                                local cx, cy = screenPos.X, screenPos.Y
-                                
-                                -- 1. Lia trỏ chuột thật bám dính sát theo tâm cá
-                                VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
-                                
-                                -- 2. Các điểm xoay quanh cá để spam click bào máu
-                                local trackingPoints = {
-                                    {x = cx, y = cy - offsetDistance},           -- Trên
-                                    {x = cx - offsetDistance, y = cy},           -- Trái
-                                    {x = cx + offsetDistance, y = cy}            -- Phải
-                                }
-                                
-                                -- Spam cực nhanh xung quanh vị trí cá theo thời gian thực
-                                for _, pt in ipairs(trackingPoints) do
-                                    if not isRunning or isSellingFish or (getFishToSellCount() > initialInventoryCount) then break end
-                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
-                                    task.wait(0.01)
-                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
-                                    task.wait(0.01)
-                                end
-                            else
-                                break
-                            end
-                        else
-                            -- Nếu mất dấu hoặc cá biến mất, ngưng vòng lặp đánh
-                            break
                         end
                     end
                 end
