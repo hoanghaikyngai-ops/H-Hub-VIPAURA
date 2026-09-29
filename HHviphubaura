@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - AUTO CLICK TRÊN - TRÁI - PHẢI QUANH TÂM CÁ (FINAL V13)
+-- H-HUB VIPAURA - AUTO CLICK TRÊN - TRÁI - PHẢI QUANH TÂM CÁ (FINAL V15 - FAST SPAM INTEGRATED)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -93,7 +93,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V13]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V15]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -1003,31 +1003,31 @@ task.spawn(function()
                     task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
-                    local safeTargetPos = Vector3.new(dynamicMerchantPos.X, dynamicMerchantPos.Y, dynamicMerchantPos.Z - 3.5)
+                    local merchantTargetCFrame = CFrame.new(dynamicMerchantPos)
+                    local safeTargetPos = dynamicMerchantPos - (merchantTargetCFrame.LookVector * 3.5)
                     local dist = (root.Position - safeTargetPos).Magnitude
                     
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
                     
                     merchantLockConnection = RunService.RenderStepped:Connect(function()
-                        if isSellingFish then
-                            pcall(function()
-                                local currentChar = LocalPlayer.Character
-                                local currentRoot = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
-                                local currentHum = currentChar and currentChar:FindFirstChildOfClass("Humanoid")
-                                if currentRoot and dynamicMerchantPos then
-                                    currentRoot.Anchored = true
-                                    if currentHum then currentHum.WalkSpeed = 0 end
-                                    Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
-                                    currentRoot.CFrame = CFrame.lookAt(currentRoot.Position, dynamicMerchantPos)
-                                end
-                            end)
-                        end
+                        pcall(function()
+                            local currentChar = LocalPlayer.Character
+                            local currentRoot = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+                            local currentHum = currentChar and currentChar:FindFirstChildOfClass("Humanoid")
+                            if currentRoot and dynamicMerchantPos then
+                                currentRoot.Anchored = true
+                                if currentHum then currentHum.WalkSpeed = 0 end
+                                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
+                                currentRoot.CFrame = CFrame.lookAt(currentRoot.Position, Vector3.new(dynamicMerchantPos.X, currentRoot.Position.Y, dynamicMerchantPos.Z))
+                            end
+                        end)
                     end)
 
                     local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 55, Enum.EasingStyle.Linear), {CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
+                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                     task.wait(0.3)
 
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
@@ -1040,15 +1040,23 @@ task.spawn(function()
 
                     repeat
                         if not isRunning then break end
+                        
+                        pcall(function()
+                            root.Anchored = true
+                            hum.WalkSpeed = 0
+                            root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                        end)
+
                         clickBtn({"bán tất cả", "sell all", "bán", "sell"})
                         task.wait(0.25)
                         clickBtn({"xác nhận", "confirm", "đồng ý", "yes", "ok"})
-                        task.wait(0.5)
+                        task.wait(0.4)
 
                         local currentFish = getFishToSellCount()
                         local fishSold = initialFishCount - currentFish
 
-                        if fishSold > 2 or currentFish == 0 then
+                        if currentFish == 0 or fishSold > 0 then
+                            task.wait(0.3)
                             break
                         end
                     until (tick() - sellStartTime > 8) or not isRunning
@@ -1059,16 +1067,22 @@ task.spawn(function()
                     local successfullyClosed = false
                     repeat
                         if not isRunning then break end
-                        local clicked = clickBtn({"tạm biệt.", "tam biet.", "tạm biệt", "tam biet", "goodbye", "thoát", "close", "đóng", "x"})
+                        
+                        pcall(function()
+                            root.Anchored = true
+                            hum.WalkSpeed = 0
+                        end)
+
+                        local clicked = clickBtn({"tạm biệt.", "tam biet.", "tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"})
                         if clicked then 
                             successfullyClosed = true
-                            task.wait(0.6)
+                            task.wait(0.5)
                             break 
                         end
                         task.wait(0.25)
-                    until (tick() - byeStartTime > 5.0) or not isRunning
+                    until (tick() - byeStartTime > 4.0) or not isRunning
 
-                    if not successfullyClosed then task.wait(0.5) end
+                    if not successfullyClosed then task.wait(0.4) end
 
                     if merchantLockConnection then
                         merchantLockConnection:Disconnect()
@@ -1144,41 +1158,42 @@ task.spawn(function()
                         end
                     end
 
-                    -- AUTO CLICK QUANH TÂM CÁ: TRÊN, TRÁI, PHẢI KHI CÁ XUẤT HIỆN
+                    -- CƠ CHẾ SPAM CỰC NHANH TRÊN - TRÁI - PHẢI VỊ TRÍ CÁ (CHỈ CHẠY KHI CÁ CÒN XUẤT HIỆN)
                     local fishFightStart = tick()
-                    local offsetDistance = 22 -- Khoảng cách lệch từ tâm ra các hướng (pixel)
+                    local offsetDistance = 22
+                    local initialInventoryCount = getFishToSellCount()
                     
                     while isRunning and not isSellingFish and (tick() - fishFightStart < 15) do
+                        -- Kiểm tra nếu số cá trong kho tăng lên (+1), nghĩa là đã bắt xong -> Dừng ngay lập tức
+                        if getFishToSellCount() > initialInventoryCount then
+                            break
+                        end
+
                         local fishPart = findActiveFishTarget()
                         if fishPart then
                             local screenPos, onScreen = Camera:WorldToViewportPoint(fishPart.Position)
                             if onScreen then
                                 local cx, cy = screenPos.X, screenPos.Y
                                 
-                                -- 1. CLICK HƯỚNG TRÊN (UP)
-                                local upX, upY = cx, cy - offsetDistance
-                                VirtualInputManager:SendMouseButtonEvent(upX, upY, 0, true, game, 1)
-                                task.wait(0.03)
-                                VirtualInputManager:SendMouseButtonEvent(upX, upY, 0, false, game, 1)
-                                task.wait(0.03)
+                                local clickPoints = {
+                                    {x = cx, y = cy - offsetDistance},           -- Trên (Up)
+                                    {x = cx - offsetDistance, y = cy},           -- Trái (Left)
+                                    {x = cx + offsetDistance, y = cy}            -- Phải (Right)
+                                }
                                 
-                                -- 2. CLICK HƯỚNG TRÁI (LEFT)
-                                local leftX, leftY = cx - offsetDistance, cy
-                                VirtualInputManager:SendMouseButtonEvent(leftX, leftY, 0, true, game, 1)
-                                task.wait(0.03)
-                                VirtualInputManager:SendMouseButtonEvent(leftX, leftY, 0, false, game, 1)
-                                task.wait(0.03)
-                                
-                                -- 3. CLICK HƯỚNG PHẢI (RIGHT)
-                                local rightX, rightY = cx + offsetDistance, cy
-                                VirtualInputManager:SendMouseButtonEvent(rightX, rightY, 0, true, game, 1)
-                                task.wait(0.03)
-                                VirtualInputManager:SendMouseButtonEvent(rightX, rightY, 0, false, game, 1)
-                                task.wait(0.03)
+                                -- Tối ưu hóa tốc độ spam cực nhanh bằng vòng lặp nhỏ tối thiểu độ trễ
+                                for _, pt in ipairs(clickPoints) do
+                                    if not isRunning or isSellingFish then break end
+                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, true, game, 1)
+                                    task.wait(0.01)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.x, pt.y, 0, false, game, 1)
+                                    task.wait(0.01)
+                                end
                             else
                                 break
                             end
                         else
+                            -- Nếu mất dấu hoặc cá chết (biến mất khỏi workspace), dừng spam vòng lặp đánh
                             break
                         end
                     end
