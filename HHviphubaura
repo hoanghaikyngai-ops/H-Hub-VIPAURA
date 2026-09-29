@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - LOW CORTISOL INTENSE DANCE & IMAGE
+-- H-HUB VIPAURA - SPAM GIỮ CẦN LIÊN TỤC & LOW CORTISOL
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -42,7 +42,6 @@ local ToggleStroke = Instance.new("UIStroke", ToggleBtn)
 ToggleStroke.Color = Color3.fromRGB(0, 255, 128)
 ToggleStroke.Thickness = 2
 
--- Vòng tròn cảm biến nhạc (Audio Reactive Ring)
 local MusicRing = Instance.new("Frame", ToggleBtn)
 MusicRing.Size = UDim2.new(1, 14, 1, 14)
 MusicRing.Position = UDim2.new(0, -7, 0, -7)
@@ -93,7 +92,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [INTENSE DANCE & CORTISOL MODE]"
+LogoText.Text = "🌿 H-HUB VIPAURA [SPAM CẦN LIÊN TỤC]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 13
@@ -348,25 +347,15 @@ end)
 local titleP4 = Instance.new("TextLabel", P4)
 titleP4.Size = UDim2.new(1, 0, 0, 20)
 titleP4.BackgroundTransparency = 1
-titleP4.Text = "Cài đặt 4 Ô Kỹ Năng (Mobile)"
+titleP4.Text = "Cài đặt Vùng Chạm Kỹ Năng (Mobile)"
 titleP4.TextColor3 = Color3.fromRGB(0, 220, 255)
 titleP4.Font = Enum.Font.GothamBold
 titleP4.TextSize = 11
 titleP4.TextXAlignment = Enum.TextXAlignment.Left
 
-local AutoSkillToggle = Instance.new("TextButton", P4)
-AutoSkillToggle.Size = UDim2.new(1, 0, 0, 28)
-AutoSkillToggle.Position = UDim2.new(0, 0, 0, 22)
-AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-AutoSkillToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoSkillToggle.Font = Enum.Font.GothamBold
-AutoSkillToggle.TextSize = 10
-AutoSkillToggle.Text = "SPAM CHIÊU (MOBILE): TẮT"
-Instance.new("UICorner", AutoSkillToggle).CornerRadius = UDim.new(0, 6)
-
 local ShowMarkersBtn = Instance.new("TextButton", P4)
-ShowMarkersBtn.Size = UDim2.new(0.48, 0, 0, 26)
-ShowMarkersBtn.Position = UDim2.new(0, 0, 0, 54)
+ShowMarkersBtn.Size = UDim2.new(0.48, 0, 0, 28)
+ShowMarkersBtn.Position = UDim2.new(0, 0, 0, 25)
 ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
 ShowMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ShowMarkersBtn.Font = Enum.Font.GothamBold
@@ -375,8 +364,8 @@ ShowMarkersBtn.Text = "HIỆN 4 Ô KỸ NĂNG: TẮT"
 Instance.new("UICorner", ShowMarkersBtn).CornerRadius = UDim.new(0, 6)
 
 local LockMarkersBtn = Instance.new("TextButton", P4)
-LockMarkersBtn.Size = UDim2.new(0.48, 0, 0, 26)
-LockMarkersBtn.Position = UDim2.new(0.52, 0, 0, 54)
+LockMarkersBtn.Size = UDim2.new(0.48, 0, 0, 28)
+LockMarkersBtn.Position = UDim2.new(0.52, 0, 0, 25)
 LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 LockMarkersBtn.Font = Enum.Font.GothamBold
@@ -386,7 +375,7 @@ Instance.new("UICorner", LockMarkersBtn).CornerRadius = UDim.new(0, 6)
 
 local GuideLabel = Instance.new("TextLabel", P4)
 GuideLabel.Size = UDim2.new(1, 0, 0, 110)
-GuideLabel.Position = UDim2.new(0, 0, 0, 88)
+GuideLabel.Position = UDim2.new(0, 0, 0, 62)
 GuideLabel.BackgroundTransparency = 1
 GuideLabel.TextColor3 = Color3.fromRGB(220, 220, 100)
 GuideLabel.Font = Enum.Font.Gotham
@@ -394,7 +383,7 @@ GuideLabel.TextSize = 9.5
 GuideLabel.TextWrapped = true
 GuideLabel.TextXAlignment = Enum.TextXAlignment.Left
 GuideLabel.TextYAlignment = Enum.TextYAlignment.Top
-GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật nút 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định vị trí.\n4. Khi Auto Câu bật, hệ thống tự động chạm vào 4 ô này để xả chiêu sau khi thả cần!"
+GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định.\n4. Khi Auto Câu bật, hệ thống sẽ thực hiện giữ cần 2s liên tục rồi xả chiêu qua các ô này!"
 
 local MarkersGui = Instance.new("ScreenGui")
 MarkersGui.Name = "SkillMarkersUI"
@@ -444,21 +433,6 @@ LockMarkersBtn.MouseButton1Click:Connect(function()
     else
         LockMarkersBtn.Text = "KHÓA Ô: MỞ 🔓"
         LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-    end
-end)
-
-local isAutoSkillOn = false
-AutoSkillToggle.MouseButton1Click:Connect(function()
-    isAutoSkillOn = not isAutoSkillOn
-    if isAutoSkillOn then
-        AutoSkillToggle.Text = "SPAM CHIÊU (MOBILE): BẬT"
-        AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(0, 160, 80)
-    else
-        AutoSkillToggle.Text = "SPAM CHIÊU (MOBILE): TẮT"
-        AutoSkillToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        MarkersGui.Enabled = false
-        ShowMarkersBtn.Text = "HIỆN 4 Ô KỸ NĂNG: TẮT"
-        ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 180)
     end
 end)
 
@@ -556,7 +530,6 @@ HipSwayToggleBtn.TextSize = 9.5
 HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: TẮT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
--- Bảng Chọn Bài Theo ID Tổng Hợp (Preset)
 local PresetTitle = Instance.new("TextLabel", P5)
 PresetTitle.Size = UDim2.new(1, 0, 0, 20)
 PresetTitle.Position = UDim2.new(0, 0, 0, 196)
@@ -580,7 +553,6 @@ local PresetLayout = Instance.new("UIListLayout", PresetContainer)
 PresetLayout.SortOrder = Enum.SortOrder.LayoutOrder
 PresetLayout.Padding = UDim.new(0, 4)
 
--- Bảng Lịch sử ID Bài Hát
 local HistoryTitle = Instance.new("TextLabel", P5)
 HistoryTitle.Size = UDim2.new(1, 0, 0, 20)
 HistoryTitle.Position = UDim2.new(0, 0, 0, 306)
@@ -655,6 +627,7 @@ local function addIdToHistory(idStr)
             MusicInput.Text = id
             bgSound.SoundId = "rbxassetid://" .. id
             bgSound:Play()
+            addIdToHistory(id)
         end)
     end
 end
@@ -853,7 +826,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Thả cần giữ 2 giây & Xả chiêu ZXC."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tính năng: Spam giữ cần 2 giây liên tục đến khi đầy kho cá."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -982,21 +955,6 @@ local function clickBtn(keys)
     return false
 end
 
-local function solveMiniGameFast()
-    pcall(function()
-        for _, obj in pairs(PlayerGui:GetDescendants()) do
-            if obj and obj.Parent and not obj:IsDescendantOf(ScreenGui) and obj.Visible then
-                local n = string.lower(obj.Name)
-                if n:find("bar") or n:find("progress") or n:find("fill") then
-                    if obj:IsA("Frame") or obj:IsA("ImageLabel") then
-                        pcall(function() obj.Size = UDim2.new(1, 0, obj.Size.Y.Scale, obj.Size.Y.Offset) end)
-                    end
-                end
-            end
-        end
-    end)
-end
-
 task.spawn(function()
     local skillsList = {
         {key = Enum.KeyCode.Z, index = 1},
@@ -1016,7 +974,7 @@ task.spawn(function()
                 
                 if not OriginalFishingSpotCFrame and not isSellingFish then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- KIỂM TRA BÁN CÁ
+                -- KIỂM TRA ĐẦY KHOÁNG CÁ ĐỂ ĐI BÁN
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
@@ -1085,7 +1043,7 @@ task.spawn(function()
                     local vp = Workspace.CurrentCamera.ViewportSize
                     if activeTool then pcall(function() activeTool:Activate() end) end
                     
-                    -- THẢ CẦN BẰNG CÁCH GIỮ VÀO MÀN HÌNH TRONG 2 GIÂY
+                    -- SPAM GIỮ MÀN HÌNH CHÍNH XÁC 2 GIÂY KHÔNG NGỪNG NGHỈ
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
                     
                     local holdStart = tick()
@@ -1094,14 +1052,12 @@ task.spawn(function()
                     end
                     
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
+                    task.wait(0.1)
 
-                    -- ĐỢI THÊM MỘT NHỊP ỔN ĐỊNH SAU KHI THẢ
-                    task.wait(0.2)
-
-                    -- XẢ CHUỖI KỸ NĂNG Z, X, C, V (NẾU BẬT)
-                    if isAutoSkillOn and isRunning and not isSellingFish then
+                    -- XẢ KỸ NĂNG Z, X, C, V TỰ ĐỘNG
+                    if isRunning and not isSellingFish then
                         for _, skill in ipairs(skillsList) do
-                            if not isAutoSkillOn or not isRunning or isSellingFish then break end
+                            if not isRunning or isSellingFish then break end
                             
                             VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
                             task.wait(0.05)
@@ -1122,20 +1078,6 @@ task.spawn(function()
                                 task.wait(0.05)
                             end
                         end
-                    end
-
-                    local initialFishCount = getFishToSellCount()
-                    local aStart = tick()
-
-                    while tick() - aStart < 60 and isRunning and not isSellingFish do
-                        solveMiniGameFast()
-                        
-                        if getFishToSellCount() > initialFishCount then
-                            task.wait(0.05)
-                            break
-                        end
-                        
-                        task.wait(0.05)
                     end
                 end
             end)
