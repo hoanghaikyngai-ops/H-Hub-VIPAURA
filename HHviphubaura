@@ -504,7 +504,7 @@ NewMusicBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 180)
 NewMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 NewMusicBtn.Font = Enum.Font.GothamBold
 NewMusicBtn.TextSize = 9
-NewMusicBtn.Text = "🎶 PHÁT BÀI MỚI (124915036011783)"
+NewMusicBtn.Text = "🎶 PHÁT BÀI MỚI (1841542996)"
 Instance.new("UICorner", NewMusicBtn).CornerRadius = UDim.new(0, 5)
 
 local MusicInput = Instance.new("TextBox", P5)
@@ -556,19 +556,19 @@ HipSwayToggleBtn.TextSize = 9.5
 HipSwayToggleBtn.Text = "💃 NHẢY LẮC HÔNG MẠNH & ẢNH CORTISOL: TẮT"
 Instance.new("UICorner", HipSwayToggleBtn).CornerRadius = UDim.new(0, 6)
 
--- Bảng Chọn Bài Theo ID Tổng Hợp (Preset List)
+-- Bảng Chọn Bài Theo ID Tổng Hợp (Preset với ID mới)
 local PresetTitle = Instance.new("TextLabel", P5)
 PresetTitle.Size = UDim2.new(1, 0, 0, 20)
 PresetTitle.Position = UDim2.new(0, 0, 0, 196)
 PresetTitle.BackgroundTransparency = 1
-PresetTitle.Text = "📂 DANH SÁCH BÀI HÁT TỔNG HỢP (Preset):"
+PresetTitle.Text = "📂 BÀI HÁT CỦA TÔI (Preset):"
 PresetTitle.TextColor3 = Color3.fromRGB(0, 220, 255)
 PresetTitle.Font = Enum.Font.GothamBold
 PresetTitle.TextSize = 10
 PresetTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 local PresetContainer = Instance.new("ScrollingFrame", P5)
-PresetContainer.Size = UDim2.new(1, 0, 0, 110)
+PresetContainer.Size = UDim2.new(1, 0, 0, 80)
 PresetContainer.Position = UDim2.new(0, 0, 0, 220)
 PresetContainer.BackgroundColor3 = Color3.fromRGB(22, 26, 35)
 PresetContainer.BackgroundTransparency = 0.5
@@ -583,7 +583,7 @@ PresetLayout.Padding = UDim.new(0, 4)
 -- Bảng Lịch sử ID Bài Hát
 local HistoryTitle = Instance.new("TextLabel", P5)
 HistoryTitle.Size = UDim2.new(1, 0, 0, 20)
-HistoryTitle.Position = UDim2.new(0, 0, 0, 336)
+HistoryTitle.Position = UDim2.new(0, 0, 0, 306)
 HistoryTitle.BackgroundTransparency = 1
 HistoryTitle.Text = "📜 LỊCH SỬ ID ĐÃ PHÁT:"
 HistoryTitle.TextColor3 = Color3.fromRGB(200, 220, 255)
@@ -592,8 +592,8 @@ HistoryTitle.TextSize = 10
 HistoryTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 local HistoryContainer = Instance.new("ScrollingFrame", P5)
-HistoryContainer.Size = UDim2.new(1, 0, 0, 110)
-HistoryContainer.Position = UDim2.new(0, 0, 0, 360)
+HistoryContainer.Size = UDim2.new(1, 0, 0, 100)
+HistoryContainer.Position = UDim2.new(0, 0, 0, 330)
 HistoryContainer.BackgroundColor3 = Color3.fromRGB(20, 24, 32)
 HistoryContainer.BackgroundTransparency = 0.5
 HistoryContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -607,14 +607,12 @@ HistoryLayout.Padding = UDim.new(0, 4)
 local playedIdHistory = {}
 
 local DEFAULT_SOUND_ID = "110919391228823"
-local NEW_SOUND_ID = "124915036011783"
+local NEW_SOUND_ID = "1841542996"
 
--- Danh sách tổng hợp các bài hát mẫu
+-- Cập nhật danh sách bài hát với ID mới
 local PresetSongs = {
     {Name = "🎵 Nhạc Chill Mặc Định", Id = DEFAULT_SOUND_ID},
-    {Name = "🎶 Bài Hát Mới Cập Nhật", Id = NEW_SOUND_ID},
-    {Name = "🔥 Nhạc Sôi Động Cuốn Hút", Id = "1848354536"},
-    {Name = "✨ Nhạc Lofi Thư Giãn", Id = "1423760883"}
+    {Name = "🎶 Bài Hát Mới Cập Nhật", Id = NEW_SOUND_ID}
 }
 
 local bgSound = Instance.new("Sound")
@@ -659,7 +657,7 @@ local function addIdToHistory(idStr)
     end
 end
 
--- Tạo danh sách bài hát tổng hợp (Preset)
+-- Tạo danh sách bài hát preset
 PresetContainer.CanvasSize = UDim2.new(0, 0, 0, #PresetSongs * 28)
 for i, song in ipairs(PresetSongs) do
     local pBtn = Instance.new("TextButton", PresetContainer)
@@ -855,7 +853,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Tích hợp danh sách bài hát tổng hợp (Preset) và lịch sử ID."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã thay ID bài hát mới (1841542996)."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
