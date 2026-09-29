@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB VIPAURA - FULL VIP + FIX LAG TỐI ƯU MƯỢT MÀ (FINAL V22 - HOANG HAI)
+-- H-HUB VIPAURA - TÍCH HỢP TẤT CẢ TÍNH NĂNG (FINAL V23 - HOANG HAI)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -18,27 +18,6 @@ local Camera = Workspace.CurrentCamera
 pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
-end)
-
--- TỰ ĐỘNG KÍCH HOẠT FIX LAG NGAY KHI CHẠY SCRIPT
-task.spawn(function()
-    pcall(function()
-        local Terrain = Workspace:FindFirstChildOfClass("Terrain")
-        if Terrain then
-            Terrain.WaterWaveSize = 0
-            Terrain.WaterWaveSpeed = 0
-            Terrain.WaterReflectance = 0
-            Terrain.WaterTransparency = 0
-        end
-        Lighting.GlobalShadows = false
-        Lighting.FogEnd = 9e9
-        for _, v in pairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect") or v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then
-                v.Enabled = false
-            end
-        end
-        settings():GetService("RenderSettings").QualityLevel = Enum.QualityLevel.Level01
-    end)
 end)
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -115,7 +94,7 @@ TopBar.BackgroundTransparency = 1
 local LogoText = Instance.new("TextLabel", TopBar)
 LogoText.Size = UDim2.new(1, 0, 1, 0)
 LogoText.BackgroundTransparency = 1
-LogoText.Text = "🌿 H-HUB VIPAURA [FIX LAG + TELEPORT V22]"
+LogoText.Text = "🌿 H-HUB VIPAURA [HOANG HAI FIXED V23]"
 LogoText.TextColor3 = Color3.fromRGB(180, 255, 210)
 LogoText.Font = Enum.Font.GothamBold
 LogoText.TextSize = 12
@@ -152,7 +131,7 @@ local MenuContainer = Instance.new("ScrollingFrame", Main)
 MenuContainer.Size = UDim2.new(0, 145, 1, -44)
 MenuContainer.Position = UDim2.new(0, 8, 0, 40)
 MenuContainer.BackgroundTransparency = 1
-MenuContainer.CanvasSize = UDim2.new(0, 0, 0, 260)
+MenuContainer.CanvasSize = UDim2.new(0, 0, 0, 300)
 MenuContainer.ScrollBarThickness = 2
 
 local MenuLayout = Instance.new("UIListLayout", MenuContainer)
@@ -170,7 +149,7 @@ local function createTabButton(name, order)
     btn.BackgroundColor3 = Color3.fromRGB(25, 28, 38)
     btn.TextColor3 = Color3.fromRGB(160, 175, 195)
     btn.Font = Enum.Font.GothamSemibold
-    btn.Text = "   " + name
+    btn.Text = "   " .. name
     btn.TextSize = 11
     btn.TextXAlignment = Enum.TextXAlignment.Left
     btn.LayoutOrder = order
@@ -188,7 +167,8 @@ local Tab2 = createTabButton("Tự động câu", 2)
 local Tab3 = createTabButton("Bán cá", 3)
 local Tab4 = createTabButton("Kỹ năng ⚡", 4)
 local Tab5 = createTabButton("Âm nhạc 🎵", 5)
-local Tab6 = createTabButton("Thông tin", 6)
+local Tab6 = createTabButton("Fix Lag 🚀", 6)
+local Tab7 = createTabButton("Thông tin", 7)
 
 local function createPage(canvasH)
     local p = Instance.new("ScrollingFrame", ContentContainer)
@@ -206,12 +186,13 @@ local P3 = createPage(480)
 local P4 = createPage(480)
 local P5 = createPage(520)
 local P6 = createPage(480)
+local P7 = createPage(480)
 P1.Visible = true
 
 local titleP1 = Instance.new("TextLabel", P1)
 titleP1.Size = UDim2.new(1, 0, 0, 20)
 titleP1.BackgroundTransparency = 1
-titleP1.Text = "Vị trí phổ biến (Teleport & Khóa 17s)"
+titleP1.Text = "Vị trí phổ biến"
 titleP1.TextColor3 = Color3.fromRGB(220, 220, 240)
 titleP1.Font = Enum.Font.GothamBold
 titleP1.TextSize = 11
@@ -247,29 +228,24 @@ local function teleportAndRespawnAtIsland(targetPos)
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if not hum then return end
-        
         simulateHeavyLagSpike(0.7)
         local isTeleporting = true
         local connection
-        
         connection = LocalPlayer.CharacterAdded:Connect(function(newChar)
             if not isTeleporting then return end
             isTeleporting = false
             if connection then connection:Disconnect() end
-            
             task.spawn(function()
                 local newRoot = newChar:WaitForChild("HumanoidRootPart", 5)
                 local newHum = newChar:WaitForChild("Humanoid", 5)
                 if newRoot and newHum then
                     newRoot.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
                     simulateHeavyLagSpike(1.0)
-                    
                     local lockStart = tick()
-                    while tick() - lockStart < 17 do
+                    while tick() - lockStart < 12 do
                         pcall(function()
                             if newRoot and newHum then
-                                newRoot.Anchored = true
-                                newHum.WalkSpeed = 0
+                                newRoot.Anchored = true; newHum.WalkSpeed = 0
                                 newRoot.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
                             end
                         end)
@@ -288,7 +264,6 @@ local function teleportAndRespawnAtIsland(targetPos)
                 end
             end)
         end)
-        
         hum.Health = 0
     end)
 end
@@ -302,11 +277,7 @@ for i, island in ipairs(Islands) do
     btn.Text = island.Name
     btn.LayoutOrder = i
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-    btn.MouseButton1Click:Connect(function() 
-        task.spawn(function() 
-            teleportAndRespawnAtIsland(island.Pos) 
-        end) 
-    end)
+    btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
 
 local titleP2 = Instance.new("TextLabel", P2)
@@ -416,7 +387,7 @@ GuideLabel.TextSize = 9.5
 GuideLabel.TextWrapped = true
 GuideLabel.TextXAlignment = Enum.TextXAlignment.Left
 GuideLabel.TextYAlignment = Enum.TextYAlignment.Top
-GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong game.\n3. Bấm 'KHÓA Ô' để cố định.\n4. Khi Auto Câu bật, hệ thống sẽ thực hiện giữ cần 2s liên tục rồi xả chiêu qua các ô này!"
+GuideLabel.Text = "📱 HƯỚNG DẪN DÙNG TRÊN ĐIỆN THOẠI:\n1. Bật 'HIỆN 4 Ô KỸ NĂNG' để thấy 4 nút Z, X, C, V.\n2. Kéo thả 4 ô này đặt đè trực tiếp lên các nút kỹ năng trong giao diện game.\n3. Bấm 'KHÓA Ô' để cố định.\n4. Khi Auto Câu bật, hệ thống sẽ thực hiện giữ cần 2s liên tục rồi xả chiêu qua các ô này!"
 
 local MarkersGui = Instance.new("ScreenGui")
 MarkersGui.Name = "SkillMarkersUI"
@@ -469,6 +440,7 @@ LockMarkersBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- TAB 5: ÂM NHẠC
 local titleP5 = Instance.new("TextLabel", P5)
 titleP5.Size = UDim2.new(1, 0, 0, 20)
 titleP5.BackgroundTransparency = 1
@@ -596,27 +568,27 @@ local PresetSongs = {
     {Name = "⏳ Thế Gian Xoay Vòng – Không Thời Gian Remix", Id = "113675312413032"},
     {Name = "💔 Phía Sau 1 Cô Gái Remix", Id = "109743636792463"},
     {Name = "🌸 Khuê Mộc Lan", Id = "98361989582185"},
-    {Name = "🌙 Chỉ Còn Là Giấc Mơ – ID music remix", Id = "121051113937228"},
+    {Name = "🌙 Chỉ Còn Là Giấc Mơ – ID music remix nhạc Việt", Id = "121051113937228"},
     {Name = "🏙️ Phố Cũ Còn Anh remix", Id = "107810773290624"},
-    {Name = "🍃 Lạc Chốn Hồng Trần", Id = "116260601379194"},
-    {Name = "👑 Cô Độc Vương & Gió Nổi Lên", Id = "89965851084527"},
+    {Name = "🍃 Lạc Chốn Hồng Trần – Cô Độc Vương & Gió Nổi Lên", Id = "116260601379194"},
+    {Name = "👑 Cô Độc Vương & Gió Nổi Lên (Bản 2)", Id = "89965851084527"},
     {Name = "🥀 Mất Anh Rồi", Id = "118574601343022"},
     {Name = "🎤 Katy Katy remix", Id = "95300067259927"},
     {Name = "🌊 Sóng và Gió remix", Id = "90113853563664"},
     {Name = "🇻🇳 Vietnamese song Roblox ID", Id = "110404768256690"},
     {Name = "🚶 Anh Cứ Đi Đi", Id = "103475172398501"},
     {Name = "🌧️ Mưa Đợi Chờ", Id = "82627558368623"},
-    {Name = "👰 Chuyện Nàng Trinh Nữ", Id = "119526323504077"},
+    {Name = "👰 Chuyện Nàng Trinh Nữ Tên Thi Remix", Id = "119526323504077"},
     {Name = "💞 Người Đến Sau", Id = "114580872442958"},
-    {Name = "💎 Vạn Vật Thay Đổi", Id = "108477308631109"},
-    {Name = "🏃 Chạy Về Với Anh", Id = "127667093795280"},
-    {Name = "🇻🇳 Cùng Anh", Id = "71716020610625"},
+    {Name = "💎 Vạn Vật Thay Đổi Vật Chất Lên Ngôi", Id = "108477308631109"},
+    {Name = "🏃 ID nhạc Thắng Ngọt Roblox – Chạy Về Với Anh", Id = "127667093795280"},
+    {Name = "🇻🇳 Remix nhạc Việt – Cùng Anh", Id = "71716020610625"},
     {Name = "🇻🇳 Quốc ca Việt Nam", Id = "1845922899"},
     {Name = "🎶 See Tình", Id = "121242950842428"},
     {Name = "🎶 Trả Lại Cho Anh Remix", Id = "110396752508363"},
     {Name = "⚡ Cứ Thế Mong Chờ Remix", Id = "73423580532746"},
     {Name = "🔥 Tuyển Vợ - Remix", Id = "139968910103444"},
-    {Name = "🔥 2 phút hơn x mimimi", Id = "124166975687737"},
+    {Name = "🔥 2 phút hơn x mimimi - Remix", Id = "124166975687737"},
     {Name = "🎵 Ai đưa em về", Id = "110919391228823"}
 }
 
@@ -839,18 +811,83 @@ RunService.RenderStepped:Connect(function()
     end)
 end)
 
+-- ====================================================
+-- TAB 6: FIX LAG 🚀
+-- ====================================================
 local titleP6 = Instance.new("TextLabel", P6)
-titleP6.Size = UDim2.new(1, 0, 1, 0)
+titleP6.Size = UDim2.new(1, 0, 0, 20)
 titleP6.BackgroundTransparency = 1
-titleP6.TextColor3 = Color3.fromRGB(200, 200, 220)
-titleP6.Font = Enum.Font.Gotham
-titleP6.TextSize = 10
+titleP6.Text = "⚡ TỐI ƯU HÓA & FIX LAG TOÀN DIỆN"
+titleP6.TextColor3 = Color3.fromRGB(0, 255, 150)
+titleP6.Font = Enum.Font.GothamBold
+titleP6.TextSize = 11
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
-titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống Fix Lag & Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Đã tích hợp chống lag FPS & Teleport đảo an toàn."
 
-local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
-local pages = {P1, P2, P3, P4, P5, P6}
+local function createFixLagButton(name, yPos, colorOn, colorOff, callback)
+    local btn = Instance.new("TextButton", P6)
+    btn.Size = UDim2.new(1, 0, 0, 32)
+    btn.Position = UDim2.new(0, 0, 0, yPos)
+    btn.BackgroundColor3 = colorOff
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 10
+    btn.Text = name .. ": TẮT"
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.Text = name .. (state and ": BẬT" or ": TẮT")
+        btn.BackgroundColor3 = state and colorOn or colorOff
+        callback(state)
+    end)
+    return btn
+end
+
+createFixLagButton("XÓA HIỆU ỨNG & ĐỔ BÓNG (SHADOWS)", 25, Color3.fromRGB(0, 160, 80), Color3.fromRGB(100, 100, 100), function(enabled)
+    pcall(function()
+        Lighting.GlobalShadows = not enabled
+        Lighting.Brightness = enabled and 2 or 1
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
+                v.Enabled = not enabled
+            end
+        end
+    end)
+end)
+
+createFixLagButton("CHẾ ĐỘ MÁY YẾU (POTATO GRAPHICS)", 65, Color3.fromRGB(140, 0, 160), Color3.fromRGB(100, 100, 100), function(enabled)
+    pcall(function()
+        for _, v in pairs(Workspace:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = enabled and Enum.Material.SmoothPlastic or Enum.Material.Plastic
+                v.Reflectance = enabled and 0 or v.Reflectance
+            end
+        end
+    end)
+end)
+
+createFixLagButton("TĂNG TỐC FPS (FPS BOOSTER)", 105, Color3.fromRGB(0, 120, 200), Color3.fromRGB(100, 100, 100), function(enabled)
+    pcall(function()
+        if setfpscap then
+            setfpscap(enabled and 999 or 60)
+        end
+    end)
+end)
+
+-- TAB 7: THÔNG TIN
+local titleP7 = Instance.new("TextLabel", P7)
+titleP7.Size = UDim2.new(1, 0, 1, 0)
+titleP7.BackgroundTransparency = 1
+titleP7.TextColor3 = Color3.fromRGB(200, 200, 220)
+titleP7.Font = Enum.Font.Gotham
+titleP7.TextSize = 10
+titleP7.TextXAlignment = Enum.TextXAlignment.Left
+titleP7.TextYAlignment = Enum.TextYAlignment.Top
+titleP7.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Tích hợp lia chuột mượt mà, không khựng."
+
+local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6, Tab7}
+local pages = {P1, P2, P3, P4, P5, P6, P7}
 
 local function switchTab(index)
     for i, page in ipairs(pages) do
@@ -873,6 +910,7 @@ Tab3.MouseButton1Click:Connect(function() switchTab(3) end)
 Tab4.MouseButton1Click:Connect(function() switchTab(4) end)
 Tab5.MouseButton1Click:Connect(function() switchTab(5) end)
 Tab6.MouseButton1Click:Connect(function() switchTab(6) end)
+Tab7.MouseButton1Click:Connect(function() switchTab(7) end)
 switchTab(1)
 
 local isServerDmgOn = false
