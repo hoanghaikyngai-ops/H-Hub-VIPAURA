@@ -623,7 +623,7 @@ bgSound.Parent = SoundService
 
 local function addIdToHistory(idStr)
     if not idStr or idStr == "" then return end
-    idStr = idStr:match("^%s*(.-)%s*$") -- Xóa khoảng trắng thừa
+    idStr = idStr:match("^%s*(.-)%s*$")
     if idStr == "" then return end
     
     for i, v in ipairs(playedIdHistory) do
@@ -659,7 +659,6 @@ local function addIdToHistory(idStr)
     end
 end
 
--- Tạo danh sách bài hát preset
 PresetContainer.CanvasSize = UDim2.new(0, 0, 0, #PresetSongs * 28)
 for i, song in ipairs(PresetSongs) do
     local pBtn = Instance.new("TextButton", PresetContainer)
@@ -771,7 +770,6 @@ HipSwayToggleBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Vòng tròn cảm biến nhạc (Audio Reactive Ring Animation)
 RunService.RenderStepped:Connect(function()
     pcall(function()
         local t = tick()
@@ -791,7 +789,6 @@ RunService.RenderStepped:Connect(function()
     end)
 end)
 
--- Xử lý chuyển động lắc hông nhân vật
 RunService.RenderStepped:Connect(function()
     pcall(function()
         local char = LocalPlayer.Character
@@ -856,7 +853,7 @@ titleP6.Font = Enum.Font.Gotham
 titleP6.TextSize = 10
 titleP6.TextXAlignment = Enum.TextXAlignment.Left
 titleP6.TextYAlignment = Enum.TextYAlignment.Top
-titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Đã sửa lỗi nút phát ID tùy chỉnh."
+titleP6.Text = "Hệ thống tự động Low Cortisol Image Edition.\n- Tác giả: HOANGHAI\n- Khẩu hiệu: Con tuất Pikachu bố cân tất 🔥\n- Cập nhật: Thả cần giữ 2 giây & Xả chiêu ZXC."
 
 local tabs = {Tab1, Tab2, Tab3, Tab4, Tab5, Tab6}
 local pages = {P1, P2, P3, P4, P5, P6}
@@ -1009,7 +1006,7 @@ task.spawn(function()
     }
 
     while ScreenGui.Parent do
-        task.wait(0.2)
+        task.wait(0.1)
         if isRunning then
             pcall(function()
                 local char = LocalPlayer.Character
@@ -1019,6 +1016,7 @@ task.spawn(function()
                 
                 if not OriginalFishingSpotCFrame and not isSellingFish then OriginalFishingSpotCFrame = root.CFrame end
 
+                -- KIỂM TRA BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
@@ -1026,30 +1024,30 @@ task.spawn(function()
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1)
                     task.wait(0.08)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1)
-                    task.wait(0.4)
+                    task.wait(0.2)
 
                     root.Anchored = false
                     hum.WalkSpeed = 16
-                    task.wait(0.1)
+                    task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local dist = (root.Position - dynamicMerchantPos).Magnitude
                     local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 60, Enum.EasingStyle.Linear), {CFrame = CFrame.new(dynamicMerchantPos + Vector3.new(0, 3, 3))})
                     merchantTween:Play()
-                    while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.1) end
+                    while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
                     root.CFrame = CFrame.lookAt(dynamicMerchantPos + Vector3.new(0, 2, 3), dynamicMerchantPos)
-                    task.wait(0.5)
+                    task.wait(0.3)
 
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                    task.wait(0.08)
+                    task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                    task.wait(0.6)
+                    task.wait(0.4)
 
                     repeat
                         if not isRunning then break end
                         clickBtn({"bán tất cả", "sell all", "bán", "sell", "confirm", "đồng ý"})
-                        task.wait(1.0)
+                        task.wait(0.8)
                     until getFishToSellCount() == 0 or not isRunning
 
                     if OriginalFishingSpotCFrame then
@@ -1058,7 +1056,7 @@ task.spawn(function()
                         local dBack = (root.Position - OriginalFishingSpotCFrame.Position).Magnitude
                         local backTween = TweenService:Create(root, TweenInfo.new(dBack / 60, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
                         backTween:Play()
-                        while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.1) end
+                        while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                         root.CFrame = OriginalFishingSpotCFrame
                     end
                     
@@ -1071,23 +1069,60 @@ task.spawn(function()
                 root.Anchored = true
                 hum.WalkSpeed = 0
 
+                -- TRANG BỊ CẦN CÂU
                 local activeTool = char and char:FindFirstChildOfClass("Tool")
                 local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
 
                 if not isHoldingRod then
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game)
-                    task.wait(0.05)
+                    task.wait(0.02)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game)
-                    task.wait(0.3)
+                    task.wait(0.1)
+                    activeTool = char and char:FindFirstChildOfClass("Tool")
                 end
 
-                if isHoldingRod and isRunning and not isSellingFish then
+                if isRunning and not isSellingFish then
                     local vp = Workspace.CurrentCamera.ViewportSize
-                    pcall(function() activeTool:Activate() end)
+                    if activeTool then pcall(function() activeTool:Activate() end) end
                     
+                    -- THẢ CẦN BẰNG CÁCH GIỮ VÀO MÀN HÌNH TRONG 2 GIÂY
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, true, game, 1)
-                    task.wait(0.2)
+                    
+                    local holdStart = tick()
+                    while tick() - holdStart < 2.0 and isRunning and not isSellingFish do
+                        task.wait(0.05)
+                    end
+                    
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2 - 80, 0, false, game, 1)
+
+                    -- ĐỢI THÊM MỘT NHỊP ỔN ĐỊNH SAU KHI THẢ
+                    task.wait(0.2)
+
+                    -- XẢ CHUỖI KỸ NĂNG Z, X, C, V (NẾU BẬT)
+                    if isAutoSkillOn and isRunning and not isSellingFish then
+                        for _, skill in ipairs(skillsList) do
+                            if not isAutoSkillOn or not isRunning or isSellingFish then break end
+                            
+                            VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
+                            task.wait(0.05)
+                            VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
+                            task.wait(0.05)
+                            
+                            local btn = markerButtons[skill.index]
+                            local inset = GuiService:GetGuiInset()
+                            if btn and MarkersGui.Enabled then
+                                local pos = btn.AbsolutePosition
+                                local sz = btn.AbsoluteSize
+                                local finalX = pos.X + sz.X / 2 + inset.X
+                                local finalY = pos.Y + sz.Y / 2 + inset.Y
+                                
+                                VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
+                                task.wait(0.05)
+                                VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
+                                task.wait(0.05)
+                            end
+                        end
+                    end
 
                     local initialFishCount = getFishToSellCount()
                     local aStart = tick()
@@ -1095,39 +1130,12 @@ task.spawn(function()
                     while tick() - aStart < 60 and isRunning and not isSellingFish do
                         solveMiniGameFast()
                         
-                        if isAutoSkillOn then
-                            pcall(function()
-                                for _, skill in ipairs(skillsList) do
-                                    if not isAutoSkillOn or not isRunning or isSellingFish then break end
-                                    
-                                    VirtualInputManager:SendKeyEvent(true, skill.key, false, game)
-                                    task.wait(0.12)
-                                    VirtualInputManager:SendKeyEvent(false, skill.key, false, game)
-                                    task.wait(0.15)
-                                    
-                                    local btn = markerButtons[skill.index]
-                                    local inset = GuiService:GetGuiInset()
-                                    if btn and MarkersGui.Enabled then
-                                        local pos = btn.AbsolutePosition
-                                        local sz = btn.AbsoluteSize
-                                        local finalX = pos.X + sz.X / 2 + inset.X
-                                        local finalY = pos.Y + sz.Y / 2 + inset.Y
-                                        
-                                        VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, true, game, 1)
-                                        task.wait(0.12)
-                                        VirtualInputManager:SendMouseButtonEvent(finalX, finalY, 0, false, game, 1)
-                                        task.wait(0.15)
-                                    end
-                                end
-                            end)
-                        end
-                        
                         if getFishToSellCount() > initialFishCount then
-                            task.wait(0.1)
+                            task.wait(0.05)
                             break
                         end
                         
-                        task.wait(0.1)
+                        task.wait(0.05)
                     end
                 end
             end)
