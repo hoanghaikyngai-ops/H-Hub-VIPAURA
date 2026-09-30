@@ -120,7 +120,7 @@ BirthdayText.ZIndex = 1001
 
 local BirthdaySound = Instance.new("Sound", ScreenGui)
 BirthdaySound.Name = "BirthdayMusic"
-BirthdaySound.SoundId = "rbxassetid://9043574701"
+BirthdaySound.SoundId = "rbxassetid://9045814042"
 BirthdaySound.Volume = 0.7
 BirthdaySound.Looped = false
 BirthdaySound.Parent = ScreenGui
@@ -136,33 +136,12 @@ BirthdaySound.Ended:Connect(function()
     StopBirthdayIntro()
 end)
 
--- Giữ chuột/chạm màn hình liên tục 3 giây mới tắt chữ và nhạc
-local birthdayHoldToken = 0
-
+-- Chạm/click bất kỳ chỗ nào trên màn hình để tắt cả chữ và nhạc.
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not BirthdayIntroActive then return end
-
     if input.UserInputType == Enum.UserInputType.MouseButton1
         or input.UserInputType == Enum.UserInputType.Touch then
-
-        birthdayHoldToken += 1
-        local currentToken = birthdayHoldToken
-
-        task.delay(3, function()
-            if BirthdayIntroActive and currentToken == birthdayHoldToken then
-                StopBirthdayIntro()
-            end
-        end)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if not BirthdayIntroActive then return end
-
-    if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
-        -- Thả tay/chuột trước 3 giây thì hủy
-        birthdayHoldToken += 1
+        StopBirthdayIntro()
     end
 end)
 
@@ -406,7 +385,6 @@ local function mkBtn(parent, text, h, bg, order)
     local b = Instance.new("TextButton", parent)
     b.Size = UDim2.new(1, -4, 0, h or 34)
     b.BackgroundColor3 = bg
-    b.BackgroundTransparency = 0
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
     b.Font = FONT_BOLD
     b.TextSize = 11
@@ -415,13 +393,18 @@ local function mkBtn(parent, text, h, bg, order)
     b.LayoutOrder = order or 0
     b.AutoButtonColor = false
     corner(b, 10)
-    -- Đảm bảo nút luôn hiển thị đúng màu nền, kể cả khi có UIGradient còn sót lại.
-    for _, child in ipairs(b:GetChildren()) do
-        if child:IsA("UIGradient") then child:Destroy() end
-    end
-    stroke(b, Color3.fromRGB(255,255,255), 1, 0.55)
-    b.ZIndex = 5
-    -- Không dùng UIGradient trên các nút con để tránh nền bị tối/đen.
+    stroke(b, Color3.fromRGB(255,255,255), 1, 0.85)
+    -- Gradient trắng cực nhẹ: không phủ đen lên màu nền của từng nút.
+    local g = Instance.new("UIGradient", b)
+    g.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255,255,255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255,255,255))
+    })
+    g.Transparency = NumberSequence.new({
+        NumberSequenceKeypoint.new(0, 0.96),
+        NumberSequenceKeypoint.new(1, 1)
+    })
+    g.Rotation = 90
     b.MouseEnter:Connect(function()
         TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
     end)
@@ -557,12 +540,8 @@ end
 
 -- ====================== TAB 2: THU HOẠCH ======================
 sectionLabel(P2, "  CHẾ ĐỘ TỰ ĐỘNG", 0)
-local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fromRGB(210, 55, 75), 1)
-local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(75, 125, 220), 2)
-AutoToggleBtn.BackgroundTransparency = 0
-ServerDmgBtn.BackgroundTransparency = 0
-for _, child in ipairs(AutoToggleBtn:GetChildren()) do if child:IsA("UIGradient") then child:Destroy() end end
-for _, child in ipairs(ServerDmgBtn:GetChildren()) do if child:IsA("UIGradient") then child:Destroy() end end
+local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fromRGB(120, 20, 40), 1)
+local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(35, 45, 60), 2)
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28)
 tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
@@ -870,14 +849,12 @@ end)
 -- ====================== TAB 6: TỐI ƯU ======================
 sectionLabel(P6, "  HIỆU NĂNG & FPS", 0)
 local function createFixLagButton(name, order, callback)
-    local btn = mkBtn(P6, "◇ " .. name .. ": TẮT", 36, Color3.fromRGB(75, 125, 220), order)
-    btn.BackgroundTransparency = 0
-    for _, child in ipairs(btn:GetChildren()) do if child:IsA("UIGradient") then child:Destroy() end end
+    local btn = mkBtn(P6, "◇ " .. name .. ": TẮT", 36, Color3.fromRGB(50, 55, 70), order)
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = (state and "◆ " or "◇ ") .. name .. (state and ": BẬT" or ": TẮT")
-        btn.BackgroundColor3 = state and Color3.fromRGB(20, 170, 105) or Color3.fromRGB(75, 125, 220)
+        btn.BackgroundColor3 = state and Color3.fromRGB(10, 120, 70) or Color3.fromRGB(50, 55, 70)
         callback(state)
     end)
     return btn
@@ -903,19 +880,6 @@ end)
 createFixLagButton("MỞ KHÓA FPS", 3, function(enabled)
     pcall(function() if setfpscap then setfpscap(enabled and 999 or 60) end end)
 end)
-
--- ÉP MÀU BAN ĐẦU CHO TOÀN BỘ NÚT CON THU HOẠCH + FIX LAG
-AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(210, 55, 75)
-ServerDmgBtn.BackgroundColor3 = Color3.fromRGB(75, 125, 220)
-for _, obj in ipairs(P6:GetChildren()) do
-    if obj:IsA("TextButton") then
-        obj.BackgroundTransparency = 0
-        for _, child in ipairs(obj:GetChildren()) do
-            if child:IsA("UIGradient") then child:Destroy() end
-        end
-        obj.BackgroundColor3 = Color3.fromRGB(75, 125, 220)
-    end
-end
 
 -- ====================== TAB 7: HỆ THỐNG ======================
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -1116,7 +1080,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
         if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = true; if hum then hum.WalkSpeed = 0 end end
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
-        AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(170, 45, 65)
+        AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(120, 20, 40)
         OriginalFishingSpotCFrame = nil; isSellingFish = false
         if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
         pcall(function() if root then root.Anchored = false end; if hum then hum.WalkSpeed = 16 end end)
@@ -1126,7 +1090,7 @@ end)
 ServerDmgBtn.MouseButton1Click:Connect(function()
     isServerDmgOn = not isServerDmgOn
     ServerDmgBtn.Text = isServerDmgOn and "⚡  SÁT THƯƠNG: BẬT" or "⚡  SÁT THƯƠNG: TẮT"
-    ServerDmgBtn.BackgroundColor3 = isServerDmgOn and Color3.fromRGB(150, 35, 185) or Color3.fromRGB(85, 105, 190)
+    ServerDmgBtn.BackgroundColor3 = isServerDmgOn and Color3.fromRGB(100, 15, 130) or Color3.fromRGB(35, 45, 60)
 end)
 
 local ProtectedItems = {"rod", "cần", "bait", "mồi", "potion", "license", "cá hiếm", "legendary", "mythical"}
@@ -1155,19 +1119,17 @@ task.spawn(function()
     end
 end)
 
-local function getMerchantCFrame()
+local function getMerchantPosition()
     for _, obj in pairs(Workspace:GetDescendants()) do
         if obj and (obj:IsA("Model") or obj:IsA("Part")) then
             local objName = string.lower(obj.Name)
             if objName:find("fish") and objName:find("merchant") then
                 local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
-                if primaryPart and primaryPart:IsA("BasePart") then
-                    return primaryPart.CFrame
-                end
+                if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
             end
         end
     end
-    return CFrame.new(1263.48, 27.71, -349.61)
+    return Vector3.new(1263.48, 27.71, -349.61)
 end
 
 local function clickBtn(keys)
@@ -1284,12 +1246,8 @@ task.spawn(function()
                     -- Khóa chân ngay sau khi click màn hình và giữ khóa trong suốt quá trình bay đi bán.
                     root.Anchored = true; hum.WalkSpeed = 0; task.wait(0.05)
 
-                    local dynamicMerchantCFrame = getMerchantCFrame()
-                    local dynamicMerchantPos = dynamicMerchantCFrame.Position
-                    -- Đặt người chơi ở PHÍA TRƯỚC NPC theo đúng hướng mặt của NPC,
-                    -- cách NPC khoảng 3 studs, tránh bị lệch ra sau lưng.
-                    local safeTargetPos = dynamicMerchantPos + (dynamicMerchantCFrame.LookVector * 3.0)
-                    safeTargetPos = Vector3.new(safeTargetPos.X, dynamicMerchantPos.Y, safeTargetPos.Z)
+                    local dynamicMerchantPos = getMerchantPosition()
+                    local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
                     local dist = (root.Position - safeTargetPos).Magnitude
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
 
