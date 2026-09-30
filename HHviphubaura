@@ -415,7 +415,12 @@ local function mkBtn(parent, text, h, bg, order)
     b.LayoutOrder = order or 0
     b.AutoButtonColor = false
     corner(b, 10)
-    stroke(b, Color3.fromRGB(255,255,255), 1, 0.85)
+    -- Đảm bảo nút luôn hiển thị đúng màu nền, kể cả khi có UIGradient còn sót lại.
+    for _, child in ipairs(b:GetChildren()) do
+        if child:IsA("UIGradient") then child:Destroy() end
+    end
+    stroke(b, Color3.fromRGB(255,255,255), 1, 0.55)
+    b.ZIndex = 5
     -- Không dùng UIGradient trên các nút con để tránh nền bị tối/đen.
     b.MouseEnter:Connect(function()
         TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
@@ -554,6 +559,10 @@ end
 sectionLabel(P2, "  CHẾ ĐỘ TỰ ĐỘNG", 0)
 local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fromRGB(210, 55, 75), 1)
 local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(75, 125, 220), 2)
+AutoToggleBtn.BackgroundTransparency = 0
+ServerDmgBtn.BackgroundTransparency = 0
+for _, child in ipairs(AutoToggleBtn:GetChildren()) do if child:IsA("UIGradient") then child:Destroy() end end
+for _, child in ipairs(ServerDmgBtn:GetChildren()) do if child:IsA("UIGradient") then child:Destroy() end end
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28)
 tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
@@ -862,6 +871,8 @@ end)
 sectionLabel(P6, "  HIỆU NĂNG & FPS", 0)
 local function createFixLagButton(name, order, callback)
     local btn = mkBtn(P6, "◇ " .. name .. ": TẮT", 36, Color3.fromRGB(75, 125, 220), order)
+    btn.BackgroundTransparency = 0
+    for _, child in ipairs(btn:GetChildren()) do if child:IsA("UIGradient") then child:Destroy() end end
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
@@ -892,6 +903,19 @@ end)
 createFixLagButton("MỞ KHÓA FPS", 3, function(enabled)
     pcall(function() if setfpscap then setfpscap(enabled and 999 or 60) end end)
 end)
+
+-- ÉP MÀU BAN ĐẦU CHO TOÀN BỘ NÚT CON THU HOẠCH + FIX LAG
+AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(210, 55, 75)
+ServerDmgBtn.BackgroundColor3 = Color3.fromRGB(75, 125, 220)
+for _, obj in ipairs(P6:GetChildren()) do
+    if obj:IsA("TextButton") then
+        obj.BackgroundTransparency = 0
+        for _, child in ipairs(obj:GetChildren()) do
+            if child:IsA("UIGradient") then child:Destroy() end
+        end
+        obj.BackgroundColor3 = Color3.fromRGB(75, 125, 220)
+    end
+end
 
 -- ====================== TAB 7: HỆ THỐNG ======================
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
