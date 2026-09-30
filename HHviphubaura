@@ -561,8 +561,8 @@ end
 
 -- ====================== TAB 2: THU HOẠCH ======================
 sectionLabel(P2, "  CHẾ ĐỘ TỰ ĐỘNG", 0)
-local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fromRGB(120, 20, 40), 1)
-local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(70, 55, 110), 2)
+local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fromRGB(170, 45, 65), 1)
+local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(85, 105, 190), 2)
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28)
 tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
@@ -870,12 +870,12 @@ end)
 -- ====================== TAB 6: TỐI ƯU ======================
 sectionLabel(P6, "  HIỆU NĂNG & FPS", 0)
 local function createFixLagButton(name, order, callback)
-    local btn = mkBtn(P6, "◇ " .. name .. ": TẮT", 36, Color3.fromRGB(55, 75, 120), order)
+    local btn = mkBtn(P6, "◇ " .. name .. ": TẮT", 36, Color3.fromRGB(65, 115, 190), order)
     local state = false
     btn.MouseButton1Click:Connect(function()
         state = not state
         btn.Text = (state and "◆ " or "◇ ") .. name .. (state and ": BẬT" or ": TẮT")
-        btn.BackgroundColor3 = state and Color3.fromRGB(15, 135, 85) or Color3.fromRGB(55, 75, 120)
+        btn.BackgroundColor3 = state and Color3.fromRGB(20, 155, 95) or Color3.fromRGB(65, 115, 190)
         callback(state)
     end)
     return btn
@@ -1101,7 +1101,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
         if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = true; if hum then hum.WalkSpeed = 0 end end
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
-        AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(120, 20, 40)
+        AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(170, 45, 65)
         OriginalFishingSpotCFrame = nil; isSellingFish = false
         if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
         pcall(function() if root then root.Anchored = false end; if hum then hum.WalkSpeed = 16 end end)
@@ -1111,7 +1111,7 @@ end)
 ServerDmgBtn.MouseButton1Click:Connect(function()
     isServerDmgOn = not isServerDmgOn
     ServerDmgBtn.Text = isServerDmgOn and "⚡  SÁT THƯƠNG: BẬT" or "⚡  SÁT THƯƠNG: TẮT"
-    ServerDmgBtn.BackgroundColor3 = isServerDmgOn and Color3.fromRGB(100, 15, 130) or Color3.fromRGB(35, 45, 60)
+    ServerDmgBtn.BackgroundColor3 = isServerDmgOn and Color3.fromRGB(150, 35, 185) or Color3.fromRGB(85, 105, 190)
 end)
 
 local ProtectedItems = {"rod", "cần", "bait", "mồi", "potion", "license", "cá hiếm", "legendary", "mythical"}
