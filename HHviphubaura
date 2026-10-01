@@ -452,68 +452,62 @@ local function teleportAndRespawnAtIsland(targetPos)
                 
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
+                    
+                    -- =====================================================
+                    -- CẤU HÌNH: CHẠY ĐỦ 5 LẦN KHÓA / NHẢ
+                    -- =====================================================
+                    local cycles = 5 
+                    
+                    for i = 1, cycles do
+                        if not newChar or not newChar.Parent then break end
 
-                    -- =========================================================
-                    -- 1. BẬT FLY NGAY LẬP TỨC KHI NHÂN VẬT VỪA SPAWN
-                    -- =========================================================
-                    local bv = Instance.new("BodyVelocity")
-                    bv.Name = "AntiLagbackFly"
-                    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                    bv.Velocity = Vector3.zero
-                    bv.Parent = newRoot
-
-                    local bg = Instance.new("BodyGyro")
-                    bg.Name = "AntiLagbackGyro"
-                    bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                    bg.CFrame = targetCFrame
-                    bg.Parent = newRoot
-
-                    -- Đưa Humanoid vào trạng thái bơi (Swimming) để vô hiệu hóa kiểm tra trọng lực
-                    newHum:ChangeState(Enum.HumanoidStateType.Swimming)
-
-                    -- =========================================================
-                    -- 2. KHÓA CFRAME LIÊN TỤC TRONG 17 GIÂY
-                    -- =========================================================
-                    local lockStartTime = tick()
-                    local lockConn
-
-                    lockConn = RunService.Heartbeat:Connect(function()
-                        if tick() - lockStartTime < 17.0 then
-                            pcall(function()
-                                -- Liên tục giữ trạng thái Fly & Vị trí
-                                newHum:ChangeState(Enum.HumanoidStateType.Swimming)
-                                newRoot.AssemblyLinearVelocity = Vector3.zero
-                                newRoot.AssemblyAngularVelocity = Vector3.zero
-                                newChar:PivotTo(targetCFrame)
-                                newRoot.Anchored = true
-                                newHum.WalkSpeed = 0
-                            end)
-                        else
-                            -- HẾT 17 GIÂY: TẮT FLY VÀ KHÔI PHỤC TRẠNG THÁI
-                            if lockConn then
-                                lockConn:Disconnect()
-                                lockConn = nil
-                            end
-
-                            -- Hủy các object Fly
-                            if bv then bv:Destroy() end
-                            if bg then bg:Destroy() end
-
-                            pcall(function()
-                                newHum:ChangeState(Enum.HumanoidStateType.GettingUp)
-                                newRoot.Anchored = false
-                                newRoot.AssemblyLinearVelocity = Vector3.zero
-                                newRoot.AssemblyAngularVelocity = Vector3.zero
-
-                                if isRunning then
-                                    OriginalFishingSpotCFrame = targetCFrame
+                        -- 1. KHÓA CHÂN 4 GIÂY
+                        local lockStartTime = tick()
+                        local lockConn
+                        
+                        lockConn = RunService.Heartbeat:Connect(function()
+                            if tick() - lockStartTime < 4.0 then
+                                pcall(function()
+                                    newRoot.AssemblyLinearVelocity = Vector3.zero
+                                    newRoot.AssemblyAngularVelocity = Vector3.zero
+                                    newChar:PivotTo(targetCFrame)
                                     newRoot.Anchored = true
                                     newHum.WalkSpeed = 0
-                                else
-                                    OriginalFishingSpotCFrame = nil
-                                    newHum.WalkSpeed = 20 -- Trả lại WalkSpeed = 20
-                                end
-                            end)
+                                end)
+                            else
+                                if lockConn then lockConn:Disconnect(); lockConn = nil end
+                            end
+                        end)
+
+                        -- Chờ đủ 4 giây cho xong đợt khóa
+                        task.wait(4.0)
+
+                        -- 2. NHẢ 1 GIÂY ĐỂ ĐỒNG BỘ VẬT LÝ
+                        pcall(function()
+                            newRoot.Anchored = false
+                            newHum.WalkSpeed = 20
+                        end)
+
+                        -- Nếu chưa đến lần thứ 5 thì chờ 1 giây rồi mới lặp tiếp
+                        if i < cycles then
+                            task.wait(1.0)
+                        end
+                    end
+
+                    -- =====================================================
+                    -- HOÀN THÀNH ĐỦ 5 LẦN: KHÔI PHỤC TRẠNG THÁI CUỐI CÙNG
+                    -- =====================================================
+                    pcall(function()
+                        newRoot.Anchored = false
+                        newRoot.AssemblyLinearVelocity = Vector3.zero
+                        
+                        if isRunning then
+                            OriginalFishingSpotCFrame = targetCFrame
+                            newRoot.Anchored = true
+                            newHum.WalkSpeed = 0
+                        else
+                            OriginalFishingSpotCFrame = nil
+                            newHum.WalkSpeed = 20 -- Trả về WalkSpeed = 20
                         end
                     end)
                 end
