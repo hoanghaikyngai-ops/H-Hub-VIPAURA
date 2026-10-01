@@ -451,17 +451,33 @@ local function teleportAndRespawnAtIsland(targetPos)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
                 
                 if newRoot and newHum then
-                    local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
+                    -- Hạ độ cao xuống sát mặt đất hơn (1.5 studs thay vì 3) để dễ chạm vùng
+                    local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 1.5, 0))
                     
-                    -- =====================================================
-                    -- CẤU HÌNH: CHẠY ĐỦ 5 LẦN KHÓA / NHẢ
-                    -- =====================================================
-                    local cycles = 5 
+                    -- =========================================================
+                    -- 1. ĐẶT VỊ TRÍ & BẬT CANCOLLIDE ĐỂ KÍCH HOẠT TÊN ĐẢO
+                    -- =========================================================
+                    newChar:PivotTo(targetCFrame)
+                    
+                    -- Bật va chạm để chân chạm đất/nước kích hoạt Zone Event của game
+                    for _, part in ipairs(newChar:GetChildren()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = true
+                        end
+                    end
+                    
+                    -- Cho phép nhân vật nhúc nhích nhẹ 0.2s để game nhận diện va chạm đảo
+                    task.wait(0.2)
+
+                    -- =========================================================
+                    -- 2. BẮT ĐẦU CHU KỲ KHÓA NHỊP (3 CHU KỲ)
+                    -- =========================================================
+                    local cycles = 3 
                     
                     for i = 1, cycles do
                         if not newChar or not newChar.Parent then break end
 
-                        -- 1. KHÓA CHÂN 4 GIÂY
+                        -- Khóa 4 giây
                         local lockStartTime = tick()
                         local lockConn
                         
@@ -479,24 +495,22 @@ local function teleportAndRespawnAtIsland(targetPos)
                             end
                         end)
 
-                        -- Chờ đủ 4 giây cho xong đợt khóa
                         task.wait(4.0)
 
-                        -- 2. NHẢ 1 GIÂY ĐỂ ĐỒNG BỘ VẬT LÝ
+                        -- Nhả 0.3 giây để cập nhật vật lý
                         pcall(function()
                             newRoot.Anchored = false
                             newHum.WalkSpeed = 20
                         end)
 
-                        -- Nếu chưa đến lần thứ 5 thì chờ 1 giây rồi mới lặp tiếp
                         if i < cycles then
-                            task.wait(1.0)
+                            task.wait(0.3)
                         end
                     end
 
-                    -- =====================================================
-                    -- HOÀN THÀNH ĐỦ 5 LẦN: KHÔI PHỤC TRẠNG THÁI CUỐI CÙNG
-                    -- =====================================================
+                    -- =========================================================
+                    -- 3. HOÀN THÀNH
+                    -- =========================================================
                     pcall(function()
                         newRoot.Anchored = false
                         newRoot.AssemblyLinearVelocity = Vector3.zero
@@ -507,7 +521,7 @@ local function teleportAndRespawnAtIsland(targetPos)
                             newHum.WalkSpeed = 0
                         else
                             OriginalFishingSpotCFrame = nil
-                            newHum.WalkSpeed = 20 -- Trả về WalkSpeed = 20
+                            newHum.WalkSpeed = 20
                         end
                     end)
                 end
