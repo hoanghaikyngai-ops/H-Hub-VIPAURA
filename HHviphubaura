@@ -433,26 +433,13 @@ end
 
 local RunService = game:GetService("RunService")
 local NetworkSettings = settings().Network
+local NetworkClient = game:GetService("NetworkClient")
 
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if not hum then return end
-
-        -- =========================================================
-        -- 1. BẬT LAG NGAY TRƯỚC KHI CHỈNH MÁU VỀ 0
-        -- =========================================================
-        pcall(function()
-            NetworkSettings.IncomingReplicationLag = 999999 -- Tạo độ trễ gói tin 10 giây
-        end)
-
-        -- Tự động ngắt Lag giả lập sau đúng 10 giây
-        task.delay(10, function()
-            pcall(function()
-                NetworkSettings.IncomingReplicationLag = 0
-            end)
-        end)
 
         local isTeleporting = true
         local connection
@@ -469,17 +456,33 @@ local function teleportAndRespawnAtIsland(targetPos)
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
 
                     -- =========================================================
-                    -- 2. ĐẶT TỌA ĐỘ Ở ĐẢO MỚI TRONG KHI SERVER ĐANG BỊ LAG
+                    -- 1. ĐẶT NHÂN VẬT SANG ĐẢO MỚI TRƯỚC
                     -- =========================================================
                     newChar:PivotTo(targetCFrame)
                     newRoot.Anchored = true
                     newHum.WalkSpeed = 0
 
                     -- =========================================================
-                    -- 3. KHÓA GIỮ VỊ TRÍ TRONG KHI CHỜ SERVER XẢ LAG VA ĐỒNG BỘ
+                    -- 2. BẬT LAG MẠNG VÔ HẠN (MATH.HUGE) NGAY KHI VỪA SANG ĐẢO MỚI
+                    -- =========================================================
+                    pcall(function()
+                        NetworkSettings.IncomingReplicationLag = math.huge
+                        sethiddenproperty(NetworkClient, "ClientReplicationLag", math.huge)
+                    end)
+
+                    -- Tự động xả Lag và kết nối lại sau đúng 10 giây
+                    task.delay(10, function()
+                        pcall(function()
+                            NetworkSettings.IncomingReplicationLag = 0
+                            sethiddenproperty(NetworkClient, "ClientReplicationLag", 0)
+                        end)
+                    end)
+
+                    -- =========================================================
+                    -- 3. KHÓA GIỮ TỌA ĐỘ 12 GIÂY (10S LAG + 2S CHỜ MẠNG ỔN ĐỊNH)
                     -- =========================================================
                     local lockStartTime = tick()
-                    local holdDuration = 12.0 -- Khóa 12s để phủ hết 10s lag + 2s chờ map load
+                    local holdDuration = 12.0
                     local lockConn
 
                     lockConn = RunService.Heartbeat:Connect(function()
@@ -516,9 +519,7 @@ local function teleportAndRespawnAtIsland(targetPos)
             end)
         end)
 
-        -- =========================================================
-        -- 4. CHỈNH MÁU VỀ 0 NGAY SAU KHI VỪA BẬT LAG
-        -- =========================================================
+        -- Reset nhân vật
         hum.Health = 0
     end)
 end
