@@ -432,12 +432,27 @@ local function simulateLagSpike(sec)
 end
 
 local RunService = game:GetService("RunService")
+local NetworkSettings = settings().Network
 
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if not hum then return end
+
+        -- =========================================================
+        -- 1. BẬT LAG NGAY TRƯỚC KHI CHỈNH MÁU VỀ 0
+        -- =========================================================
+        pcall(function()
+            NetworkSettings.IncomingReplicationLag = 10 -- Tạo độ trễ gói tin 10 giây
+        end)
+
+        -- Tự động ngắt Lag giả lập sau đúng 10 giây
+        task.delay(10, function()
+            pcall(function()
+                NetworkSettings.IncomingReplicationLag = 0
+            end)
+        end)
 
         local isTeleporting = true
         local connection
@@ -451,83 +466,59 @@ local function teleportAndRespawnAtIsland(targetPos)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
                 
                 if newRoot and newHum then
-                    -- Hạ độ cao xuống sát mặt đất hơn (1.5 studs thay vì 3) để dễ chạm vùng
-                    local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 1.5, 0))
-                    
+                    local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
+
                     -- =========================================================
-                    -- 1. ĐẶT VỊ TRÍ & BẬT CANCOLLIDE ĐỂ KÍCH HOẠT TÊN ĐẢO
+                    -- 2. ĐẶT TỌA ĐỘ Ở ĐẢO MỚI TRONG KHI SERVER ĐANG BỊ LAG
                     -- =========================================================
                     newChar:PivotTo(targetCFrame)
-                    
-                    -- Bật va chạm để chân chạm đất/nước kích hoạt Zone Event của game
-                    for _, part in ipairs(newChar:GetChildren()) do
-                        if part:IsA("BasePart") then
-                            part.CanCollide = true
-                        end
-                    end
-                    
-                    -- Cho phép nhân vật nhúc nhích nhẹ 0.2s để game nhận diện va chạm đảo
-                    task.wait(0.2)
+                    newRoot.Anchored = true
+                    newHum.WalkSpeed = 0
 
                     -- =========================================================
-                    -- 2. BẮT ĐẦU CHU KỲ KHÓA NHỊP (3 CHU KỲ)
+                    -- 3. KHÓA GIỮ VỊ TRÍ TRONG KHI CHỜ SERVER XẢ LAG VA ĐỒNG BỘ
                     -- =========================================================
-                    local cycles = 3 
-                    
-                    for i = 1, cycles do
-                        if not newChar or not newChar.Parent then break end
+                    local lockStartTime = tick()
+                    local holdDuration = 12.0 -- Khóa 12s để phủ hết 10s lag + 2s chờ map load
+                    local lockConn
 
-                        -- Khóa 4 giây
-                        local lockStartTime = tick()
-                        local lockConn
-                        
-                        lockConn = RunService.Heartbeat:Connect(function()
-                            if tick() - lockStartTime < 4.0 then
-                                pcall(function()
-                                    newRoot.AssemblyLinearVelocity = Vector3.zero
-                                    newRoot.AssemblyAngularVelocity = Vector3.zero
-                                    newChar:PivotTo(targetCFrame)
+                    lockConn = RunService.Heartbeat:Connect(function()
+                        if tick() - lockStartTime < holdDuration then
+                            pcall(function()
+                                newRoot.AssemblyLinearVelocity = Vector3.zero
+                                newRoot.AssemblyAngularVelocity = Vector3.zero
+                                newChar:PivotTo(targetCFrame)
+                                newRoot.Anchored = true
+                                newHum.WalkSpeed = 0
+                            end)
+                        else
+                            if lockConn then
+                                lockConn:Disconnect()
+                                lockConn = nil
+                            end
+
+                            pcall(function()
+                                newRoot.AssemblyLinearVelocity = Vector3.zero
+                                newRoot.Anchored = false
+                                
+                                if isRunning then
+                                    OriginalFishingSpotCFrame = targetCFrame
                                     newRoot.Anchored = true
                                     newHum.WalkSpeed = 0
-                                end)
-                            else
-                                if lockConn then lockConn:Disconnect(); lockConn = nil end
-                            end
-                        end)
-
-                        task.wait(4.0)
-
-                        -- Nhả 0.3 giây để cập nhật vật lý
-                        pcall(function()
-                            newRoot.Anchored = false
-                            newHum.WalkSpeed = 20
-                        end)
-
-                        if i < cycles then
-                            task.wait(0.3)
-                        end
-                    end
-
-                    -- =========================================================
-                    -- 3. HOÀN THÀNH
-                    -- =========================================================
-                    pcall(function()
-                        newRoot.Anchored = false
-                        newRoot.AssemblyLinearVelocity = Vector3.zero
-                        
-                        if isRunning then
-                            OriginalFishingSpotCFrame = targetCFrame
-                            newRoot.Anchored = true
-                            newHum.WalkSpeed = 0
-                        else
-                            OriginalFishingSpotCFrame = nil
-                            newHum.WalkSpeed = 20
+                                else
+                                    OriginalFishingSpotCFrame = nil
+                                    newHum.WalkSpeed = 20 -- Trả lại WalkSpeed = 20
+                                end
+                            end)
                         end
                     end)
                 end
             end)
         end)
 
+        -- =========================================================
+        -- 4. CHỈNH MÁU VỀ 0 NGAY SAU KHI VỪA BẬT LAG
+        -- =========================================================
         hum.Health = 0
     end)
 end
