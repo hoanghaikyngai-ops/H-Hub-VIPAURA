@@ -451,44 +451,65 @@ local function teleportAndRespawnAtIsland(targetPos)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
                 
                 if newRoot and newHum then
+                    -- 1. CHỜ SERVER ĐỒNG BỘ NETWORK OWNERSHIP (Tránh giật về ngay khi spawn)
+                    task.wait(0.3)
+                    
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
+                    
+                    -- 2. TẠO BODYVELOCITY ĐỂ ĐÈ VẬT LÝ SERVER
+                    local bv = Instance.new("BodyVelocity")
+                    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                    bv.Velocity = Vector3.zero
+                    bv.Parent = newRoot
+
+                    -- 3. TẮT TÍNH TOÁN DỊCH CHUYỂN CỦA HUMANOID
+                    newHum.PlatformStand = true
+
                     local lockStartTime = tick()
                     local lockConn
 
-                    -- Dùng Heartbeat để đè hoàn toàn bước tính toán vật lý
                     lockConn = RunService.Heartbeat:Connect(function()
                         if tick() - lockStartTime < 17.0 then
                             pcall(function()
-                                -- 1. Triệt tiêu toàn bộ vận tốc tích tụ (Nguyên nhân chính gây kéo về)
+                                -- 4. NOCLIP TẤT CẢ BỘ PHẬN (Tránh bị Terrain/Map đẩy văng)
+                                for _, part in ipairs(newChar:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        part.CanCollide = false
+                                    end
+                                end
+                                
+                                -- 5. KHÓA TỌA ĐỘ VÀ TRIỆT TIÊU VẬN TỐC
                                 newRoot.AssemblyLinearVelocity = Vector3.zero
                                 newRoot.AssemblyAngularVelocity = Vector3.zero
-                                
-                                -- 2. Dịch chuyển toàn bộ Character Assembly
                                 newChar:PivotTo(targetCFrame)
-                                
-                                -- 3. Đặt trạng thái khóa
                                 newRoot.Anchored = true
-                                newHum.WalkSpeed = 0
                             end)
                         else
-                            -- Hết 17 giây: Giải phóng
+                            -- HẾT 17 GIÂY: KHÔI PHỤC TRẠNG THÁI
                             if lockConn then
                                 lockConn:Disconnect()
                                 lockConn = nil
                             end
 
+                            if bv then bv:Destroy() end
+
                             pcall(function()
+                                newHum.PlatformStand = false
                                 newRoot.Anchored = false
-                                newRoot.AssemblyLinearVelocity = Vector3.zero
-                                newRoot.AssemblyAngularVelocity = Vector3.zero
                                 
+                                for _, part in ipairs(newChar:GetChildren()) do
+                                    if part:IsA("BasePart") then
+                                        part.CanCollide = true
+                                    end
+                                end
+
                                 if isRunning then
                                     OriginalFishingSpotCFrame = targetCFrame
                                     newRoot.Anchored = true
                                     newHum.WalkSpeed = 0
                                 else
                                     OriginalFishingSpotCFrame = nil
-                                    newHum.WalkSpeed = 20
+                                    newHum.WalkSpeed = 20 -- Trả lại WalkSpeed = 20
                                 end
                             end)
                         end
