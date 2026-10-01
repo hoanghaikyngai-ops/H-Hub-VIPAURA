@@ -451,57 +451,59 @@ local function teleportAndRespawnAtIsland(targetPos)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
                 
                 if newRoot and newHum then
-                    -- 1. CHỜ SERVER ĐỒNG BỘ NETWORK OWNERSHIP (Tránh giật về ngay khi spawn)
-                    task.wait(0.3)
-                    
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
-                    
-                    -- 2. TẠO BODYVELOCITY ĐỂ ĐÈ VẬT LÝ SERVER
+
+                    -- =========================================================
+                    -- 1. BẬT FLY NGAY LẬP TỨC KHI NHÂN VẬT VỪA SPAWN
+                    -- =========================================================
                     local bv = Instance.new("BodyVelocity")
+                    bv.Name = "AntiLagbackFly"
                     bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
                     bv.Velocity = Vector3.zero
                     bv.Parent = newRoot
 
-                    -- 3. TẮT TÍNH TOÁN DỊCH CHUYỂN CỦA HUMANOID
-                    newHum.PlatformStand = true
+                    local bg = Instance.new("BodyGyro")
+                    bg.Name = "AntiLagbackGyro"
+                    bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                    bg.CFrame = targetCFrame
+                    bg.Parent = newRoot
 
+                    -- Đưa Humanoid vào trạng thái bơi (Swimming) để vô hiệu hóa kiểm tra trọng lực
+                    newHum:ChangeState(Enum.HumanoidStateType.Swimming)
+
+                    -- =========================================================
+                    -- 2. KHÓA CFRAME LIÊN TỤC TRONG 17 GIÂY
+                    -- =========================================================
                     local lockStartTime = tick()
                     local lockConn
 
                     lockConn = RunService.Heartbeat:Connect(function()
                         if tick() - lockStartTime < 17.0 then
                             pcall(function()
-                                -- 4. NOCLIP TẤT CẢ BỘ PHẬN (Tránh bị Terrain/Map đẩy văng)
-                                for _, part in ipairs(newChar:GetChildren()) do
-                                    if part:IsA("BasePart") then
-                                        part.CanCollide = false
-                                    end
-                                end
-                                
-                                -- 5. KHÓA TỌA ĐỘ VÀ TRIỆT TIÊU VẬN TỐC
+                                -- Liên tục giữ trạng thái Fly & Vị trí
+                                newHum:ChangeState(Enum.HumanoidStateType.Swimming)
                                 newRoot.AssemblyLinearVelocity = Vector3.zero
                                 newRoot.AssemblyAngularVelocity = Vector3.zero
                                 newChar:PivotTo(targetCFrame)
                                 newRoot.Anchored = true
+                                newHum.WalkSpeed = 0
                             end)
                         else
-                            -- HẾT 17 GIÂY: KHÔI PHỤC TRẠNG THÁI
+                            -- HẾT 17 GIÂY: TẮT FLY VÀ KHÔI PHỤC TRẠNG THÁI
                             if lockConn then
                                 lockConn:Disconnect()
                                 lockConn = nil
                             end
 
+                            -- Hủy các object Fly
                             if bv then bv:Destroy() end
+                            if bg then bg:Destroy() end
 
                             pcall(function()
-                                newHum.PlatformStand = false
+                                newHum:ChangeState(Enum.HumanoidStateType.GettingUp)
                                 newRoot.Anchored = false
-                                
-                                for _, part in ipairs(newChar:GetChildren()) do
-                                    if part:IsA("BasePart") then
-                                        part.CanCollide = true
-                                    end
-                                end
+                                newRoot.AssemblyLinearVelocity = Vector3.zero
+                                newRoot.AssemblyAngularVelocity = Vector3.zero
 
                                 if isRunning then
                                     OriginalFishingSpotCFrame = targetCFrame
