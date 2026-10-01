@@ -431,6 +431,8 @@ local function simulateLagSpike(sec)
     end
 end
 
+local RunService = game:GetService("RunService")
+
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -447,36 +449,48 @@ local function teleportAndRespawnAtIsland(targetPos)
             task.spawn(function()
                 local newRoot = newChar:WaitForChild("HumanoidRootPart", 10)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
+                
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
                     local lockStartTime = tick()
                     local lockConn
 
-                    -- Spam giữ vị trí liên tục mỗi Frame trong 17 giây
-                    lockConn = RunService.PreRender:Connect(function()
+                    -- Dùng Heartbeat để đè hoàn toàn bước tính toán vật lý
+                    lockConn = RunService.Heartbeat:Connect(function()
                         if tick() - lockStartTime < 17.0 then
                             pcall(function()
-                                newRoot.CFrame = targetCFrame
+                                -- 1. Triệt tiêu toàn bộ vận tốc tích tụ (Nguyên nhân chính gây kéo về)
+                                newRoot.AssemblyLinearVelocity = Vector3.zero
+                                newRoot.AssemblyAngularVelocity = Vector3.zero
+                                
+                                -- 2. Dịch chuyển toàn bộ Character Assembly
+                                newChar:PivotTo(targetCFrame)
+                                
+                                -- 3. Đặt trạng thái khóa
                                 newRoot.Anchored = true
                                 newHum.WalkSpeed = 0
                             end)
                         else
-                            -- Ngắt luồng giữ CFrame sau 17 giây
+                            -- Hết 17 giây: Giải phóng
                             if lockConn then
                                 lockConn:Disconnect()
                                 lockConn = nil
                             end
 
-                            -- Thiết lập trạng thái dựa trên việc Auto Farm có đang bật hay không
-                            if isRunning then
-                                OriginalFishingSpotCFrame = targetCFrame
-                                newRoot.Anchored = true
-                                newHum.WalkSpeed = 0
-                            else
-                                OriginalFishingSpotCFrame = nil
+                            pcall(function()
                                 newRoot.Anchored = false
-                                newHum.WalkSpeed = 20
-                            end
+                                newRoot.AssemblyLinearVelocity = Vector3.zero
+                                newRoot.AssemblyAngularVelocity = Vector3.zero
+                                
+                                if isRunning then
+                                    OriginalFishingSpotCFrame = targetCFrame
+                                    newRoot.Anchored = true
+                                    newHum.WalkSpeed = 0
+                                else
+                                    OriginalFishingSpotCFrame = nil
+                                    newHum.WalkSpeed = 20
+                                end
+                            end)
                         end
                     end)
                 end
