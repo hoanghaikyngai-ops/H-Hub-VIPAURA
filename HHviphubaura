@@ -444,7 +444,7 @@ local function teleportAndRespawnAtIsland(targetPos)
         -- 1. BẬT LAG NGAY TRƯỚC KHI CHỈNH MÁU VỀ 0
         -- =========================================================
         pcall(function()
-            NetworkSettings.IncomingReplicationLag = 10 -- Tạo độ trễ gói tin 10 giây
+            NetworkSettings.IncomingReplicationLag = 999999 -- Tạo độ trễ gói tin 10 giây
         end)
 
         -- Tự động ngắt Lag giả lập sau đúng 10 giây
