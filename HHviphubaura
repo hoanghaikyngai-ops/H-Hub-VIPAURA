@@ -424,7 +424,7 @@ local OriginalFishingSpotCFrame = nil
 
 local function simulateLagSpike(sec)
     local start = tick()
-    while tick() - start < (sec or 0.8) do
+    while tick() - start < (sec or 17.0) do
         for i = 1, 3000000 do
             local _ = math.sin(i) * math.cos(i)
         end
