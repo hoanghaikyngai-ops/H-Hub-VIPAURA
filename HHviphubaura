@@ -453,7 +453,7 @@ local function teleportAndRespawnAtIsland(targetPos)
                     local lockConn
 
                     -- Spam giữ vị trí liên tục mỗi Frame trong 17 giây
-                    lockConn = RunService.RenderStepped:Connect(function()
+                    lockConn = RunService.PreRender:Connect(function()
                         if tick() - lockStartTime < 17.0 then
                             pcall(function()
                                 newRoot.CFrame = targetCFrame
@@ -475,7 +475,7 @@ local function teleportAndRespawnAtIsland(targetPos)
                             else
                                 OriginalFishingSpotCFrame = nil
                                 newRoot.Anchored = false
-                                newHum.WalkSpeed = 16
+                                newHum.WalkSpeed = 20
                             end
                         end
                     end)
