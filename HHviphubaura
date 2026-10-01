@@ -425,7 +425,7 @@ local OriginalFishingSpotCFrame = nil
 local function simulateLagSpike(sec)
     local start = tick()
     while tick() - start < (sec or 0.8) do
-        for i = 1, 30000000 do
+        for i = 1, 3000000 do
             local _ = math.sin(i) * math.cos(i)
         end
     end
@@ -436,16 +436,14 @@ local function teleportAndRespawnAtIsland(targetPos)
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if not hum then return end
-        
-        task.spawn(function() simulateLagSpike(0.8) end)
-        
+
         local isTeleporting = true
         local connection
         connection = LocalPlayer.CharacterAdded:Connect(function(newChar)
             if not isTeleporting then return end
             isTeleporting = false
             if connection then connection:Disconnect() end
-            
+
             task.spawn(function()
                 local newRoot = newChar:WaitForChild("HumanoidRootPart", 10)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
@@ -453,16 +451,23 @@ local function teleportAndRespawnAtIsland(targetPos)
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0))
                     local lockStartTime = tick()
                     local lockConn
+
+                    -- Spam giữ vị trí liên tục mỗi Frame trong 17 giây
                     lockConn = RunService.RenderStepped:Connect(function()
-                        if tick() - lockStartTime < 27.0 then
+                        if tick() - lockStartTime < 17.0 then
                             pcall(function()
                                 newRoot.CFrame = targetCFrame
                                 newRoot.Anchored = true
                                 newHum.WalkSpeed = 0
-                                for i = 1, 30000 do end
                             end)
                         else
-                            if lockConn then lockConn:Disconnect() end
+                            -- Ngắt luồng giữ CFrame sau 17 giây
+                            if lockConn then
+                                lockConn:Disconnect()
+                                lockConn = nil
+                            end
+
+                            -- Thiết lập trạng thái dựa trên việc Auto Farm có đang bật hay không
                             if isRunning then
                                 OriginalFishingSpotCFrame = targetCFrame
                                 newRoot.Anchored = true
@@ -477,7 +482,7 @@ local function teleportAndRespawnAtIsland(targetPos)
                 end
             end)
         end)
-        
+
         hum.Health = 0
     end)
 end
@@ -919,7 +924,7 @@ local function findActiveFishTarget()
     if not root then return nil end
 
     local closestFish = nil
-    local minDistance = 45 -- Bán kính quét tối đa xung quanh nhân vật (studs)
+    local minDistance = 50 -- Bán kính quét tối đa xung quanh nhân vật (studs)
 
     local overlapParams = OverlapParams.new()
     overlapParams.FilterType = RaycastFilterType.Exclude
@@ -936,7 +941,7 @@ local function findActiveFishTarget()
             local isIgnored = name:find("rod") or name:find("cần") or name:find("bait") or name:find("mồi") or name:find("merchant")
             
             if not isIgnored then
-                if name:find("fish") or name:find("catch") or name:find("shark") or name:find("whale") or name:find("mob") or name:find("boss") then
+                if name:find("fish") or name:find("shark") or name:find("whale") or name:find("mob") or name:find("boss") then
                     local dist = (part.Position - root.Position).Magnitude
                     if dist < minDistance then
                         minDistance = dist
@@ -1013,7 +1018,7 @@ task.spawn(function()
                         if getFishToSellCount() <= 0 then task.wait(0.3); break end
                     until (tick() - sellStartTime > 10) or not isRunning
 
-                    task.wait(0.4)
+                    task.wait(2.0)
                     local byeStartTime = tick()
                     repeat
                         if not isRunning then break end
@@ -1073,7 +1078,7 @@ task.spawn(function()
                     isFightingFish = true
                     pcall(function()
                         local fishFightStart = tick()
-                        local offsetDistance = 25 -- Khoảng cách dải nhấp chuột quanh tâm cá (pixels)
+                        local offsetDistance = 30 -- Khoảng cách dải nhấp chuột quanh tâm cá (pixels)
                         local inset = GuiService:GetGuiInset()
                         local lastValidX, lastValidY = vp.X / 2, vp.Y / 2
                         
@@ -1094,12 +1099,11 @@ task.spawn(function()
                             local cx, cy = lastValidX, lastValidY
                             VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
                             
-                            -- Danh sách tọa độ bao phủ: Trái, Phải, Trên, Dưới & Tâm
+                            -- Danh sách tọa độ bao phủ: Trái, Phải, Trên, & Tâm
                             local attackOffsets = {
                                 {x = cx - offsetDistance, y = cy}, -- Trái
                                 {x = cx + offsetDistance, y = cy}, -- Phải
                                 {x = cx, y = cy - offsetDistance}, -- Trên
-                                {x = cx, y = cy + offsetDistance}, -- Dưới
                                 {x = cx, y = cy}                    -- Tâm
                             }
                             
