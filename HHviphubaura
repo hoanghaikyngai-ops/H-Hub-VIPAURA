@@ -640,7 +640,7 @@ local PresetSongs = {
     {Name = "🌙 Chỉ Còn Là Giấc Mơ", Id = "121051113937228"},
     {Name = "🏙 Phố Cũ Còn Anh Remix", Id = "107810773290624"},
     {Name = "🍃 Lạc Chốn Hồng Trần", Id = "116260601379194"},
-    {Name = "👑 Cô Độc Vương & Gió Nổi Lên", Id = "89965851084527"},
+    {Name = "👑 I wan you crazy for me", Id = "125230341990848"},
     {Name = "🥀 Mất Anh Rồi", Id = "118574601343022"},
     {Name = "🎤 Katy Katy Remix", Id = "95300067259927"},
     {Name = "🌊 Sóng và Gió Remix", Id = "90113853563664"},
