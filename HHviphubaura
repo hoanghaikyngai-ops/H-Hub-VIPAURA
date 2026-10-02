@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB MODERN UI v8.9 - TỐI ƯU BĂM CÁ CÓ PHẠM VI (TRÁI/PHẢI/TRÊN/TÂM)
--- Cập nhật: Quét bán kính mượt FPS + Nhấp chuột đa điểm (Trái/Phải) quanh cá
+-- Cập nhật: Spam Z-X-C-V Độc Lập Từ Khi Thả Cần + Băm Cá Đa Điểm Lùa Chuột
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -78,7 +78,7 @@ local BirthdayText = Instance.new("TextLabel", BirthdayFrame)
 BirthdayText.Size = UDim2.new(1, -20, 0, 45)
 BirthdayText.Position = UDim2.new(0, 10, 0, 10)
 BirthdayText.BackgroundTransparency = 1
-BirthdayText.Text = "AURA"
+BirthdayText.Text = "🎂 CHÚC MỪNG SINH NHẬT CHÍ DUY 🎉"
 BirthdayText.TextColor3 = Color3.fromRGB(255, 215, 60)
 BirthdayText.Font = FONT_BOLD
 BirthdayText.TextSize = 22
@@ -110,7 +110,7 @@ corner(HoldProgressBar, 4)
 
 local BirthdaySound = Instance.new("Sound", ScreenGui)
 BirthdaySound.Name = "BirthdayMusic"
-BirthdaySound.SoundId = "rbxassetid://97819883348155"
+BirthdaySound.SoundId = "rbxassetid://9043574701"
 BirthdaySound.Volume = 0.7
 BirthdaySound.Looped = false
 BirthdaySound.Parent = ScreenGui
@@ -769,7 +769,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9 (QUÉT BÁN KÍNH MƯỢT + BĂM CÁ ĐA HƯỚNG)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Luồng câu cá: CHUẨN THỨ TỰ 3 BƯỚC\n• Lọc mục tiêu: BÁN KÍNH SPATIAL QUERY\n• Bộ đệm FPS: ĐƯỢC BẢO VỆ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9 (SPAM Z-X-C-V ĐỘC LẬP TỪ KHI THẢ CẦN)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Luồng câu cá: CHUẨN THỨ TỰ 3 BƯỚC\n• Lọc mục tiêu: BÁN KÍNH SPATIAL QUERY\n• Bộ đệm FPS: ĐƯỢC BẢO VỆ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -936,35 +936,83 @@ local function clickBtn(keys)
 end
 
 -- =========================================================
--- HÀM QUÉT CÁ TÍNH TỌA ĐỘ MÀN HÌNH (TRÁI - PHẢI - TRÊN - TÂM)
+-- LUỒNG SPAM Z-X-C-V ĐỘC LẬP (CHẠY TỪ KHI BẮT ĐẦU THẢ CẦN TOÀN BỘ VÒNG LẶP)
+-- =========================================================
+task.spawn(function()
+    local skillsList = {
+        {key = Enum.KeyCode.Z, index = 1}, {key = Enum.KeyCode.X, index = 2},
+        {key = Enum.KeyCode.C, index = 3}, {key = Enum.KeyCode.V, index = 4}
+    }
+    local inset = GuiService:GetGuiInset()
+
+    while ScreenGui.Parent do
+        task.wait(0.01)
+        if isRunning and not isSellingFish then
+            for _, skill in ipairs(skillsList) do
+                -- Gửi tín hiệu phím bàn phím
+                VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.003)
+                VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.003)
+
+                -- Nếu phím ảo UI đang bật -> Click trực tiếp lên nút ảo
+                local btn = markerButtons[skill.index]
+                if btn and MarkersGui.Enabled then
+                    local pos, sz = btn.AbsolutePosition, btn.AbsoluteSize
+                    VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, true, game, 1); task.wait(0.003)
+                    VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, false, game, 1); task.wait(0.003)
+                end
+            end
+        end
+    end
+end)
+
+-- =========================================================
+-- HÀM QUÉT CÁ TÍNH TỌA ĐỘ MÀN HÌNH CHUẨN (TRÁI - PHẢI - TRÊN - TÂM)
 -- =========================================================
 local function getFishScreenData()
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return nil, nil end
 
-    local maxDistance = 45 -- Bán kính quét xung quanh nhân vật (studs)
-    local overlapParams = OverlapParams.new()
-    overlapParams.FilterType = RaycastFilterType.Exclude
-    overlapParams.FilterDescendantsInstances = {char}
-
-    local nearbyParts = Workspace:GetPartBoundsInRadius(root.Position, maxDistance, overlapParams)
+    local maxDistance = 50 -- Bán kính quét xung quanh nhân vật (studs)
     local closestPart = nil
     local minDist = maxDistance
 
-    for _, part in ipairs(nearbyParts) do
-        local parentModel = part:FindFirstAncestorOfClass("Model") or part.Parent
-        if parentModel and not Players:GetPlayerFromCharacter(parentModel) then
-            local name = string.lower(part.Name .. " " .. parentModel.Name)
-            local isIgnored = name:find("rod") or name:find("cần") or name:find("bait") or name:find("mồi") or name:find("merchant")
-            
-            if not isIgnored then
-                local hum = parentModel:FindFirstChildOfClass("Humanoid") or part:FindFirstChildOfClass("Humanoid")
-                if hum or name:find("fish") or name:find("shark") or name:find("whale") or name:find("mob") or name:find("boss") then
+    -- Quét toàn bộ đối tượng trong Workspace
+    for _, obj in ipairs(Workspace:GetChildren()) do
+        if obj:IsA("Model") and obj ~= char and not Players:GetPlayerFromCharacter(obj) then
+            local hum = obj:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                local part = obj:FindFirstChild("HumanoidRootPart") or obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart")
+                if part then
                     local dist = (part.Position - root.Position).Magnitude
                     if dist < minDist then
                         minDist = dist
                         closestPart = part
+                    end
+                end
+            end
+        end
+    end
+
+    -- Quét bổ sung theo Part Bounds
+    if not closestPart then
+        local overlapParams = OverlapParams.new()
+        overlapParams.FilterType = RaycastFilterType.Exclude
+        overlapParams.FilterDescendantsInstances = {char}
+        local nearbyParts = Workspace:GetPartBoundsInRadius(root.Position, maxDistance, overlapParams)
+        for _, part in ipairs(nearbyParts) do
+            local parentModel = part:FindFirstAncestorOfClass("Model") or part.Parent
+            if parentModel and not Players:GetPlayerFromCharacter(parentModel) then
+                local name = string.lower(part.Name .. " " .. parentModel.Name)
+                local isIgnored = name:find("rod") or name:find("cần") or name:find("bait") or name:find("mồi") or name:find("merchant")
+                if not isIgnored then
+                    local hum = parentModel:FindFirstChildOfClass("Humanoid") or part:FindFirstChildOfClass("Humanoid")
+                    if (hum and hum.Health > 0) or name:find("fish") or name:find("shark") or name:find("mob") then
+                        local dist = (part.Position - root.Position).Magnitude
+                        if dist < minDist then
+                            minDist = dist
+                            closestPart = part
+                        end
                     end
                 end
             end
@@ -977,10 +1025,10 @@ local function getFishScreenData()
     local camCFrame = Camera.CFrame
     local inset = GuiService:GetGuiInset()
 
-    -- 4 Điểm bao phủ quanh cá (3 studs)
-    local top3D = center3D + Vector3.new(0, 3, 0)
-    local left3D = center3D - (camCFrame.RightVector * 3)
-    local right3D = center3D + (camCFrame.RightVector * 3)
+    -- 4 Điểm bao phủ quanh cá
+    local top3D = center3D + Vector3.new(0, 3.5, 0)
+    local left3D = center3D - (camCFrame.RightVector * 3.5)
+    local right3D = center3D + (camCFrame.RightVector * 3.5)
 
     local centerScr, onCenter = Camera:WorldToViewportPoint(center3D)
     local topScr, onTop = Camera:WorldToViewportPoint(top3D)
@@ -996,15 +1044,9 @@ local function getFishScreenData()
 end
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ HOÀN CHỈNH (TẮT CẦN 2S -> CHỜ CÁ -> BĂM ĐA ĐIỂM TRÁI/PHẢI)
+-- VÒNG LẶP CÂU CÁ CHÍNH (QUĂNG CẦN 2S -> CHỜ CÁ -> BĂM CHUỘT TRÁI/PHẢI LÙA THEO CÁ)
 -- =========================================================
 task.spawn(function()
-    local skillsList = {
-        {key = Enum.KeyCode.Z, index = 1}, {key = Enum.KeyCode.X, index = 2},
-        {key = Enum.KeyCode.C, index = 3}, {key = Enum.KeyCode.V, index = 4}
-    }
-    local lastSkillTick = 0
-    
     while ScreenGui.Parent do
         task.wait(0.05)
         if isRunning and not isSellingFish then
@@ -1093,18 +1135,18 @@ task.spawn(function()
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
                 end
 
-                -- [BƯỚC 1: GIỮ CHUỘT 2 GIÂY VÀ THẢ CẦN QUĂNG LỰC]
+                -- [BƯỚC 1: GIỮ CHUỘT 2 GIÂY VÀ THẢ CẦN - GIỮ LIÊN TỤC KHÔNG BỊ TRƯỢT]
                 local _, screenPoints = getFishScreenData()
                 if not screenPoints then
                     local vp = Camera.ViewportSize
                     local castX, castY = vp.X / 2, vp.Y / 2 - 80
                     
                     VirtualInputManager:SendMouseButtonEvent(castX, castY, 0, true, game, 1)
-                    if activeTool then pcall(function() activeTool:Activate() end) end
-                    
-                    -- Giữ lực quăng đúng 2 giây
-                    task.wait(2.0)
-                    
+                    local holdStart = tick()
+                    while (tick() - holdStart < 2.0) and isRunning do
+                        if activeTool then pcall(function() activeTool:Activate() end) end
+                        task.wait(0.05)
+                    end
                     VirtualInputManager:SendMouseButtonEvent(castX, castY, 0, false, game, 1)
                 end
 
@@ -1119,48 +1161,45 @@ task.spawn(function()
                     task.wait(0.05)
                 end
 
-                -- [BƯỚC 3: CÁ XUẤT HIỆN -> BĂM TRÁI/PHẢI/TRÊN/TÂM & SPAM PHÍM Z-X-C-V]
+                -- [BƯỚC 3: CÁ XUẤT HIỆN -> BĂM CHUỘT TRÁI/PHẢI 4 HƯỚNG QUANH CÁ]
                 if fishTargetPart then
                     isFightingFish = true
                     local fightStart = tick()
-                    local inset = GuiService:GetGuiInset()
+                    local lostTargetTime = 0
 
-                    while isRunning and not isSellingFish and (tick() - fightStart < 12) do
+                    while isRunning and not isSellingFish and (tick() - fightStart < 15) do
                         fishTargetPart, points = getFishScreenData()
-                        if not fishTargetPart or not points then break end
 
-                        -- 1. SPAM BỘ PHÍM Z, X, C, V
-                        for _, skill in ipairs(skillsList) do
-                            VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.005)
-                            VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.005)
-                            
-                            -- Nếu bật phím ảo Skill Markers UI -> Click luôn phím ảo
-                            local btn = markerButtons[skill.index]
-                            if btn and MarkersGui.Enabled then
-                                local pos, sz = btn.AbsolutePosition, btn.AbsoluteSize
-                                VirtualInputManager:SendMouseButtonEvent(pos.X+sz.X/2+inset.X, pos.Y+sz.Y/2+inset.Y, 0, true, game, 1); task.wait(0.005)
-                                VirtualInputManager:SendMouseButtonEvent(pos.X+sz.X/2+inset.X, pos.Y+sz.Y/2+inset.Y, 0, false, game, 1); task.wait(0.005)
+                        -- Bộ đệm chịu lỗi 1.2s khi cá di chuyển vượt góc quay
+                        if not fishTargetPart or not points then
+                            if lostTargetTime == 0 then
+                                lostTargetTime = tick()
+                            elseif tick() - lostTargetTime > 1.2 then
+                                break
+                            end
+                        else
+                            lostTargetTime = 0
+                        end
+
+                        -- LÙA CHUỘT ĐUỔI THEO CÁ VÀ BĂM CHUỘT TRÁI (0) + CHUỘT PHẢI (1)
+                        if points then
+                            local attackPoints = {points.Center, points.Top, points.Left, points.Right}
+                            for _, pt in ipairs(attackPoints) do
+                                if pt then
+                                    VirtualInputManager:SendMouseMoveEvent(pt.X, pt.Y, game)
+                                    
+                                    -- Click Chuột Trái (0)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 1); task.wait(0.003)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 1); task.wait(0.003)
+
+                                    -- Click Chuột Phải (1)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 1, true, game, 1); task.wait(0.003)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 1, false, game, 1); task.wait(0.003)
+                                end
                             end
                         end
 
-                        -- 2. LÙA CHUỘT BĂM CẢ CHUỘT TRÁI (0) VÀ CHUỘT PHẢI (1) TẠI 4 VỊ TRÍ
-                        local attackOrder = {points.Center, points.Top, points.Left, points.Right}
-
-                        for _, pt in ipairs(attackOrder) do
-                            if pt then
-                                VirtualInputManager:SendMouseMoveEvent(pt.X, pt.Y, game)
-                                
-                                -- Băm Chuột Trái (0)
-                                VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 1); task.wait(0.005)
-                                VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 1); task.wait(0.005)
-
-                                -- Băm Chuột Phải (1)
-                                VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 1, true, game, 1); task.wait(0.005)
-                                VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 1, false, game, 1); task.wait(0.005)
-                            end
-                        end
-
-                        task.wait(0.02)
+                        task.wait(0.01)
                     end
                     isFightingFish = false
                 end
