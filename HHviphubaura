@@ -1,9 +1,10 @@
 -- ====================================================
--- H-HUB MODERN UI v8.9 - TỰ ĐỘNG GIỮ CHUỘT 2S & NHẢ TÂM MÀN HÌNH
--- Cập nhật: Nhấn Giữ Chuột 2s -> Nhả Chuột Liên Tục + Spam Z-X-C-V Độc Lập
+-- H-HUB MODERN UI v8.9.1 - HYBRID VIRTUALUSER HOLD (2S)
+-- Sửa lỗi: Giữ chuột 2 giây chuẩn xác trên cả Mobile & PC Executor
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local VirtualUser = game:GetService("VirtualUser")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local GuiService = game:GetService("GuiService")
@@ -225,7 +226,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v8.9"
+HeaderText.Text = "H-HUB  •  v8.9.1"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -422,7 +423,6 @@ local Islands = {
 local isRunning = false
 local OriginalFishingSpotCFrame = nil
 
-local RunService = game:GetService("RunService")
 local NetworkSettings = settings().Network
 local NetworkClient = game:GetService("NetworkClient")
 
@@ -446,12 +446,10 @@ local function teleportAndRespawnAtIsland(targetPos)
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
 
-                    -- 1. ĐẶT NHÂN VẬT SANG ĐẢO MỚI TRƯỚC
                     newChar:PivotTo(targetCFrame)
                     newRoot.Anchored = true
                     newHum.WalkSpeed = 0
 
-                    -- 2. BẬT LAG MẠNG VÔ HẠN (MATH.HUGE)
                     pcall(function()
                         NetworkSettings.IncomingReplicationLag = math.huge
                         sethiddenproperty(NetworkClient, "ClientReplicationLag", math.huge)
@@ -464,7 +462,6 @@ local function teleportAndRespawnAtIsland(targetPos)
                         end)
                     end)
 
-                    -- 3. KHÓA GIỮ TỌA ĐỘ 12 GIÂY
                     local lockStartTime = tick()
                     local holdDuration = 12.0
                     local lockConn
@@ -527,7 +524,7 @@ local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fro
 local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(30, 41, 59), 2)
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28); tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
-tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Bật tự động câu trước khi treo máy qua đêm"
+tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Giữ chuột/chạm 2s liên tục ở tâm màn hình"
 tip2.LayoutOrder = 3; corner(tip2, 8)
 
 -- ====================== TAB 3: THƯƠNG MẠI ======================
@@ -769,7 +766,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9 (GIỮ CHUỘT TÂM 2S & NHẢ LIÊN TỤC)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Luồng câu cá: NHẤN GIỮ CHUỘT 2S -> NHẢ LIÊN TỤC\n• Lọc mục tiêu: BÁN KÍNH SPATIAL QUERY\n• Bộ đệm FPS: ĐƯỢC BẢO VỆ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.1 (HYBRID VIRTUALUSER HOLD 2S)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Luồng câu cá: GIỮ VIRTUALUSER 2S -> NHẢ CHUỘT\n• Lọc mục tiêu: BÁN KÍNH SPATIAL QUERY\n• Bộ đệm FPS: ĐƯỢC BẢO VỆ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -805,7 +802,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.1\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -963,7 +960,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ CHÍNH: GIỮ CHUỘT TÂM MÀN HÌNH 2 GIÂY ➔ NHẢ ➔ LẶP LIÊN TỤC
+-- VÒNG LẶP CÂU CÁ CHÍNH: HYBRID VIRTUALUSER HOLD (2 GIÂY)
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1054,28 +1051,41 @@ task.spawn(function()
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
                 end
 
-                -- [THỰC THI CHU KỲ: GIỮ CHUỘT TRÁI TẠI TÂM 2 GIÂY -> NHẢ RA]
+                -- [CƠ CHẾ GIỮ CÂU TÂM MÀN HÌNH NÂNG CẤP VIRTUALUSER]
                 local vp = Camera.ViewportSize
-                local cx, cy = vp.X / 2, vp.Y / 2
+                local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
 
-                -- 1. Đưa chuột tới tâm màn hình
-                VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
+                -- 1. Bắt quyền điều khiển VirtualUser & Nhấn giữ xuống
+                pcall(function()
+                    VirtualUser:CaptureController()
+                    VirtualUser:Button1Down(centerPos)
+                end)
 
-                -- 2. Nhấn giữ chuột trái down
-                VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
+                -- 2. Đẩy đồng thời VirtualInputManager
+                pcall(function()
+                    VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
+                    VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
+                end)
 
-                -- 3. Duy trì nhấn giữ đúng 2.0 giây
+                -- 3. Giữ liên tục đúng 2.0 giây
                 local holdStart = tick()
                 while (tick() - holdStart < 2.0) and isRunning and not isSellingFish do
-                    if activeTool then pcall(function() activeTool:Activate() end) end
+                    activeTool = char and char:FindFirstChildOfClass("Tool")
+                    if activeTool then
+                        pcall(function() activeTool:Activate() end)
+                    end
                     task.wait(0.05)
                 end
 
-                -- 4. Nhả chuột trái up
-                VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                -- 4. Nhả chuột/chạm ra
+                pcall(function()
+                    VirtualUser:Button1Up(centerPos)
+                end)
+                pcall(function()
+                    VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
+                end)
 
-                -- 5. Khoảng nghỉ ngắn 0.1s trước khi lặp lại chu kỳ 2s mới
-                task.wait(0.1)
+                task.wait(0.15)
             end
         end
     end
