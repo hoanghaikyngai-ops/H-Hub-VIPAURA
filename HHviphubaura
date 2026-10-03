@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v8.9.7 - SCAN RADIUS ADJUSTED TO 90
--- Cập nhật: Giảm bán kính quét cá xuống 90 studs
+-- H-HUB MODERN UI v8.9.9 - FIXED SERVER POSITION SYNC
+-- Cập nhật: Đồng bộ vị trí với Server sau khi đi bán cá
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -218,7 +218,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v8.9.7"
+HeaderText.Text = "H-HUB  •  v8.9.9"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -434,34 +434,14 @@ local function teleportAndRespawnAtIsland(targetPos)
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
                     newChar:PivotTo(targetCFrame)
-                    newRoot.Anchored = true
-                    newHum.WalkSpeed = 0
+                    newRoot.Anchored = false
+                    newHum.WalkSpeed = 16
 
-                    local lockStartTime = tick()
-                    local lockConn
-                    lockConn = RunService.Heartbeat:Connect(function()
-                        if tick() - lockStartTime < 12.0 then
-                            pcall(function()
-                                newRoot.AssemblyLinearVelocity = Vector3.zero
-                                newChar:PivotTo(targetCFrame)
-                                newRoot.Anchored = true
-                                newHum.WalkSpeed = 0
-                            end)
-                        else
-                            if lockConn then lockConn:Disconnect(); lockConn = nil end
-                            pcall(function()
-                                newRoot.Anchored = false
-                                if isRunning then
-                                    OriginalFishingSpotCFrame = targetCFrame
-                                    newRoot.Anchored = true
-                                    newHum.WalkSpeed = 0
-                                else
-                                    OriginalFishingSpotCFrame = nil
-                                    newHum.WalkSpeed = 20
-                                end
-                            end)
-                        end
-                    end)
+                    if isRunning then
+                        OriginalFishingSpotCFrame = targetCFrame
+                    else
+                        OriginalFishingSpotCFrame = nil
+                    end
                 end
             end)
         end)
@@ -727,7 +707,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.7 (RADIUS 90 STUDS)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Giảm bán kính quét cá xuống 90 studs\n• Tự động dừng thả cần khi xuất hiện cá xung quanh\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.9 (FIXED SERVER SYNC)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Đồng bộ vị trí CFrame chuẩn xác với Server khi quay về\n• Nhả Anchored chớp nhoáng để Server cập nhật Network Ownership\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -763,7 +743,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.7\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.9\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -819,7 +799,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     if isRunning then
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: BẬT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
-        if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = true; if hum then hum.WalkSpeed = 0 end end
+        if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = false; if hum then hum.WalkSpeed = 0 end end
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
@@ -928,7 +908,6 @@ local function getTargetFishPosition2D()
                 local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart"))
                 if part then
                     local dist = (part.Position - root.Position).Magnitude
-                    -- GIẢM BÁN KÍNH QUÉT XUỐNG 90 STUDS
                     if dist <= 90 and dist < closestDist then
                         local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
                         if onScreen then
@@ -1043,20 +1022,38 @@ task.spawn(function()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
+                    -- =========================================================
+                    -- QUAY VỀ BÃI CÂU & ÉP TỰ ĐỒNG BỘ VỚI SERVER
+                    -- =========================================================
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false; hum.WalkSpeed = 16
                         local dBack = (root.Position - OriginalFishingSpotCFrame.Position).Magnitude
                         local backTween = TweenService:Create(root, TweenInfo.new(dBack / 55, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
                         backTween:Play()
                         while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
-                        root.CFrame = OriginalFishingSpotCFrame
+                        
+                        -- Đồng bộ cứng vị trí với Server:
+                        pcall(function()
+                            char:PivotTo(OriginalFishingSpotCFrame)
+                            root.CFrame = OriginalFishingSpotCFrame
+                            root.AssemblyLinearVelocity = Vector3.zero
+                            root.AssemblyAngularVelocity = Vector3.zero
+                        end)
+
+                        -- Mở Anchored 0.2 giây để Server cập nhật Network ownership
+                        root.Anchored = false
+                        task.wait(0.2)
                     end
                     isSellingFish = false
                     continue
                 end
 
-                if OriginalFishingSpotCFrame then root.CFrame = OriginalFishingSpotCFrame end
-                root.Anchored = true; hum.WalkSpeed = 0
+                -- KHÓA VỊ TRÍ TẠI BÃI CÂU BẰNG CƠ CHẾ DẬP VẬN TỐC THAY VÌ ANCHORED CỨNG LÀM LỖI SERVER
+                pcall(function()
+                    root.CFrame = OriginalFishingSpotCFrame
+                    root.AssemblyLinearVelocity = Vector3.zero
+                end)
+                hum.WalkSpeed = 0
 
                 -- BƯỚC 1: ĐÁNH CÁ KHI Ở TRONG BÁN KÍNH 90 STUDS
                 local currentFishPos = getTargetFishPosition2D()
