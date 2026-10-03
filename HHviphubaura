@@ -77,7 +77,7 @@ local BirthdayText = Instance.new("TextLabel", BirthdayFrame)
 BirthdayText.Size = UDim2.new(1, -20, 0, 45)
 BirthdayText.Position = UDim2.new(0, 10, 0, 10)
 BirthdayText.BackgroundTransparency = 1
-BirthdayText.Text = "ĐẠI BÁ KHÍ"
+BirthdayText.Text = "TUẤT CHÍ DUY BÉO"
 BirthdayText.TextColor3 = Color3.fromRGB(255, 215, 60)
 BirthdayText.Font = FONT_BOLD
 BirthdayText.TextSize = 22
@@ -109,7 +109,7 @@ corner(HoldProgressBar, 4)
 
 local BirthdaySound = Instance.new("Sound", ScreenGui)
 BirthdaySound.Name = "BirthdayMusic"
-BirthdaySound.SoundId = "rbxassetid://125230341990848"
+BirthdaySound.SoundId = "rbxassetid://88407917340555"
 BirthdaySound.Volume = 0.7
 BirthdaySound.Looped = false
 
@@ -608,7 +608,9 @@ local PresetSongs = {
     {Name = "⚡ Cứ Thế Mong Chờ Remix", Id = "73423580532746"},
     {Name = "🔥 Tuyển Vợ - Remix", Id = "139968910103444"},
     {Name = "🔥 2 phút hơn x mimimi", Id = "124166975687737"},
-    {Name = "🎵 Ai đưa em về", Id = "110919391228823"}
+    {Name = "🎵 Ai đưa em về", Id = "119589720384457"}
+    {Name = "nơi này có anh", Id = "107416390117542"}
+    {Name = "Vậy là anh sai", Id = "129977243808237"}
 }
 
 local bgSound = Instance.new("Sound")
