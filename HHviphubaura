@@ -1049,18 +1049,22 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- TỰ ĐỘNG XOAY CAMERA VỀ MẶT TRƯỚC NHÂN VẬT
+                        -- TỰ ĐỘNG XOAY CAMERA VỀ CHUẨN HƯỚNG BÃI CÂU (KHÔNG LỆCH)
                         pcall(function()
                             Camera.CameraType = Enum.CameraType.Scriptable
-                            local targetLook = OriginalFishingSpotCFrame.LookVector
-                            local headPos = (char:FindFirstChild("Head") or root).Position
-                            local camPos = headPos - (targetLook * 10) + Vector3.new(0, 3, 0)
                             
-                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                CFrame = CFrame.lookAt(camPos, headPos + (targetLook * 5))
+                            local headPos = (char:FindFirstChild("Head") or root).Position
+                            local lookVector = OriginalFishingSpotCFrame.LookVector
+                            
+                            local camPos = headPos - (lookVector * 10) + Vector3.new(0, 3, 0)
+                            local targetFocus = headPos + (lookVector * 10)
+                            
+                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                CFrame = CFrame.lookAt(camPos, targetFocus)
                             })
                             camTween:Play()
                             camTween.Completed:Wait()
+                            
                             Camera.CameraType = Enum.CameraType.Custom
                         end)
 
