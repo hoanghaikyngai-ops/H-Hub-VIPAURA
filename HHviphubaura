@@ -1,6 +1,7 @@
 -- ====================================================
 -- H-HUB MODERN UI v8.9.1 - HYBRID VIRTUALUSER HOLD (2S)
 -- Sửa lỗi: Giữ chuột 2 giây chuẩn xác trên cả Mobile & PC Executor
+-- FIXED: Đồng bộ vị trí với Server (Fix lỗi đứng gần NPC vẫn báo xa)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -979,7 +980,9 @@ task.spawn(function()
                     local vp = Camera.ViewportSize
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
-                    root.Anchored = true; hum.WalkSpeed = 0; task.wait(0.05)
+                    
+                    -- Mở Anchor để chuẩn bị dịch chuyển và đồng bộ Network với Server
+                    root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
@@ -992,7 +995,7 @@ task.spawn(function()
                             local cr = cc and cc:FindFirstChild("HumanoidRootPart")
                             local ch = cc and cc:FindFirstChildOfClass("Humanoid")
                             if cr and dynamicMerchantPos then
-                                cr.Anchored = true; if ch then ch.WalkSpeed = 0 end
+                                cr.Anchored = false; if ch then ch.WalkSpeed = 0 end
                                 Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
                                 cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
                             end
@@ -1002,7 +1005,11 @@ task.spawn(function()
                     local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 55, Enum.EasingStyle.Linear), {CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)})
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
-                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos); task.wait(0.3)
+                    
+                    -- Cố định CFrame đích, bỏ Anchor hoàn toàn để Server ghi nhận vị trí thực
+                    root.Anchored = false
+                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos); 
+                    task.wait(0.35) -- Chờ đồng bộ Network Replication tới Server
 
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
@@ -1010,7 +1017,7 @@ task.spawn(function()
                     local sellStartTime = tick()
                     repeat
                         if not isRunning then break end
-                        pcall(function() root.Anchored = true; hum.WalkSpeed = 0; root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos) end)
+                        pcall(function() root.Anchored = false; hum.WalkSpeed = 0; root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos) end)
                         clickBtn({"bán tất cả", "sell all", "bán", "sell"}); task.wait(0.25)
                         clickBtn({"xác nhận", "confirm", "đồng ý", "yes", "ok"}); task.wait(0.4)
                         if getFishToSellCount() <= 0 then task.wait(0.3); break end
@@ -1020,7 +1027,7 @@ task.spawn(function()
                     local byeStartTime = tick()
                     repeat
                         if not isRunning then break end
-                        pcall(function() root.Anchored = true; hum.WalkSpeed = 0 end)
+                        pcall(function() root.Anchored = false; hum.WalkSpeed = 0 end)
                         if clickBtn({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}) then task.wait(0.5); break end
                         task.wait(0.25)
                     until (tick() - byeStartTime > 4.0) or not isRunning
