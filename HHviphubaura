@@ -608,9 +608,9 @@ local PresetSongs = {
     {Name = "⚡ Cứ Thế Mong Chờ Remix", Id = "73423580532746"},
     {Name = "🔥 Tuyển Vợ - Remix", Id = "139968910103444"},
     {Name = "🔥 2 phút hơn x mimimi", Id = "124166975687737"},
-    {Name = "🎵 Ai đưa em về", Id = "119589720384457"},
-    {Name = "nơi này có anh", Id = "107416390117542"},
-    {Name = "Vậy là anh sai", Id = "129977243808237"}
+    {Name = "🎵 Ai đưa em về", Id = "110919391228823"},
+    {Name = "GIGA CHAT", Id = "15689448519"},
+    {Name = "PONTAHAHA", Id = "92090093126859"}
 }
 
 local bgSound = Instance.new("Sound")
