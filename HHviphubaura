@@ -1,7 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v8.9.1 - HYBRID VIRTUALUSER HOLD (2S)
--- Sửa lỗi: Giữ chuột 2 giây chuẩn xác trên cả Mobile & PC Executor
--- FIXED: Đồng bộ vị trí với Server (Fix lỗi đứng gần NPC vẫn báo xa)
+-- H-HUB MODERN UI v8.9.1 - HYBRID VIRTUALUSER HOLD & AUTO FISH TRACKING
+-- Sửa lỗi: Đồng bộ NPC + Tự động quét cá & Lùa chuột spam click (Trên/Trái/Phải)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -933,6 +932,48 @@ local function clickBtn(keys)
 end
 
 -- =========================================================
+-- HÀM QUÉT VỊ TRÍ CÁ (UI & WORLD MODEL)
+-- =========================================================
+local function getFishPosition()
+    local inset = GuiService:GetGuiInset()
+
+    -- 1. Quét UI Mini-game trên màn hình
+    for _, gui in pairs(PlayerGui:GetDescendants()) do
+        if gui:IsA("GuiObject") and gui.Visible then
+            local n = string.lower(gui.Name)
+            if n:find("fish") or n:find("target") or n:find("bar") or n:find("indicator") then
+                local pos, sz = gui.AbsolutePosition, gui.AbsoluteSize
+                if sz.X > 5 and sz.Y > 5 then
+                    return Vector2.new(pos.X + sz.X / 2 + inset.X, pos.Y + sz.Y / 2 + inset.Y)
+                end
+            end
+        end
+    end
+
+    -- 2. Quét Model Cá trong Workspace bán kính câu
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if root then
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj and (obj:IsA("Model") or obj:IsA("BasePart")) then
+                local name = string.lower(obj.Name)
+                if name:find("fish") or name:find("bobber") or name:find("hook") then
+                    local pPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart")) or obj
+                    if pPart and (pPart.Position - root.Position).Magnitude <= 120 then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(pPart.Position)
+                        if onScreen then
+                            return Vector2.new(screenPos.X, screenPos.Y)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
+-- =========================================================
 -- LUỒNG SPAM Z-X-C-V ĐỘC LẬP
 -- =========================================================
 task.spawn(function()
@@ -961,7 +1002,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ CHÍNH: HYBRID VIRTUALUSER HOLD (2 GIÂY)
+-- VÒNG LẶP CÂU CÁ CHÍNH & LÙA CHUỘT THEO CÁ
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -981,7 +1022,6 @@ task.spawn(function()
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
                     VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
                     
-                    -- Mở Anchor để chuẩn bị dịch chuyển và đồng bộ Network với Server
                     root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
@@ -1006,10 +1046,9 @@ task.spawn(function()
                     merchantTween:Play()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
-                    -- Cố định CFrame đích, bỏ Anchor hoàn toàn để Server ghi nhận vị trí thực
                     root.Anchored = false
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos); 
-                    task.wait(0.35) -- Chờ đồng bộ Network Replication tới Server
+                    task.wait(0.35)
 
                     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
@@ -1050,49 +1089,63 @@ task.spawn(function()
                 if OriginalFishingSpotCFrame then root.CFrame = OriginalFishingSpotCFrame end
                 root.Anchored = true; hum.WalkSpeed = 0
 
-                -- CẦM CẦN CÂU NẾU CHƯA CẦM
-                local activeTool = char and char:FindFirstChildOfClass("Tool")
-                local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
-                if not isHoldingRod then
-                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
-                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
-                end
+                -- [KIỂM TRÁ CÁ XUẤT HIỆN -> NHƯỜNG CHO HÀM LÙA CHUỘT SPAM CLICK]
+                local targetFishPos = getFishPosition()
+                if targetFishPos then
+                    -- Pattern biến thiên lùa chuột: Tâm -> Trên -> Trái -> Phải
+                    local offsets = {
+                        Vector2.new(0, 0),
+                        Vector2.new(0, -22),
+                        Vector2.new(-22, 0),
+                        Vector2.new(22, 0)
+                    }
 
-                -- [CƠ CHẾ GIỮ CÂU TÂM MÀN HÌNH NÂNG CẤP VIRTUALUSER]
-                local vp = Camera.ViewportSize
-                local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
-
-                -- 1. Bắt quyền điều khiển VirtualUser & Nhấn giữ xuống
-                pcall(function()
-                    VirtualUser:CaptureController()
-                    VirtualUser:Button1Down(centerPos)
-                end)
-
-                -- 2. Đẩy đồng thời VirtualInputManager
-                pcall(function()
-                    VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
-                    VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
-                end)
-
-                -- 3. Giữ liên tục đúng 2.0 giây
-                local holdStart = tick()
-                while (tick() - holdStart < 2.0) and isRunning and not isSellingFish do
-                    activeTool = char and char:FindFirstChildOfClass("Tool")
-                    if activeTool then
-                        pcall(function() activeTool:Activate() end)
+                    for _, offset in ipairs(offsets) do
+                        if not isRunning or isSellingFish then break end
+                        local clickPos = targetFishPos + offset
+                        pcall(function()
+                            VirtualInputManager:SendMouseMoveEvent(clickPos.X, clickPos.Y, game)
+                            VirtualInputManager:SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, true, game, 1)
+                            task.wait(0.01)
+                            VirtualInputManager:SendMouseButtonEvent(clickPos.X, clickPos.Y, 0, false, game, 1)
+                        end)
+                        task.wait(0.01)
                     end
-                    task.wait(0.05)
+                else
+                    -- [NẾU CHƯA CÓ CÁ: THỰC HIỆN HÀM THẢ CÂU GIỮ CHUỘT]
+                    local activeTool = char and char:FindFirstChildOfClass("Tool")
+                    local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
+                    if not isHoldingRod then
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
+                    end
+
+                    local vp = Camera.ViewportSize
+                    local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
+
+                    pcall(function()
+                        VirtualUser:CaptureController()
+                        VirtualUser:Button1Down(centerPos)
+                    end)
+
+                    pcall(function()
+                        VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
+                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
+                    end)
+
+                    local holdStart = tick()
+                    while (tick() - holdStart < 2.0) and isRunning and not isSellingFish do
+                        if getFishPosition() then break end -- Tắt giữ câu ngay lập tức nếu cá xuất hiện
+                        activeTool = char and char:FindFirstChildOfClass("Tool")
+                        if activeTool then pcall(function() activeTool:Activate() end) end
+                        task.wait(0.05)
+                    end
+
+                    pcall(function() VirtualUser:Button1Up(centerPos) end)
+                    pcall(function() VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1) end)
+
+                    task.wait(0.15)
                 end
-
-                -- 4. Nhả chuột/chạm ra
-                pcall(function()
-                    VirtualUser:Button1Up(centerPos)
-                end)
-                pcall(function()
-                    VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
-                end)
-
-                task.wait(0.15)
             end
         end
     end
