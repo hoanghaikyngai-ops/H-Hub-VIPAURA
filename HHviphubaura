@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v8.9.9 - FIXED SERVER POSITION SYNC
--- Cập nhật: Đồng bộ vị trí với Server sau khi đi bán cá
+-- H-HUB MODERN UI v9.0.0 - AUTO CAMERA RESET AFTER SELL
+-- Cập nhật: Tự động quay Camera về hướng trước mặt khi bán cá xong
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -218,7 +218,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v8.9.9"
+HeaderText.Text = "H-HUB  •  v9.0.0"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -707,7 +707,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.9 (FIXED SERVER SYNC)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Đồng bộ vị trí CFrame chuẩn xác với Server khi quay về\n• Nhả Anchored chớp nhoáng để Server cập nhật Network Ownership\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.0.0 (AUTO RESET CAMERA)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động xoay Camera về phía trước mặt sau khi đi bán cá\n• Đồng bộ vị trí CFrame chuẩn xác với Server\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -743,7 +743,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.9\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.0.0\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -1023,7 +1023,7 @@ task.spawn(function()
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
                     -- =========================================================
-                    -- QUAY VỀ BÃI CÂU & ÉP TỰ ĐỒNG BỘ VỚI SERVER
+                    -- QUAY VỀ BÃI CÂU, ĐỒNG BỘ VỊ TRÍ & XOAY CAMERA VỀ PHÍA TRƯỚC
                     -- =========================================================
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false; hum.WalkSpeed = 16
@@ -1032,7 +1032,7 @@ task.spawn(function()
                         backTween:Play()
                         while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                         
-                        -- Đồng bộ cứng vị trí với Server:
+                        -- Đồng bộ CFrame vị trí nhân vật
                         pcall(function()
                             char:PivotTo(OriginalFishingSpotCFrame)
                             root.CFrame = OriginalFishingSpotCFrame
@@ -1040,7 +1040,14 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- Mở Anchored 0.2 giây để Server cập nhật Network ownership
+                        -- TỰ ĐỘNG XOAY CAMERA VỀ MẶT TRƯỚC NHÂN VẬT
+                        pcall(function()
+                            local head = char:FindFirstChild("Head") or root
+                            local lookVector = root.CFrame.LookVector
+                            local camTargetPos = head.Position + (lookVector * 12) + Vector3.new(0, 4, 0)
+                            Camera.CFrame = CFrame.lookAt(camTargetPos, head.Position)
+                        end)
+
                         root.Anchored = false
                         task.wait(0.2)
                     end
@@ -1048,7 +1055,7 @@ task.spawn(function()
                     continue
                 end
 
-                -- KHÓA VỊ TRÍ TẠI BÃI CÂU BẰNG CƠ CHẾ DẬP VẬN TỐC THAY VÌ ANCHORED CỨNG LÀM LỖI SERVER
+                -- KHÓA VỊ TRÍ TẠI BÃI CÂU BẰNG CƠ CHẾ DẬP VẬN TỐC
                 pcall(function()
                     root.CFrame = OriginalFishingSpotCFrame
                     root.AssemblyLinearVelocity = Vector3.zero
