@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v8.9.4 - FIXED CRASH & NPC TRACKING
--- Sửa lỗi: Bọc an toàn pcall tuyệt đối, khôi phục giao diện 100%
+-- H-HUB MODERN UI v8.9.7 - SCAN RADIUS ADJUSTED TO 90
+-- Cập nhật: Giảm bán kính quét cá xuống 90 studs
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -218,7 +218,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v8.9.4"
+HeaderText.Text = "H-HUB  •  v8.9.7"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -727,7 +727,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.4 (FIX CRASH & SAFE RUN)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động quét NPC Cá theo Máu (Humanoid)\n• Nhường luồng giữa Lùa Chuột & Thả Cần\n• Luồng ZXCV chạy độc lập chuẩn xác\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.7 (RADIUS 90 STUDS)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Giảm bán kính quét cá xuống 90 studs\n• Tự động dừng thả cần khi xuất hiện cá xung quanh\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -763,7 +763,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.4\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.7\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -875,6 +875,9 @@ local function getMerchantPosition()
     return Vector3.new(1263.48, 27.71, -349.61)
 end
 
+-- =========================================================
+-- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG
+-- =========================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
@@ -896,34 +899,48 @@ local function clickBtn(keys)
     return false
 end
 
+local function closeMerchantDialog()
+    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}
+    local startTime = tick()
+    repeat
+        if not isRunning then break end
+        local clicked = clickBtn(byeKeywords)
+        if clicked then task.wait(0.3); break end
+        task.wait(0.2)
+    until (tick() - startTime > 4.0) or not isRunning
+end
+
 -- =========================================================
--- HÀM QUÉT TOẠ ĐỘ NPC CÁ
+-- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS (REAL-TIME)
 -- =========================================================
-local function getFishNPCPosition()
+local function getTargetFishPosition2D()
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
 
-    for _, model in pairs(Workspace:GetChildren()) do
-        if model and model:IsA("Model") and model ~= char then
-            local hum = model:FindFirstChildOfClass("Humanoid")
-            if hum and hum.Health > 0 then
-                local name = string.lower(model.Name)
-                local pPart = model.PrimaryPart or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildOfClass("BasePart")
-                
-                if pPart and (pPart.Position - root.Position).Magnitude <= 100 then
-                    local isFishName = name:find("fish") or name:find("cá") or name:find("mob") or name:find("boss") or name:find("target")
-                    if isFishName or not Players:GetPlayerFromCharacter(model) then
-                        local screenPos, onScreen = Camera:WorldToViewportPoint(pPart.Position)
+    local closestDist = math.huge
+    local targetScreenPos = nil
+
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj and (obj:IsA("Model") or obj:IsA("BasePart")) and obj ~= char then
+            local name = string.lower(obj.Name)
+            if name:find("fish") or name:find("cá") or name:find("mob") or name:find("target") or name:find("bobber") then
+                local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart"))
+                if part then
+                    local dist = (part.Position - root.Position).Magnitude
+                    -- GIẢM BÁN KÍNH QUÉT XUỐNG 90 STUDS
+                    if dist <= 90 and dist < closestDist then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
                         if onScreen then
-                            return Vector2.new(screenPos.X, screenPos.Y)
+                            closestDist = dist
+                            targetScreenPos = Vector2.new(screenPos.X, screenPos.Y)
                         end
                     end
                 end
             end
         end
     end
-    return nil
+    return targetScreenPos
 end
 
 -- =========================================================
@@ -961,7 +978,7 @@ end)
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
-        task.wait(0.03)
+        task.wait(0.02)
         if isRunning and not isSellingFish then
             local char = LocalPlayer.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -1021,14 +1038,8 @@ task.spawn(function()
                         if getFishToSellCount() <= 0 then task.wait(0.3); break end
                     until (tick() - sellStartTime > 10) or not isRunning
 
-                    task.wait(2.0)
-                    local byeStartTime = tick()
-                    repeat
-                        if not isRunning then break end
-                        pcall(function() root.Anchored = false; hum.WalkSpeed = 0 end)
-                        if clickBtn({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}) then task.wait(0.5); break end
-                        task.wait(0.25)
-                    until (tick() - byeStartTime > 4.0) or not isRunning
+                    task.wait(1.0)
+                    closeMerchantDialog()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
@@ -1047,25 +1058,36 @@ task.spawn(function()
                 if OriginalFishingSpotCFrame then root.CFrame = OriginalFishingSpotCFrame end
                 root.Anchored = true; hum.WalkSpeed = 0
 
-                -- XỬ LÝ LÙA CHUỘT CÁ NPC VS THẢ CẦN
-                local fishNPCPos = getFishNPCPosition()
+                -- BƯỚC 1: ĐÁNH CÁ KHI Ở TRONG BÁN KÍNH 90 STUDS
+                local currentFishPos = getTargetFishPosition2D()
 
-                if fishNPCPos then
-                    local offsets = {Vector2.new(0, 0), Vector2.new(0, -28), Vector2.new(-28, 0), Vector2.new(28, 0)}
+                if currentFishPos then
+                    local offsets = {
+                        Vector2.new(0, 0),
+                        Vector2.new(0, -32),
+                        Vector2.new(0, 32),
+                        Vector2.new(-32, 0),
+                        Vector2.new(32, 0)
+                    }
+
                     for _, offset in ipairs(offsets) do
                         if not isRunning or isSellingFish then break end
-                        local targetPos = fishNPCPos + offset
+                        local latestPos = getTargetFishPosition2D() or currentFishPos
+                        local targetClickPos = latestPos + offset
+
                         pcall(function()
-                            VirtualInputManager:SendMouseMoveEvent(targetPos.X, targetPos.Y, game)
-                            VirtualInputManager:SendMouseButtonEvent(targetPos.X, targetPos.Y, 0, true, game, 1)
+                            VirtualInputManager:SendMouseMoveEvent(targetClickPos.X, targetClickPos.Y, game)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, true, game, 1)
                             task.wait(0.005)
-                            VirtualInputManager:SendMouseButtonEvent(targetPos.X, targetPos.Y, 0, false, game, 1)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, false, game, 1)
                         end)
                         task.wait(0.005)
                     end
                 else
+                    -- BƯỚC 2: KHÔNG CÓ CÁ TRONG 90 STUDS -> THẢ / GIỮ CẦN
                     local activeTool = char and char:FindFirstChildOfClass("Tool")
                     local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
+                    
                     if not isHoldingRod then
                         pcall(function()
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
@@ -1084,18 +1106,18 @@ task.spawn(function()
                     end)
 
                     local holdStart = tick()
-                    while (tick() - holdStart < 2.0) and isRunning and not isSellingFish do
-                        if getFishNPCPosition() then break end
+                    while (tick() - holdStart < 1.8) and isRunning and not isSellingFish do
+                        if getTargetFishPosition2D() then break end
                         activeTool = char and char:FindFirstChildOfClass("Tool")
                         if activeTool then pcall(function() activeTool:Activate() end) end
-                        task.wait(0.05)
+                        task.wait(0.04)
                     end
 
                     pcall(function()
                         VirtualUser:Button1Up(centerPos)
                         VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
                     end)
-                    task.wait(0.15)
+                    task.wait(0.1)
                 end
             end
         end
