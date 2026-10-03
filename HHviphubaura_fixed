@@ -1,0 +1,67 @@
+-- ====================== PHẦN BÁN CÁ TỰ ĐỘNG (CÓP VÀO THAY THẾ) ======================
+-- Thay thế phần từ line 989 đến hết
+
+merchantLockConnection = RunService.RenderStepped:Connect(function()
+    pcall(function()
+        local cc = LocalPlayer.Character
+        local cr = cc and cc:FindFirstChild("HumanoidRootPart")
+        local ch = cc and cc:FindFirstChildOfClass("Humanoid")
+        
+        if cr and dynamicMerchantPos then
+            cr.Anchored = true
+            if ch then ch.WalkSpeed = 0 end
+            
+            -- Quay camera & nhân vật về phía NPC
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
+            cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
+        end
+    end)
+end)
+
+-- Đợi 2 giây rồi tìm & click nút "Bán hết"
+task.delay(2, function()
+    pcall(function()
+        local inset = GuiService:GetGuiInset()
+        local found = false
+        
+        -- Tìm nút bán (có thể là "sell", "bán", "sell all", "bán hết")
+        for _, obj in pairs(PlayerGui:GetDescendants()) do
+            if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
+                local txt = string.lower(obj.Text or "")
+                if txt:find("bán") or txt:find("sell") then
+                    local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
+                    local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
+                    
+                    VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
+                    task.wait(0.05)
+                    VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                    found = true
+                    break
+                end
+            end
+        end
+        
+        -- Nếu click nút bán xong, đợi 3 giây rồi return về chỗ câu cá
+        if found then
+            task.delay(3, function()
+                isSellingFish = false
+                pcall(function()
+                    local cc = LocalPlayer.Character
+                    local cr = cc and cc:FindFirstChild("HumanoidRootPart")
+                    local ch = cc and cc:FindFirstChildOfClass("Humanoid")
+                    
+                    if cr and OriginalFishingSpotCFrame then
+                        cr.CFrame = OriginalFishingSpotCFrame
+                        cr.Anchored = true
+                        if ch then ch.WalkSpeed = 0 end
+                    end
+                end)
+                
+                if merchantLockConnection then
+                    merchantLockConnection:Disconnect()
+                    merchantLockConnection = nil
+                end
+            end)
+        end
+    end)
+end)
