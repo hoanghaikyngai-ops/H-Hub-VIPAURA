@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.0 - FIX CAMERA RESET & DIALOG PAUSE
--- Cập nhật: Fix xoay Camera sau khi bán + Ngừng quét cá khi nói chuyện NPC
+-- H-HUB MODERN UI v9.1.1 - PASS-THROUGH UI & AUTO CAMERA RESET
+-- Cập nhật: Không chặn click auto + Vẫn tương tác bấm tay bình thường
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -178,7 +178,7 @@ Main.Size = UDim2.new(0, 580, 0, 360)
 Main.Position = UDim2.new(0.5, -290, 0.5, -180)
 Main.BackgroundColor3 = C_BG
 Main.BackgroundTransparency = 0.05
-Main.Active = true
+Main.Active = false -- Cập nhật: Không chặn click chuột xuyên qua khoảng trống
 Main.Visible = true
 corner(Main, 16)
 local MainStroke = stroke(Main, C_CYAN, 1.5, 0.25)
@@ -218,7 +218,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.0"
+HeaderText.Text = "H-HUB  •  v9.1.1"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -707,7 +707,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.0 (FIX CAMERA & PAUSE SCAN)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Ngừng quét cá trong khi tương tác NPC\n• Tự động xoay Camera chính xác hướng trước mặt\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.1 (PASS-THROUGH UI & AUTO CAMERA)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Ngừng quét cá trong khi tương tác NPC\n• Tự động xoay Camera chính xác hướng trước mặt\n• Bỏ qua UI H-HUB khi auto click (vẫn bấm tay được)\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -743,7 +743,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.0\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.1\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -856,22 +856,25 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG
+-- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG (ĐÃ BỎ QUA H-HUB UI)
 -- =========================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
-        if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
-            local txt = string.lower(obj.Text or "")
-            for _, kw in ipairs(keys) do
-                if txt:find(kw) then
-                    local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
-                    local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
-                    pcall(function()
-                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.05)
-                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                    end)
-                    return true
+        -- Cập nhật: Bỏ qua hoàn toàn giao diện thuộc HHubVipUI để không tự bấm nhầm
+        if not obj:IsDescendantOf(ScreenGui) then
+            if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
+                local txt = string.lower(obj.Text or "")
+                for _, kw in ipairs(keys) do
+                    if txt:find(kw) then
+                        local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
+                        local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
+                        pcall(function()
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.05)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                        end)
+                        return true
+                    end
                 end
             end
         end
@@ -879,7 +882,6 @@ local function clickBtn(keys)
     return false
 end
 
--- TỰ ĐỘNG THOÁT HỘI THOẠI VÀ CHỜ ẤN XONG "TẠM BIỆT"
 local function closeMerchantDialog()
     local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}
     local startTime = tick()
@@ -887,7 +889,7 @@ local function closeMerchantDialog()
         if not isRunning then break end
         local clicked = clickBtn(byeKeywords)
         if clicked then 
-            task.wait(0.5) -- Chờ hiệu ứng giao diện NPC tắt hẳn
+            task.wait(0.5)
             break 
         end
         task.wait(0.2)
@@ -898,7 +900,7 @@ end
 -- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS (REAL-TIME)
 -- =========================================================
 local function getTargetFishPosition2D()
-    if isSellingFish then return nil end -- ĐÃ SỬA: DỪNG HOÀN TOÀN QUÉT CÁ KHI ĐANG BÁN
+    if isSellingFish then return nil end
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
@@ -928,7 +930,7 @@ local function getTargetFishPosition2D()
 end
 
 -- =========================================================
--- LUỒNG SPAM Z-X-C-V ĐỘC LẬP (TỰ TẮT KHI ĐANG BÁN CÁ)
+-- LUỒNG SPAM Z-X-C-V ĐỘC LẬP
 -- =========================================================
 task.spawn(function()
     local skillsList = {
@@ -974,7 +976,7 @@ task.spawn(function()
 
                 -- TỰ ĐỘNG BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
-                    isSellingFish = true -- KHÓA TOÀN BỘ TIẾN TRÌNH QUÉT CÁ & TƯƠNG TÁC
+                    isSellingFish = true
                     
                     local vp = Camera.ViewportSize
                     pcall(function()
@@ -1025,7 +1027,6 @@ task.spawn(function()
                     until (tick() - sellStartTime > 10) or not isRunning
 
                     task.wait(0.5)
-                    -- ĐÃ SỬA: ẤN TẠM BIỆT XONG MỚI MỞ LẠI TIẾN TRÌNH QUÉT CÁ
                     closeMerchantDialog()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
@@ -1048,7 +1049,7 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- ĐÃ SỬA: XOAY CAMERA MƯỢT VỀ TRƯỚC MẶT VỚI KHOẢNG CÁCH CHUẨN
+                        -- TỰ ĐỘNG XOAY CAMERA VỀ MẶT TRƯỚC NHÂN VẬT
                         pcall(function()
                             Camera.CameraType = Enum.CameraType.Scriptable
                             local targetLook = OriginalFishingSpotCFrame.LookVector
@@ -1067,7 +1068,6 @@ task.spawn(function()
                         task.wait(0.2)
                     end
                     
-                    -- MỞ LẠI TRẠNG THÁI QUÉT CÁ
                     isSellingFish = false
                     continue
                 end
