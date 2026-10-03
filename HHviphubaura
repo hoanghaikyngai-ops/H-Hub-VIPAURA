@@ -857,7 +857,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     local root = char and char:FindFirstChild("HumanoidRootPart")
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if isRunning then
-        AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: BẬT"
+        AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: CHẠY"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
         if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = true; if hum then hum.WalkSpeed = 0 end end
     else
