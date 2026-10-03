@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB MODERN UI v9.1.1 - PASS-THROUGH UI & AUTO CAMERA RESET
--- Cập nhật: Không chặn click auto + Vẫn tương tác bấm tay bình thường
+-- Cập nhật: Tự động dùng tool:Activate() đâm xuyên 100% UI
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -178,7 +178,7 @@ Main.Size = UDim2.new(0, 580, 0, 360)
 Main.Position = UDim2.new(0.5, -290, 0.5, -180)
 Main.BackgroundColor3 = C_BG
 Main.BackgroundTransparency = 0.05
-Main.Active = false -- Cập nhật: Không chặn click chuột xuyên qua khoảng trống
+Main.Active = false
 Main.Visible = true
 corner(Main, 16)
 local MainStroke = stroke(Main, C_CYAN, 1.5, 0.25)
@@ -467,7 +467,7 @@ local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fro
 local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(30, 41, 59), 2)
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28); tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
-tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và spam click"
+tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và kích hoạt Tool trực tiếp"
 tip2.LayoutOrder = 3; corner(tip2, 8)
 
 -- ====================== TAB 3: THƯƠNG MẠI ======================
@@ -861,7 +861,6 @@ end
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
-        -- Cập nhật: Bỏ qua hoàn toàn giao diện thuộc HHubVipUI để không tự bấm nhầm
         if not obj:IsDescendantOf(ScreenGui) then
             if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
                 local txt = string.lower(obj.Text or "")
@@ -961,7 +960,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ CHÍNH (ĐÃ ĐỔI SANG TOOL:ACTIVATE)
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1083,32 +1082,17 @@ task.spawn(function()
                 end)
                 hum.WalkSpeed = 0
 
-                -- BƯỚC 1: ĐÁNH CÁ KHI Ở TRONG BÁN KÍNH 90 STUDS
+                -- BƯỚC 1: ĐÁNH CÁ KHI Ở TRONG BÁN KÍNH 90 STUDS (SỬ DỤNG TOOL:ACTIVATE)
                 local currentFishPos = getTargetFishPosition2D()
 
                 if currentFishPos then
-                    local offsets = {
-                        Vector2.new(0, 0),
-                        Vector2.new(0, -32),
-                        Vector2.new(0, 32),
-                        Vector2.new(-32, 0),
-                        Vector2.new(32, 0)
-                    }
-
-                    for _, offset in ipairs(offsets) do
-                        if not isRunning or isSellingFish then break end
-                        local latestPos = getTargetFishPosition2D() or currentFishPos
-                        if not latestPos then break end
-                        local targetClickPos = latestPos + offset
-
-                        pcall(function()
-                            VirtualInputManager:SendMouseMoveEvent(targetClickPos.X, targetClickPos.Y, game)
-                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, true, game, 1)
-                            task.wait(0.005)
-                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, false, game, 1)
-                        end)
-                        task.wait(0.005)
-                    end
+                    pcall(function()
+                        local activeTool = char and char:FindFirstChildOfClass("Tool")
+                        if activeTool then
+                            activeTool:Activate()
+                        end
+                    end)
+                    task.wait(0.02)
                 else
                     -- BƯỚC 2: KHÔNG CÓ CÁ TRONG 90 STUDS -> THẢ / GIỮ CẦN
                     local activeTool = char and char:FindFirstChildOfClass("Tool")
@@ -1121,28 +1105,16 @@ task.spawn(function()
                         end)
                     end
 
-                    local vp = Camera.ViewportSize
-                    local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
-
-                    pcall(function()
-                        VirtualUser:CaptureController()
-                        VirtualUser:Button1Down(centerPos)
-                        VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
-                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
-                    end)
-
                     local holdStart = tick()
                     while (tick() - holdStart < 1.8) and isRunning and not isSellingFish do
                         if getTargetFishPosition2D() then break end
                         activeTool = char and char:FindFirstChildOfClass("Tool")
-                        if activeTool then pcall(function() activeTool:Activate() end) end
+                        if activeTool then 
+                            pcall(function() activeTool:Activate() end) 
+                        end
                         task.wait(0.04)
                     end
 
-                    pcall(function()
-                        VirtualUser:Button1Up(centerPos)
-                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
-                    end)
                     task.wait(0.1)
                 end
             end
