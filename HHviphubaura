@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.1 - PASS-THROUGH UI & AUTO CAMERA RESET
--- Cập nhật: Tự động dùng tool:Activate() đâm xuyên 100% UI
+-- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
+-- Cập nhật: Tích hợp NoClip xuyên tường & Tự động gỡ kẹt khi bán cá
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -68,6 +68,7 @@ BirthdayFrame.Size = UDim2.new(0, 520, 0, 135)
 BirthdayFrame.Position = UDim2.new(0.5, -260, 0.18, 0)
 BirthdayFrame.BackgroundColor3 = Color3.fromRGB(15, 22, 40)
 BirthdayFrame.BackgroundTransparency = 0.05
+BirthdayFrame.Active = false
 BirthdayFrame.ZIndex = 1000
 corner(BirthdayFrame, 18)
 stroke(BirthdayFrame, Color3.fromRGB(255, 180, 40), 2, 0.1)
@@ -151,15 +152,15 @@ end)
 
 pcall(function() BirthdaySound:Play() end)
 
--- ============ NÚT MỞ MENU ============
+-- ============ NÚT MỞ MENU (CÓ HIỆN SỐ CÁ) ============
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
-ToggleBtn.Size = UDim2.new(0, 126, 0, 36)
+ToggleBtn.Size = UDim2.new(0, 150, 0, 36)
 ToggleBtn.Position = UDim2.new(0, 14, 0.42, 0)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 24, 48)
-ToggleBtn.Text = "  ◈  H-HUB"
+ToggleBtn.Text = "  ◈  H-HUB (0/50)"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.Font = FONT_BOLD
-ToggleBtn.TextSize = 14
+ToggleBtn.TextSize = 12
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
 corner(ToggleBtn, 18)
@@ -167,7 +168,7 @@ local ToggleStroke = stroke(ToggleBtn, C_CYAN, 1.8, 0.1)
 
 local ToggleDot = Instance.new("Frame", ToggleBtn)
 ToggleDot.Size = UDim2.new(0, 8, 0, 8)
-ToggleDot.Position = UDim2.new(0, 12, 0.5, -4)
+ToggleDot.Position = UDim2.new(0, 10, 0.5, -4)
 ToggleDot.BackgroundColor3 = C_CYAN
 ToggleDot.BorderSizePixel = 0
 corner(ToggleDot, 8)
@@ -196,6 +197,7 @@ TopHeader.Size = UDim2.new(1, -24, 0, 52)
 TopHeader.Position = UDim2.new(0, 12, 0, 10)
 TopHeader.BackgroundColor3 = C_CARD
 TopHeader.BackgroundTransparency = 0.1
+TopHeader.Active = true
 corner(TopHeader, 12)
 stroke(TopHeader, Color3.fromRGB(255,255,255), 1, 0.85)
 
@@ -218,7 +220,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.1"
+HeaderText.Text = "H-HUB  •  v9.1.4"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -297,6 +299,7 @@ SideBar.Size = UDim2.new(0, 148, 1, -142)
 SideBar.Position = UDim2.new(0, 12, 0, 70)
 SideBar.BackgroundColor3 = C_CARD
 SideBar.BackgroundTransparency = 0.1
+SideBar.Active = false
 corner(SideBar, 12)
 stroke(SideBar, Color3.fromRGB(255,255,255), 1, 0.85)
 
@@ -322,6 +325,7 @@ CenterPanel.Size = UDim2.new(0, 396, 1, -142)
 CenterPanel.Position = UDim2.new(0, 168, 0, 70)
 CenterPanel.BackgroundColor3 = C_CARD
 CenterPanel.BackgroundTransparency = 0.05
+CenterPanel.Active = false
 corner(CenterPanel, 12)
 local CenterStroke = stroke(CenterPanel, C_CYAN, 1.2, 0.45)
 
@@ -339,6 +343,7 @@ local TabContentArea = Instance.new("Frame", CenterPanel)
 TabContentArea.Size = UDim2.new(1, -24, 1, -44)
 TabContentArea.Position = UDim2.new(0, 12, 0, 32)
 TabContentArea.BackgroundTransparency = 1
+TabContentArea.Active = false
 
 local function createPage()
     local p = Instance.new("ScrollingFrame", TabContentArea)
@@ -349,6 +354,7 @@ local function createPage()
     p.AutomaticCanvasSize = Enum.AutomaticSize.Y
     p.ScrollBarThickness = 3
     p.ScrollBarImageColor3 = C_CYAN
+    p.Active = false
     p.Visible = false
     return p
 end
@@ -371,6 +377,7 @@ local function mkBtn(parent, text, h, bg, order)
     b.TextTruncate = Enum.TextTruncate.AtEnd
     b.LayoutOrder = order or 0
     b.AutoButtonColor = true
+    b.Active = true
     corner(b, 10)
     stroke(b, Color3.fromRGB(255,255,255), 1, 0.7)
     return b
@@ -400,6 +407,7 @@ mapInfo.LayoutOrder = 1; corner(mapInfo, 10); stroke(mapInfo, C_CYAN, 1, 0.6)
 local IslandGrid = Instance.new("Frame", P1)
 IslandGrid.Size = UDim2.new(1, 0, 0, 150); IslandGrid.BackgroundTransparency = 1
 IslandGrid.AutomaticSize = Enum.AutomaticSize.Y; IslandGrid.LayoutOrder = 2
+IslandGrid.Active = false
 local gridP1 = Instance.new("UIGridLayout", IslandGrid)
 gridP1.CellSize = UDim2.new(0, 176, 0, 40); gridP1.CellPadding = UDim2.new(0, 8, 0, 8); gridP1.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -457,6 +465,7 @@ for i, island in ipairs(Islands) do
     btn.TextSize = 12
     btn.Text = island.Name
     btn.LayoutOrder = i
+    btn.Active = true
     corner(btn, 10); stroke(btn, C_CYAN, 1, 0.6)
     btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
@@ -467,7 +476,7 @@ local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fro
 local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(30, 41, 59), 2)
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28); tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
-tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và kích hoạt Tool trực tiếp"
+tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và spam click"
 tip2.LayoutOrder = 3; corner(tip2, 8)
 
 -- ====================== TAB 3: THƯƠNG MẠI ======================
@@ -492,18 +501,18 @@ end)
 -- ====================== TAB 4: PHÍM ẢO ======================
 sectionLabel(P4, "  PHÍM KỸ NĂNG ẢO", 0)
 local KeyRow = Instance.new("Frame", P4)
-KeyRow.Size = UDim2.new(1, -4, 0, 40); KeyRow.BackgroundTransparency = 1; KeyRow.LayoutOrder = 1
+KeyRow.Size = UDim2.new(1, -4, 0, 40); KeyRow.BackgroundTransparency = 1; KeyRow.LayoutOrder = 1; KeyRow.Active = false
 
 local ShowMarkersBtn = Instance.new("TextButton", KeyRow)
 ShowMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(13, 110, 253)
 ShowMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); ShowMarkersBtn.Font = FONT_BOLD; ShowMarkersBtn.TextSize = 10
-ShowMarkersBtn.Text = "⌨ PHÍM ẢO: TẮT"
+ShowMarkersBtn.Text = "⌨ PHÍM ẢO: TẮT"; ShowMarkersBtn.Active = true
 corner(ShowMarkersBtn, 10); stroke(ShowMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
 
 local LockMarkersBtn = Instance.new("TextButton", KeyRow)
 LockMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); LockMarkersBtn.Position = UDim2.new(0.51, 0, 0, 0)
 LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
-LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"
+LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"; LockMarkersBtn.Active = true
 corner(LockMarkersBtn, 10); stroke(LockMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
 
 local MarkersGui = Instance.new("ScreenGui")
@@ -542,22 +551,22 @@ sectionLabel(P5, "  NHẠC NỀN", 0)
 local MusicInput = Instance.new("TextBox", P5)
 MusicInput.Size = UDim2.new(1, -4, 0, 34); MusicInput.BackgroundColor3 = Color3.fromRGB(10, 16, 30)
 MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255); MusicInput.PlaceholderText = "🔎  Nhập ID nhạc..."; MusicInput.PlaceholderColor3 = C_SUB
-MusicInput.Text = ""; MusicInput.Font = FONT; MusicInput.TextSize = 11; MusicInput.LayoutOrder = 1; MusicInput.ClearTextOnFocus = false
+MusicInput.Text = ""; MusicInput.Font = FONT; MusicInput.TextSize = 11; MusicInput.LayoutOrder = 1; MusicInput.ClearTextOnFocus = false; MusicInput.Active = true
 corner(MusicInput, 10); stroke(MusicInput, C_CYAN, 1, 0.6)
 
 local MusicRow = Instance.new("Frame", P5)
-MusicRow.Size = UDim2.new(1, -4, 0, 36); MusicRow.BackgroundTransparency = 1; MusicRow.LayoutOrder = 2
+MusicRow.Size = UDim2.new(1, -4, 0, 36); MusicRow.BackgroundTransparency = 1; MusicRow.LayoutOrder = 2; MusicRow.Active = false
 
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
 PlayMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
 PlayMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); PlayMusicBtn.Font = FONT_BOLD; PlayMusicBtn.TextSize = 11
-PlayMusicBtn.Text = "▶ PHÁT NHẠC"; corner(PlayMusicBtn, 10)
+PlayMusicBtn.Text = "▶ PHÁT NHẠC"; PlayMusicBtn.Active = true; corner(PlayMusicBtn, 10)
 
 local StopMusicBtn = Instance.new("TextButton", MusicRow)
 StopMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); StopMusicBtn.Position = UDim2.new(0.51, 0, 0, 0)
 StopMusicBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
 StopMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); StopMusicBtn.Font = FONT_BOLD; StopMusicBtn.TextSize = 11
-StopMusicBtn.Text = "⏹ DỪNG"; corner(StopMusicBtn, 10)
+StopMusicBtn.Text = "⏹ DỪNG"; StopMusicBtn.Active = true; corner(StopMusicBtn, 10)
 
 local HipSwayToggleBtn = mkBtn(P5, "⚡ LẮC HÔNG & HUD TRÊN ĐẦU: TẮT", 34, Color3.fromRGB(220, 38, 38), 3)
 
@@ -565,7 +574,7 @@ local PresetContainer = Instance.new("ScrollingFrame", P5)
 PresetContainer.Size = UDim2.new(1, -4, 0, 110); PresetContainer.BackgroundColor3 = Color3.fromRGB(8, 12, 24)
 PresetContainer.BackgroundTransparency = 0.1; PresetContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
 PresetContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y; PresetContainer.ScrollBarThickness = 3
-PresetContainer.ScrollBarImageColor3 = C_CYAN; PresetContainer.BorderSizePixel = 0; PresetContainer.LayoutOrder = 4
+PresetContainer.ScrollBarImageColor3 = C_CYAN; PresetContainer.BorderSizePixel = 0; PresetContainer.LayoutOrder = 4; PresetContainer.Active = false
 corner(PresetContainer, 10); stroke(PresetContainer, Color3.fromRGB(255,255,255), 1, 0.85)
 
 local PresetLayout = Instance.new("UIListLayout", PresetContainer)
@@ -613,7 +622,7 @@ for i, song in ipairs(PresetSongs) do
     pBtn.Size = UDim2.new(1, -6, 0, 26); pBtn.BackgroundColor3 = Color3.fromRGB(24, 38, 62)
     pBtn.TextColor3 = Color3.fromRGB(220, 245, 255); pBtn.Font = FONT; pBtn.TextSize = 10
     pBtn.Text = "  ♫  " .. song.Name; pBtn.TextXAlignment = Enum.TextXAlignment.Left; pBtn.TextTruncate = Enum.TextTruncate.AtEnd
-    pBtn.LayoutOrder = i; corner(pBtn, 8)
+    pBtn.LayoutOrder = i; pBtn.Active = true; corner(pBtn, 8)
     pBtn.MouseButton1Click:Connect(function()
         MusicInput.Text = song.Id; bgSound.SoundId = "rbxassetid://" .. song.Id; pcall(function() bgSound:Play() end)
         if MusicIcon then MusicIcon.Text = "⏸" end
@@ -701,24 +710,25 @@ createFixLagButton("MỞ KHÓA FPS", 3, function(enabled) pcall(function() if se
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
 local sysCard = Instance.new("Frame", P7)
 sysCard.Size = UDim2.new(1, 0, 0, 285); sysCard.BackgroundColor3 = Color3.fromRGB(13, 20, 36)
+sysCard.Active = false
 corner(sysCard, 12); stroke(sysCard, C_CYAN, 1, 0.6)
 local sysPad = Instance.new("UIPadding", sysCard)
 sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.PaddingRight = UDim.new(0,12); sysPad.PaddingBottom = UDim.new(0,10)
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.1 (PASS-THROUGH UI & AUTO CAMERA)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Ngừng quét cá trong khi tương tác NPC\n• Tự động xoay Camera chính xác hướng trước mặt\n• Bỏ qua UI H-HUB khi auto click (vẫn bấm tay được)\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (NOCLIP & AUTO UNSTUCK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Spam click 4 hướng (Trên, Dưới, Trái, Phải)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
 MusicBarContainer.Size = UDim2.new(0, 396, 0, 52); MusicBarContainer.Position = UDim2.new(0, 168, 1, -64)
-MusicBarContainer.BackgroundColor3 = Color3.fromRGB(13, 20, 36); MusicBarContainer.BackgroundTransparency = 0.1
+MusicBarContainer.BackgroundColor3 = Color3.fromRGB(13, 20, 36); MusicBarContainer.BackgroundTransparency = 0.1; MusicBarContainer.Active = false
 corner(MusicBarContainer, 12); local MusicBarStroke = stroke(MusicBarContainer, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
 
 MusicIcon = Instance.new("TextButton", MusicBarContainer)
 MusicIcon.Size = UDim2.new(0, 34, 0, 34); MusicIcon.Position = UDim2.new(0, 8, 0.5, -17); MusicIcon.BackgroundColor3 = C_CYAN
 MusicIcon.Text = "▶"; MusicIcon.TextColor3 = Color3.fromRGB(8, 12, 22); MusicIcon.Font = FONT_BOLD; MusicIcon.TextSize = 13
-MusicIcon.AutoButtonColor = true; corner(MusicIcon, 17)
+MusicIcon.AutoButtonColor = true; MusicIcon.Active = true; corner(MusicIcon, 17)
 
 currentTrackNameLabel = Instance.new("TextLabel", MusicBarContainer)
 currentTrackNameLabel.Size = UDim2.new(1, -120, 0, 18); currentTrackNameLabel.Position = UDim2.new(0, 50, 0, 7)
@@ -743,7 +753,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.1\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.4\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -758,7 +768,7 @@ for i, def in ipairs(tabDefs) do
     local btn = Instance.new("TextButton", SideBar)
     btn.Size = UDim2.new(1, 0, 0, 32); btn.BackgroundColor3 = C_BTN; btn.TextColor3 = Color3.fromRGB(180, 220, 255)
     btn.Font = FONT_BOLD; btn.Text = def.icon .. "  " .. def.name; btn.TextSize = 10; btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.LayoutOrder = i; corner(btn, 9); local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
+    btn.LayoutOrder = i; btn.Active = true; corner(btn, 9); local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
     stroke(btn, Color3.fromRGB(0, 150, 220), 1, 0.75)
     local bar = Instance.new("Frame", btn)
     bar.Name = "SelBar"; bar.Size = UDim2.new(0, 3, 0, 18); bar.Position = UDim2.new(0, 2, 0.5, -9)
@@ -835,10 +845,17 @@ local function getFishToSellCount()
     return count
 end
 
+-- =========================================================
+-- VÒNG LẶP CẬP NHẬT SỐ CÁ VÀO THẺ KHO & NÚT TOGGLE
+-- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(1)
-        pcall(function() FishStatus.Text = "🎒 Kho cá: " .. getFishToSellCount() .. " / Ngưỡng bán: " .. maxFishCapacity end)
+        pcall(function() 
+            local fishCount = getFishToSellCount()
+            FishStatus.Text = "🎒 Kho cá: " .. fishCount .. " / Ngưỡng bán: " .. maxFishCapacity
+            ToggleBtn.Text = "  ◈  H-HUB (" .. fishCount .. "/" .. maxFishCapacity .. ")"
+        end)
     end
 end)
 
@@ -856,7 +873,59 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG (ĐÃ BỎ QUA H-HUB UI)
+-- HÀM MỚI v9.1.4: BẬT / TẮT NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
+-- =========================================================
+local function setCharacterNoClip(enabled)
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = not enabled
+                end
+            end
+        end
+    end)
+end
+
+local function safeTweenToTarget(targetCFrame, travelSpeed)
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    setCharacterNoClip(true)
+    root.Anchored = false
+
+    local dist = (root.Position - targetCFrame.Position).Magnitude
+    local duration = math.max(dist / (travelSpeed or 55), 0.1)
+    local tween = TweenService:Create(root, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
+
+    tween:Play()
+
+    local lastCheckPos = root.Position
+    local stuckCounter = 0
+
+    while tween.PlaybackState == Enum.PlaybackState.Playing and isRunning do
+        task.wait(0.2)
+        setCharacterNoClip(true)
+
+        if (root.Position - lastCheckPos).Magnitude < 0.8 then
+            stuckCounter = stuckCounter + 0.2
+            if stuckCounter >= 1.2 then
+                root.CFrame = root.CFrame + Vector3.new(0, 10, 0)
+                stuckCounter = 0
+            end
+        else
+            stuckCounter = 0
+        end
+        lastCheckPos = root.Position
+    end
+
+    setCharacterNoClip(false)
+end
+
+-- =========================================================
+-- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG
 -- =========================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
@@ -896,7 +965,7 @@ local function closeMerchantDialog()
 end
 
 -- =========================================================
--- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS (REAL-TIME)
+-- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS
 -- =========================================================
 local function getTargetFishPosition2D()
     if isSellingFish then return nil end
@@ -960,7 +1029,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ CHÍNH (ĐÃ ĐỔI SANG TOOL:ACTIVATE)
+-- VÒNG LẶP CÂU CÁ CHÍNH
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -973,7 +1042,7 @@ task.spawn(function()
             if root and hum then
                 if not OriginalFishingSpotCFrame then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- TỰ ĐỘNG BÁN CÁ
+                -- TỰ ĐỘNG BÁN CÁ CÓ CHỐNG KẸT & NOCLIP
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
@@ -987,7 +1056,7 @@ task.spawn(function()
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
-                    local dist = (root.Position - safeTargetPos).Magnitude
+                    
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
 
                     merchantLockConnection = RunService.RenderStepped:Connect(function()
@@ -1003,9 +1072,8 @@ task.spawn(function()
                         end)
                     end)
 
-                    local merchantTween = TweenService:Create(root, TweenInfo.new(dist / 55, Enum.EasingStyle.Linear), {CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)})
-                    merchantTween:Play()
-                    while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
+                    -- DÙNG TWEEN AN TOÀN VÀ NOCLIP
+                    safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
                     
                     root.Anchored = false
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
@@ -1030,17 +1098,16 @@ task.spawn(function()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
-                    -- =========================================================
-                    -- QUAY VỀ BÃI CÂU, ĐỒNG BỘ VỊ TRÍ & TỰ ĐỘNG XOAY CAMERA CHUẨN
-                    -- =========================================================
+                    -- NHẢY NHẸ ĐỂ GIẢI THOÁT KHỎI KHUNG THOẠI NPC
+                    pcall(function() hum.Jump = true end)
+                    task.wait(0.2)
+
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false; hum.WalkSpeed = 16
-                        local dBack = (root.Position - OriginalFishingSpotCFrame.Position).Magnitude
-                        local backTween = TweenService:Create(root, TweenInfo.new(dBack / 55, Enum.EasingStyle.Linear), {CFrame = OriginalFishingSpotCFrame})
-                        backTween:Play()
-                        while backTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                         
-                        -- Đồng bộ CFrame vị trí nhân vật
+                        -- DÙNG TWEEN AN TOÀN KHI BAY VỀ ĐIỂM CÂU
+                        safeTweenToTarget(OriginalFishingSpotCFrame, 55)
+                        
                         pcall(function()
                             char:PivotTo(OriginalFishingSpotCFrame)
                             root.CFrame = OriginalFishingSpotCFrame
@@ -1048,22 +1115,17 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- TỰ ĐỘNG XOAY CAMERA VỀ CHUẨN HƯỚNG BÃI CÂU (KHÔNG LỆCH)
                         pcall(function()
                             Camera.CameraType = Enum.CameraType.Scriptable
-                            
+                            local targetLook = OriginalFishingSpotCFrame.LookVector
                             local headPos = (char:FindFirstChild("Head") or root).Position
-                            local lookVector = OriginalFishingSpotCFrame.LookVector
+                            local camPos = headPos - (targetLook * 10) + Vector3.new(0, 3, 0)
                             
-                            local camPos = headPos - (lookVector * 10) + Vector3.new(0, 3, 0)
-                            local targetFocus = headPos + (lookVector * 10)
-                            
-                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                CFrame = CFrame.lookAt(camPos, targetFocus)
+                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                CFrame = CFrame.lookAt(camPos, headPos + (targetLook * 5))
                             })
                             camTween:Play()
                             camTween.Completed:Wait()
-                            
                             Camera.CameraType = Enum.CameraType.Custom
                         end)
 
@@ -1075,26 +1137,38 @@ task.spawn(function()
                     continue
                 end
 
-                -- KHÓA VỊ TRÍ TẠI BÃI CÂU BẰNG CƠ CHẾ DẬP VẬN TỐC
                 pcall(function()
                     root.CFrame = OriginalFishingSpotCFrame
                     root.AssemblyLinearVelocity = Vector3.zero
                 end)
                 hum.WalkSpeed = 0
 
-                -- BƯỚC 1: ĐÁNH CÁ KHI Ở TRONG BÁN KÍNH 90 STUDS (SỬ DỤNG TOOL:ACTIVATE)
                 local currentFishPos = getTargetFishPosition2D()
 
                 if currentFishPos then
-                    pcall(function()
-                        local activeTool = char and char:FindFirstChildOfClass("Tool")
-                        if activeTool then
-                            activeTool:Activate()
-                        end
-                    end)
-                    task.wait(0.02)
+                    local offsets = {
+                        Vector2.new(0, 0),
+                        Vector2.new(0, -32),
+                        Vector2.new(0, 32),
+                        Vector2.new(-32, 0),
+                        Vector2.new(32, 0)
+                    }
+
+                    for _, offset in ipairs(offsets) do
+                        if not isRunning or isSellingFish then break end
+                        local latestPos = getTargetFishPosition2D() or currentFishPos
+                        if not latestPos then break end
+                        local targetClickPos = latestPos + offset
+
+                        pcall(function()
+                            VirtualInputManager:SendMouseMoveEvent(targetClickPos.X, targetClickPos.Y, game)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, true, game, 1)
+                            task.wait(0.005)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, false, game, 1)
+                        end)
+                        task.wait(0.005)
+                    end
                 else
-                    -- BƯỚC 2: KHÔNG CÓ CÁ TRONG 90 STUDS -> THẢ / GIỮ CẦN
                     local activeTool = char and char:FindFirstChildOfClass("Tool")
                     local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
                     
@@ -1105,16 +1179,28 @@ task.spawn(function()
                         end)
                     end
 
+                    local vp = Camera.ViewportSize
+                    local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
+
+                    pcall(function()
+                        VirtualUser:CaptureController()
+                        VirtualUser:Button1Down(centerPos)
+                        VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
+                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
+                    end)
+
                     local holdStart = tick()
                     while (tick() - holdStart < 1.8) and isRunning and not isSellingFish do
                         if getTargetFishPosition2D() then break end
                         activeTool = char and char:FindFirstChildOfClass("Tool")
-                        if activeTool then 
-                            pcall(function() activeTool:Activate() end) 
-                        end
+                        if activeTool then pcall(function() activeTool:Activate() end) end
                         task.wait(0.04)
                     end
 
+                    pcall(function()
+                        VirtualUser:Button1Up(centerPos)
+                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
+                    end)
                     task.wait(0.1)
                 end
             end
