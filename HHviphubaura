@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v8.9.3 - REAL-TIME NPC FISH TRACKING
--- Sửa lỗi: Quét NPC Cá theo Máu (Humanoid) & Lùa chuột Spam Click (Trên/Trái/Phải)
+-- H-HUB MODERN UI v8.9.4 - FIXED CRASH & NPC TRACKING
+-- Sửa lỗi: Bọc an toàn pcall tuyệt đối, khôi phục giao diện 100%
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -22,20 +22,17 @@ pcall(function()
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
--- ============ PHONG CÁCH HIỆN ĐẠI & MÀU SẮC CHUẨN ============
+-- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
 local FONT_BOLD = Enum.Font.GothamBold
 
 local C_BG      = Color3.fromRGB(10, 14, 26)
 local C_CARD    = Color3.fromRGB(17, 24, 40)
 local C_CYAN    = Color3.fromRGB(0, 229, 255)
-local C_BLUE    = Color3.fromRGB(59, 130, 246)
-local C_PURPLE  = Color3.fromRGB(139, 92, 246)
 local C_TEXT    = Color3.fromRGB(235, 245, 255)
 local C_SUB     = Color3.fromRGB(148, 163, 184)
 local C_BTN     = Color3.fromRGB(22, 32, 54)
 local C_OK      = Color3.fromRGB(16, 185, 129)
-local C_BAD     = Color3.fromRGB(239, 68, 68)
 
 local function corner(obj, r)
     local c = Instance.new("UICorner")
@@ -61,7 +58,7 @@ ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = PlayerGui
 
 -- =========================================================
--- BIRTHDAY INTRO: GIỮ MÀN HÌNH 3 GIÂY ĐỂ TẮT
+-- INTRO BÁ KHÍ
 -- =========================================================
 local BirthdayIntroActive = true
 
@@ -114,12 +111,11 @@ BirthdaySound.Name = "BirthdayMusic"
 BirthdaySound.SoundId = "rbxassetid://125230341990848"
 BirthdaySound.Volume = 0.7
 BirthdaySound.Looped = false
-BirthdaySound.Parent = ScreenGui
 
 local function StopBirthdayIntro()
     if not BirthdayIntroActive then return end
     BirthdayIntroActive = false
-    BirthdaySound:Stop()
+    pcall(function() BirthdaySound:Stop() end)
     BirthdayFrame.Visible = false
 end
 
@@ -128,7 +124,7 @@ BirthdaySound.Ended:Connect(StopBirthdayIntro)
 local holdThread = nil
 local holdStartTime = 0
 
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
+UserInputService.InputBegan:Connect(function(input)
     if not BirthdayIntroActive then return end
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         holdStartTime = tick()
@@ -145,25 +141,21 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
-UserInputService.InputEnded:Connect(function(input, gameProcessed)
+UserInputService.InputEnded:Connect(function(input)
     if not BirthdayIntroActive then return end
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        if holdThread then
-            task.cancel(holdThread)
-            holdThread = nil
-        end
+        if holdThread then task.cancel(holdThread); holdThread = nil end
         TweenService:Create(HoldProgressBar, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 1, 0)}):Play()
     end
 end)
 
-BirthdaySound:Play()
+pcall(function() BirthdaySound:Play() end)
 
 -- ============ NÚT MỞ MENU ============
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 126, 0, 36)
 ToggleBtn.Position = UDim2.new(0, 14, 0.42, 0)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(15, 24, 48)
-ToggleBtn.BackgroundTransparency = 0
 ToggleBtn.Text = "  ◈  H-HUB"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.Font = FONT_BOLD
@@ -226,7 +218,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v8.9.3"
+HeaderText.Text = "H-HUB  •  v8.9.4"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -372,7 +364,6 @@ local function mkBtn(parent, text, h, bg, order)
     local b = Instance.new("TextButton", parent)
     b.Size = UDim2.new(1, -4, 0, h or 34)
     b.BackgroundColor3 = bg
-    b.BackgroundTransparency = 0
     b.TextColor3 = Color3.fromRGB(255, 255, 255)
     b.Font = FONT_BOLD
     b.TextSize = 12
@@ -402,7 +393,7 @@ end
 -- ====================== TAB 1: BẢN ĐỒ ======================
 local mapInfo = Instance.new("TextLabel", P1)
 mapInfo.Size = UDim2.new(1, -4, 0, 30); mapInfo.BackgroundColor3 = Color3.fromRGB(12, 30, 48)
-mapInfo.BackgroundTransparency = 0; mapInfo.TextColor3 = C_CYAN; mapInfo.Font = FONT_BOLD; mapInfo.TextSize = 11
+mapInfo.TextColor3 = C_CYAN; mapInfo.Font = FONT_BOLD; mapInfo.TextSize = 11
 mapInfo.Text = "  🗺 CHỌN ĐIỂM DỊCH CHUYỂN"; mapInfo.TextXAlignment = Enum.TextXAlignment.Left
 mapInfo.LayoutOrder = 1; corner(mapInfo, 10); stroke(mapInfo, C_CYAN, 1, 0.6)
 
@@ -423,9 +414,6 @@ local Islands = {
 local isRunning = false
 local OriginalFishingSpotCFrame = nil
 
-local NetworkSettings = settings().Network
-local NetworkClient = game:GetService("NetworkClient")
-
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -445,46 +433,24 @@ local function teleportAndRespawnAtIsland(targetPos)
                 
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
-
                     newChar:PivotTo(targetCFrame)
                     newRoot.Anchored = true
                     newHum.WalkSpeed = 0
 
-                    pcall(function()
-                        NetworkSettings.IncomingReplicationLag = math.huge
-                        sethiddenproperty(NetworkClient, "ClientReplicationLag", math.huge)
-                    end)
-
-                    task.delay(10, function()
-                        pcall(function()
-                            NetworkSettings.IncomingReplicationLag = 0
-                            sethiddenproperty(NetworkClient, "ClientReplicationLag", 0)
-                        end)
-                    end)
-
                     local lockStartTime = tick()
-                    local holdDuration = 12.0
                     local lockConn
-
                     lockConn = RunService.Heartbeat:Connect(function()
-                        if tick() - lockStartTime < holdDuration then
+                        if tick() - lockStartTime < 12.0 then
                             pcall(function()
                                 newRoot.AssemblyLinearVelocity = Vector3.zero
-                                newRoot.AssemblyAngularVelocity = Vector3.zero
                                 newChar:PivotTo(targetCFrame)
                                 newRoot.Anchored = true
                                 newHum.WalkSpeed = 0
                             end)
                         else
-                            if lockConn then
-                                lockConn:Disconnect()
-                                lockConn = nil
-                            end
-
+                            if lockConn then lockConn:Disconnect(); lockConn = nil end
                             pcall(function()
-                                newRoot.AssemblyLinearVelocity = Vector3.zero
                                 newRoot.Anchored = false
-                                
                                 if isRunning then
                                     OriginalFishingSpotCFrame = targetCFrame
                                     newRoot.Anchored = true
@@ -499,7 +465,6 @@ local function teleportAndRespawnAtIsland(targetPos)
                 end
             end)
         end)
-
         hum.Health = 0
     end)
 end
@@ -507,13 +472,11 @@ end
 for i, island in ipairs(Islands) do
     local btn = Instance.new("TextButton", IslandGrid)
     btn.BackgroundColor3 = Color3.fromRGB(24, 40, 72)
-    btn.BackgroundTransparency = 0
     btn.TextColor3 = Color3.fromRGB(255,255,255)
     btn.Font = FONT_BOLD
     btn.TextSize = 12
     btn.Text = island.Name
     btn.LayoutOrder = i
-    btn.AutoButtonColor = true
     corner(btn, 10); stroke(btn, C_CYAN, 1, 0.6)
     btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
@@ -524,7 +487,7 @@ local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fro
 local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(30, 41, 59), 2)
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28); tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
-tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Giữ chuột/chạm 2s liên tục ở tâm màn hình"
+tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và spam click"
 tip2.LayoutOrder = 3; corner(tip2, 8)
 
 -- ====================== TAB 3: THƯƠNG MẠI ======================
@@ -553,16 +516,14 @@ KeyRow.Size = UDim2.new(1, -4, 0, 40); KeyRow.BackgroundTransparency = 1; KeyRow
 
 local ShowMarkersBtn = Instance.new("TextButton", KeyRow)
 ShowMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(13, 110, 253)
-ShowMarkersBtn.BackgroundTransparency = 0
 ShowMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); ShowMarkersBtn.Font = FONT_BOLD; ShowMarkersBtn.TextSize = 10
-ShowMarkersBtn.Text = "⌨ PHÍM ẢO: TẮT"; ShowMarkersBtn.AutoButtonColor = true
+ShowMarkersBtn.Text = "⌨ PHÍM ẢO: TẮT"
 corner(ShowMarkersBtn, 10); stroke(ShowMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
 
 local LockMarkersBtn = Instance.new("TextButton", KeyRow)
 LockMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); LockMarkersBtn.Position = UDim2.new(0.51, 0, 0, 0)
-LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80); LockMarkersBtn.BackgroundTransparency = 0
-LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"; LockMarkersBtn.AutoButtonColor = true
+LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
+LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"
 corner(LockMarkersBtn, 10); stroke(LockMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
 
 local MarkersGui = Instance.new("ScreenGui")
@@ -599,7 +560,7 @@ end)
 -- ====================== TAB 5: ÂM THANH ======================
 sectionLabel(P5, "  NHẠC NỀN", 0)
 local MusicInput = Instance.new("TextBox", P5)
-MusicInput.Size = UDim2.new(1, -4, 0, 34); MusicInput.BackgroundColor3 = Color3.fromRGB(10, 16, 30); MusicInput.BackgroundTransparency = 0
+MusicInput.Size = UDim2.new(1, -4, 0, 34); MusicInput.BackgroundColor3 = Color3.fromRGB(10, 16, 30)
 MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255); MusicInput.PlaceholderText = "🔎  Nhập ID nhạc..."; MusicInput.PlaceholderColor3 = C_SUB
 MusicInput.Text = ""; MusicInput.Font = FONT; MusicInput.TextSize = 11; MusicInput.LayoutOrder = 1; MusicInput.ClearTextOnFocus = false
 corner(MusicInput, 10); stroke(MusicInput, C_CYAN, 1, 0.6)
@@ -608,15 +569,15 @@ local MusicRow = Instance.new("Frame", P5)
 MusicRow.Size = UDim2.new(1, -4, 0, 36); MusicRow.BackgroundTransparency = 1; MusicRow.LayoutOrder = 2
 
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
-PlayMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129); PlayMusicBtn.BackgroundTransparency = 0
+PlayMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
 PlayMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); PlayMusicBtn.Font = FONT_BOLD; PlayMusicBtn.TextSize = 11
-PlayMusicBtn.Text = "▶ PHÁT NHẠC"; PlayMusicBtn.AutoButtonColor = true; corner(PlayMusicBtn, 10)
+PlayMusicBtn.Text = "▶ PHÁT NHẠC"; corner(PlayMusicBtn, 10)
 
 local StopMusicBtn = Instance.new("TextButton", MusicRow)
 StopMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); StopMusicBtn.Position = UDim2.new(0.51, 0, 0, 0)
-StopMusicBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38); StopMusicBtn.BackgroundTransparency = 0
+StopMusicBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
 StopMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); StopMusicBtn.Font = FONT_BOLD; StopMusicBtn.TextSize = 11
-StopMusicBtn.Text = "⏹ DỪNG"; StopMusicBtn.AutoButtonColor = true; corner(StopMusicBtn, 10)
+StopMusicBtn.Text = "⏹ DỪNG"; corner(StopMusicBtn, 10)
 
 local HipSwayToggleBtn = mkBtn(P5, "⚡ LẮC HÔNG & HUD TRÊN ĐẦU: TẮT", 34, Color3.fromRGB(220, 38, 38), 3)
 
@@ -669,12 +630,12 @@ local currentTrackNameLabel = nil; local currentProgressBar = nil; local MusicIc
 
 for i, song in ipairs(PresetSongs) do
     local pBtn = Instance.new("TextButton", PresetContainer)
-    pBtn.Size = UDim2.new(1, -6, 0, 26); pBtn.BackgroundColor3 = Color3.fromRGB(24, 38, 62); pBtn.BackgroundTransparency = 0
+    pBtn.Size = UDim2.new(1, -6, 0, 26); pBtn.BackgroundColor3 = Color3.fromRGB(24, 38, 62)
     pBtn.TextColor3 = Color3.fromRGB(220, 245, 255); pBtn.Font = FONT; pBtn.TextSize = 10
     pBtn.Text = "  ♫  " .. song.Name; pBtn.TextXAlignment = Enum.TextXAlignment.Left; pBtn.TextTruncate = Enum.TextTruncate.AtEnd
-    pBtn.LayoutOrder = i; pBtn.AutoButtonColor = true; corner(pBtn, 8)
+    pBtn.LayoutOrder = i; corner(pBtn, 8)
     pBtn.MouseButton1Click:Connect(function()
-        MusicInput.Text = song.Id; bgSound.SoundId = "rbxassetid://" .. song.Id; bgSound:Play()
+        MusicInput.Text = song.Id; bgSound.SoundId = "rbxassetid://" .. song.Id; pcall(function() bgSound:Play() end)
         if MusicIcon then MusicIcon.Text = "⏸" end
         if currentTrackNameLabel then currentTrackNameLabel.Text = song.Name end
     end)
@@ -683,13 +644,13 @@ end
 PlayMusicBtn.MouseButton1Click:Connect(function()
     local rawText = MusicInput.Text:match("^%s*(.-)%s*$")
     if rawText ~= "" then
-        bgSound.SoundId = "rbxassetid://" .. rawText; bgSound:Play()
+        bgSound.SoundId = "rbxassetid://" .. rawText; pcall(function() bgSound:Play() end)
         if MusicIcon then MusicIcon.Text = "⏸" end
         if currentTrackNameLabel then currentTrackNameLabel.Text = "Tùy chọn (" .. rawText .. ")" end
     end
 end)
 StopMusicBtn.MouseButton1Click:Connect(function()
-    bgSound:Stop()
+    pcall(function() bgSound:Stop() end)
     if MusicIcon then MusicIcon.Text = "▶" end
     if currentTrackNameLabel then currentTrackNameLabel.Text = "Đã dừng" end
 end)
@@ -721,7 +682,7 @@ HipSwayToggleBtn.MouseButton1Click:Connect(function()
     isHipSwayEnabled = not isHipSwayEnabled
     HipSwayToggleBtn.Text = isHipSwayEnabled and "⚡ LẮC HÔNG & HUD TRÊN ĐẦU: BẬT" or "⚡ LẮC HÔNG & HUD TRÊN ĐẦU: TẮT"
     HipSwayToggleBtn.BackgroundColor3 = isHipSwayEnabled and Color3.fromRGB(16, 185, 129) or Color3.fromRGB(220, 38, 38)
-    if isHipSwayEnabled and not bgSound.IsPlaying then bgSound:Play() end
+    if isHipSwayEnabled and not bgSound.IsPlaying then pcall(function() bgSound:Play() end) end
     updateHeadBillboard()
 end)
 
@@ -759,14 +720,14 @@ createFixLagButton("MỞ KHÓA FPS", 3, function(enabled) pcall(function() if se
 -- ====================== TAB 7: HỆ THỐNG ======================
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
 local sysCard = Instance.new("Frame", P7)
-sysCard.Size = UDim2.new(1, 0, 0, 285); sysCard.BackgroundColor3 = Color3.fromRGB(13, 20, 36); sysCard.BackgroundTransparency = 0
+sysCard.Size = UDim2.new(1, 0, 0, 285); sysCard.BackgroundColor3 = Color3.fromRGB(13, 20, 36)
 corner(sysCard, 12); stroke(sysCard, C_CYAN, 1, 0.6)
 local sysPad = Instance.new("UIPadding", sysCard)
 sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.PaddingRight = UDim.new(0,12); sysPad.PaddingBottom = UDim.new(0,10)
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.3 (NPC TRACKING FIX)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Lùa chuột cá: QUÉT MODEL NPC CÓ HUMANOID (HEALTH > 0)\n• Phân luồng: TỰ TẮT LÙA CHUỘT NẾU HẾT MÁU/CÁ MẤT\n• Luồng ZXCV: CHẠY ĐỘC LẬP TỪ ĐẦU ĐẾN CUỐI\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v8.9.4 (FIX CRASH & SAFE RUN)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động quét NPC Cá theo Máu (Humanoid)\n• Nhường luồng giữa Lùa Chuột & Thả Cần\n• Luồng ZXCV chạy độc lập chuẩn xác\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -775,7 +736,7 @@ MusicBarContainer.BackgroundColor3 = Color3.fromRGB(13, 20, 36); MusicBarContain
 corner(MusicBarContainer, 12); local MusicBarStroke = stroke(MusicBarContainer, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
 
 MusicIcon = Instance.new("TextButton", MusicBarContainer)
-MusicIcon.Size = UDim2.new(0, 34, 0, 34); MusicIcon.Position = UDim2.new(0, 8, 0.5, -17); MusicIcon.BackgroundColor3 = C_CYAN; MusicIcon.BackgroundTransparency = 0
+MusicIcon.Size = UDim2.new(0, 34, 0, 34); MusicIcon.Position = UDim2.new(0, 8, 0.5, -17); MusicIcon.BackgroundColor3 = C_CYAN
 MusicIcon.Text = "▶"; MusicIcon.TextColor3 = Color3.fromRGB(8, 12, 22); MusicIcon.Font = FONT_BOLD; MusicIcon.TextSize = 13
 MusicIcon.AutoButtonColor = true; corner(MusicIcon, 17)
 
@@ -797,12 +758,12 @@ currentProgressBar.Size = UDim2.new(0, 0, 1, 0); currentProgressBar.BackgroundCo
 corner(currentProgressBar, 8)
 
 MusicIcon.MouseButton1Click:Connect(function()
-    if bgSound.IsPlaying then bgSound:Pause(); MusicIcon.Text = "▶" else bgSound:Resume(); MusicIcon.Text = "⏸" end
+    if bgSound.IsPlaying then pcall(function() bgSound:Pause() end); MusicIcon.Text = "▶" else pcall(function() bgSound:Resume() end); MusicIcon.Text = "⏸" end
 end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.3\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v8.9.4\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -815,9 +776,9 @@ local tabDefs = {
 local tabs = {}
 for i, def in ipairs(tabDefs) do
     local btn = Instance.new("TextButton", SideBar)
-    btn.Size = UDim2.new(1, 0, 0, 32); btn.BackgroundColor3 = C_BTN; btn.BackgroundTransparency = 0; btn.TextColor3 = Color3.fromRGB(180, 220, 255)
+    btn.Size = UDim2.new(1, 0, 0, 32); btn.BackgroundColor3 = C_BTN; btn.TextColor3 = Color3.fromRGB(180, 220, 255)
     btn.Font = FONT_BOLD; btn.Text = def.icon .. "  " .. def.name; btn.TextSize = 10; btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.LayoutOrder = i; btn.AutoButtonColor = true; corner(btn, 9); local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
+    btn.LayoutOrder = i; corner(btn, 9); local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
     stroke(btn, Color3.fromRGB(0, 150, 220), 1, 0.75)
     local bar = Instance.new("Frame", btn)
     bar.Name = "SelBar"; bar.Size = UDim2.new(0, 3, 0, 18); bar.Position = UDim2.new(0, 2, 0.5, -9)
@@ -845,7 +806,7 @@ end
 for i, tBtn in ipairs(tabs) do tBtn.MouseButton1Click:Connect(function() switchTab(i) end) end
 switchTab(1)
 
--- ====================== LOGIC HỆ THỐNG TỰ ĐỘNG ======================
+-- ====================== LOGIC THU HOẠCH ======================
 local isServerDmgOn = false
 local isSellingFish = false
 local merchantLockConnection = nil
@@ -877,18 +838,20 @@ end)
 local ProtectedItems = {"rod", "cần", "bait", "mồi", "potion", "license", "cá hiếm", "legendary", "mythical"}
 local function getFishToSellCount()
     local count = 0
-    local function check(cont)
-        if cont then
-            for _, i in ipairs(cont:GetChildren()) do
-                if i:IsA("Tool") then
-                    local n = string.lower(i.Name); local isProtected = false
-                    for _, kw in ipairs(ProtectedItems) do if n:find(kw) then isProtected = true; break end end
-                    if not isProtected then count = count + 1 end
+    pcall(function()
+        local function check(cont)
+            if cont then
+                for _, i in ipairs(cont:GetChildren()) do
+                    if i:IsA("Tool") then
+                        local n = string.lower(i.Name); local isProtected = false
+                        for _, kw in ipairs(ProtectedItems) do if n:find(kw) then isProtected = true; break end end
+                        if not isProtected then count = count + 1 end
+                    end
                 end
             end
         end
-    end
-    check(LocalPlayer.Backpack); check(LocalPlayer.Character)
+        check(LocalPlayer.Backpack); check(LocalPlayer.Character)
+    end)
     return count
 end
 
@@ -921,8 +884,10 @@ local function clickBtn(keys)
                 if txt:find(kw) then
                     local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
                     local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
-                    VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.05)
-                    VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                    pcall(function()
+                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.05)
+                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                    end)
                     return true
                 end
             end
@@ -932,7 +897,7 @@ local function clickBtn(keys)
 end
 
 -- =========================================================
--- HÀM QUÉT TOẠ ĐỘ NPC CÁ (MODEL CÓ HUMANOID VÀ MÁU > 0)
+-- HÀM QUÉT TOẠ ĐỘ NPC CÁ
 -- =========================================================
 local function getFishNPCPosition()
     local char = LocalPlayer.Character
@@ -946,7 +911,6 @@ local function getFishNPCPosition()
                 local name = string.lower(model.Name)
                 local pPart = model.PrimaryPart or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildOfClass("BasePart")
                 
-                -- Phân loại NPC Cá (tên chứa keywords hoặc nằm gần vị trí câu)
                 if pPart and (pPart.Position - root.Position).Magnitude <= 100 then
                     local isFishName = name:find("fish") or name:find("cá") or name:find("mob") or name:find("boss") or name:find("target")
                     if isFishName or not Players:GetPlayerFromCharacter(model) then
@@ -959,12 +923,11 @@ local function getFishNPCPosition()
             end
         end
     end
-
     return nil
 end
 
 -- =========================================================
--- LUỒNG SPAM Z-X-C-V ĐỘC LẬP (GIỮ NGUYÊN 100%)
+-- LUỒNG SPAM Z-X-C-V ĐỘC LẬP
 -- =========================================================
 task.spawn(function()
     local skillsList = {
@@ -977,22 +940,24 @@ task.spawn(function()
         task.wait(0.01)
         if isRunning and not isSellingFish then
             for _, skill in ipairs(skillsList) do
-                VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.003)
-                VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.003)
+                pcall(function()
+                    VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.003)
+                    VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.003)
 
-                local btn = markerButtons[skill.index]
-                if btn and MarkersGui.Enabled then
-                    local pos, sz = btn.AbsolutePosition, btn.AbsoluteSize
-                    VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, true, game, 1); task.wait(0.003)
-                    VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, false, game, 1); task.wait(0.003)
-                end
+                    local btn = markerButtons[skill.index]
+                    if btn and MarkersGui.Enabled then
+                        local pos, sz = btn.AbsolutePosition, btn.AbsoluteSize
+                        VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, true, game, 1); task.wait(0.003)
+                        VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, false, game, 1); task.wait(0.003)
+                    end
+                end)
             end
         end
     end
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ CHÍNH: NHƯỜNG LUỒNG GIỮA CÁ VÀ THẢ CẦN
+-- VÒNG LẶP CÂU CÁ CHÍNH
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1005,13 +970,15 @@ task.spawn(function()
             if root and hum then
                 if not OriginalFishingSpotCFrame then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- [1. TỰ ĐỘNG BÁN CÁ KHỎI KHO]
+                -- TỰ ĐỘNG BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     local vp = Camera.ViewportSize
-                    VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
-                    VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
-                    
+                    pcall(function()
+                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
+                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
+                    end)
+
                     root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
@@ -1037,11 +1004,13 @@ task.spawn(function()
                     while merchantTween.PlaybackState == Enum.PlaybackState.Playing and isRunning do task.wait(0.05) end
                     
                     root.Anchored = false
-                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos); 
+                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                     task.wait(0.35)
 
-                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
-                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
+                    pcall(function()
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
+                    end)
 
                     local sellStartTime = tick()
                     repeat
@@ -1055,7 +1024,7 @@ task.spawn(function()
                     task.wait(2.0)
                     local byeStartTime = tick()
                     repeat
-                        if not isRunning me.Parent then break end
+                        if not isRunning then break end
                         pcall(function() root.Anchored = false; hum.WalkSpeed = 0 end)
                         if clickBtn({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}) then task.wait(0.5); break end
                         task.wait(0.25)
@@ -1075,28 +1044,17 @@ task.spawn(function()
                     continue
                 end
 
-                -- KHÓA VỊ TRÍ TẠI ĐIỂM CÂU
                 if OriginalFishingSpotCFrame then root.CFrame = OriginalFishingSpotCFrame end
                 root.Anchored = true; hum.WalkSpeed = 0
 
-                -- [2. QUÉT XEM NPC CÁ CÓ XUẤT HIỆN TRÊN MÀN HÌNH KHÔNG]
+                -- XỬ LÝ LÙA CHUỘT CÁ NPC VS THẢ CẦN
                 local fishNPCPos = getFishNPCPosition()
 
                 if fishNPCPos then
-                    -- =========================================================
-                    -- CHẾ ĐỘ 1: CÁ XUẤT HIỆN -> LÙA CHUỘT THEO TOẠ ĐỘ CÁ SPAM CLICK
-                    -- =========================================================
-                    local offsets = {
-                        Vector2.new(0, 0),    -- Tâm NPC
-                        Vector2.new(0, -28),  -- Trên
-                        Vector2.new(-28, 0),  -- Trái
-                        Vector2.new(28, 0)    -- Phải
-                    }
-
+                    local offsets = {Vector2.new(0, 0), Vector2.new(0, -28), Vector2.new(-28, 0), Vector2.new(28, 0)}
                     for _, offset in ipairs(offsets) do
                         if not isRunning or isSellingFish then break end
                         local targetPos = fishNPCPos + offset
-                        
                         pcall(function()
                             VirtualInputManager:SendMouseMoveEvent(targetPos.X, targetPos.Y, game)
                             VirtualInputManager:SendMouseButtonEvent(targetPos.X, targetPos.Y, 0, true, game, 1)
@@ -1106,44 +1064,37 @@ task.spawn(function()
                         task.wait(0.005)
                     end
                 else
-                    -- =========================================================
-                    -- CHẾ ĐỘ 2: CÁ CHƯA XUẤT HIỆN/ĐÃ CHẾT -> NHƯỜNG CHO HÀM THẢ CẦN
-                    -- =========================================================
                     local activeTool = char and char:FindFirstChildOfClass("Tool")
                     local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
                     if not isHoldingRod then
-                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
+                        pcall(function()
+                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
+                            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
+                        end)
                     end
 
                     local vp = Camera.ViewportSize
                     local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
 
-                    -- GIỮ CHUỘT THẢ CẦN
                     pcall(function()
                         VirtualUser:CaptureController()
                         VirtualUser:Button1Down(centerPos)
-                    end)
-
-                    pcall(function()
                         VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
                         VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
                     end)
 
                     local holdStart = tick()
                     while (tick() - holdStart < 2.0) and isRunning and not isSellingFish do
-                        -- Nếu cá xuất hiện bất ngờ trong lúc thả cần -> Ngắt thả cần ngay lập tức
                         if getFishNPCPosition() then break end
-
                         activeTool = char and char:FindFirstChildOfClass("Tool")
                         if activeTool then pcall(function() activeTool:Activate() end) end
                         task.wait(0.05)
                     end
 
-                    -- NHẢ CHUỘT SAU KHI THẢ CẦN
-                    pcall(function() VirtualUser:Button1Up(centerPos) end)
-                    pcall(function() VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1) end)
-
+                    pcall(function()
+                        VirtualUser:Button1Up(centerPos)
+                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
+                    end)
                     task.wait(0.15)
                 end
             end
