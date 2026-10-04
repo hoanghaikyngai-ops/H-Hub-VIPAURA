@@ -1,6 +1,6 @@
 -- ==================================================== --
--- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
--- Cập nhật: Tích hợp NoClip xuyên tường & Tự động gỡ kẹt khi bán cá
+-- H-HUB MODERN UI v9.1.4 - FIX LỖI THẢ CẦN & SPAM CLICK EARLY
+-- Cập nhật: Sửa logic nhận diện cá & delay chuẩn động tác quăng cần
 -- ==================================================== --
 
 local Players = game:GetService("Players")
@@ -150,7 +150,7 @@ end)
 
 pcall(function() BirthdaySound:Play() end)
 
--- ============ NÚT MỞ MENU (CÓ HIỆN SỐ CÁ) ============
+-- ============ NÚT MỞ MENU ============
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 150, 0, 36)
 ToggleBtn.Position = UDim2.new(0, 14, 0.42, 0)
@@ -832,6 +832,7 @@ switchTab(1)
 local isServerDmgOn = false
 local isSellingFish = false
 local merchantLockConnection = nil
+local isCastingRod = false
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
@@ -846,7 +847,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
-        OriginalFishingSpotCFrame = nil; isSellingFish = false
+        OriginalFishingSpotCFrame = nil; isSellingFish = false; isCastingRod = false
         if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
         pcall(function() if root then root.Anchored = false end; if hum then hum.WalkSpeed = 16 end end)
     end
@@ -908,9 +909,6 @@ local function getMerchantPosition()
     return Vector3.new(1929.41, 9.79, 1093.12)
 end
 
--- ========================================================= --
--- HÀM MỚI v9.1.4: BẬT / TẮT NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
--- ========================================================= --
 local function setCharacterNoClip(enabled)
     pcall(function()
         local char = LocalPlayer.Character
@@ -957,9 +955,6 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
     setCharacterNoClip(false)
 end
 
--- ========================================================= --
--- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG
--- ========================================================= --
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
@@ -987,20 +982,19 @@ local function closeMerchantDialog()
     local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
     local startTime = tick()
     
-    -- Vòng lặp quét liên tục mỗi 0.05 giây trong tối đa 3 giây
     repeat
         if not isRunning then break end
         local clicked = clickBtn(byeKeywords)
         if clicked then 
-            task.wait(0.15) -- Bấm thành công thì nghỉ 0.15s rồi thoát hàm
+            task.wait(0.15)
             break 
         end
-        task.wait(0.05) -- Quét với tần suất cao (20 lần/giây)
+        task.wait(0.05)
     until (tick() - startTime > 3.0) or not isRunning
 end
 
 -- ========================================================= --
--- HÀM QUÉT CHỈ CHỌN CÁ CỦA BẠN (TRONG BÁN KÍNH 90 STUDS)
+-- HÀM QUÉT NHẬN DIỆN CHÍNH XÁC PHAO/CÁ
 -- ========================================================= --
 local function getTargetFishPosition2D()
     if isSellingFish then return nil end
@@ -1020,12 +1014,10 @@ local function getTargetFishPosition2D()
             if name:find("fish") or name:find("cá") or name:find("mob") or name:find("target") or name:find("bobber") then
                 local isMyFish = false
 
-                -- 1. Tên chứa Name / DisplayName
                 if name:find(myName) or name:find(myDisplayName) then
                     isMyFish = true
                 end
 
-                -- 2. Kiểm tra thuộc tính Owner / Player / UserId
                 if not isMyFish then
                     local ownerVal = obj:FindFirstChild("Owner") 
                         or obj:FindFirstChild("Player") 
@@ -1045,12 +1037,10 @@ local function getTargetFishPosition2D()
                     end
                 end
 
-                -- 3. Nằm trong Character
                 if not isMyFish and obj:IsDescendantOf(char) then
                     isMyFish = true
                 end
 
-                -- 4. Tọa độ chính xác
                 if isMyFish then
                     local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart"))
                     if part then
@@ -1085,9 +1075,9 @@ task.spawn(function()
 
     while ScreenGui.Parent do
         task.wait(0.01)
-        if isRunning and not isSellingFish then
+        if isRunning and not isSellingFish and not isCastingRod then
             for _, skill in ipairs(skillsList) do
-                if isSellingFish then break end
+                if isSellingFish or isCastingRod then break end
                 pcall(function()
                     VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.003)
                     VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.003)
@@ -1105,7 +1095,7 @@ task.spawn(function()
 end)
 
 -- ========================================================= --
--- VÒNG LẶP CÂU CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ CHÍNH (ĐÃ FIX KHÔNG CLICK SỚM TRƯỚC KHI CÂU)
 -- ========================================================= --
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1118,15 +1108,10 @@ task.spawn(function()
             if root and hum then
                 if not OriginalFishingSpotCFrame then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- TỰ ĐỘNG BÁN CÁ CÓ CHỐNG KẸT & NOCLIP
+                -- TỰ ĐỘNG BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     local vp = Camera.ViewportSize
-
-                    pcall(function()
-                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
-                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
-                    end)
 
                     root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
                     local dynamicMerchantPos = getMerchantPosition()
@@ -1146,7 +1131,6 @@ task.spawn(function()
                         end)
                     end)
 
-                    -- DÙNG TWEEN AN TOÀN VÀ NOCLIP
                     safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
 
                     root.Anchored = false
@@ -1174,7 +1158,6 @@ task.spawn(function()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
-                    -- ĐỒNG BỘ VỊ TRÍ BAY VỀ CHỐNG KHỰNG & LỆCH SERVER
                     if OriginalFishingSpotCFrame and isRunning then
                         safeTweenToTarget(OriginalFishingSpotCFrame, 55)
                         setCharacterNoClip(false)
@@ -1189,42 +1172,37 @@ task.spawn(function()
 
                     task.wait(0.2)
                     isSellingFish = false
-                    if isRunning then hum.WalkSpeed = 0 end
+                    if isRunning then hum.WalkSpeed = 16 end
                 end
 
-                -- THAO TÁC CÂU CÁ HÀNG NGÀY & CLICK 3 HƯỚNG (TRÊN, TRÁI 98PX, PHẢI 98PX - LOẠI BỎ DƯỚI)
+                -- THAO TÁC THẢ CẦN CHUẨN XÁC & CLICK THEO TRẠNG THÁI
                 local fishScreenPos = getTargetFishPosition2D()
                 local inset = GuiService:GetGuiInset()
 
                 if fishScreenPos then
+                    -- Khi ĐÃ nhận ra vị trí phao/cá -> Tiến hành click dồn
+                    isCastingRod = false
                     pcall(function()
                         local cx, cy = fishScreenPos.X + inset.X, fishScreenPos.Y + inset.Y
                         VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.005)
                         VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
                     end)
                 else
-                    local vp = Camera.ViewportSize
-                    local cx, cy = vp.X/2, vp.Y/2
+                    -- Chưa có phao/cá -> Thực hiện QUĂNG CẦN (1 Click) và CHỜ động tác thả xong
+                    if not isCastingRod then
+                        isCastingRod = true
+                        local vp = Camera.ViewportSize
+                        local cx, cy = vp.X/2, vp.Y/2
 
-                    -- Click Tâm
-                    pcall(function()
-                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.005)
-                        VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                    end)
-
-                    -- Spam Click 3 hướng quanh tâm (Trên -70px, Trái -98px, Phải +98px)
-                    local offsets = {
-                        Vector2.new(0, -70),   -- Trên
-                        Vector2.new(-98, 0),   -- Trái (chuẩn 98px)
-                        Vector2.new(98, 0)     -- Phải (chuẩn 98px)
-                    }
-
-                    for _, off in ipairs(offsets) do
-                        if isSellingFish then break end
+                        -- Quăng Cần (1 lần nhấp)
                         pcall(function()
-                            VirtualInputManager:SendMouseButtonEvent(cx + off.X, cy + off.Y, 0, true, game, 1); task.wait(0.003)
-                            VirtualInputManager:SendMouseButtonEvent(cx + off.X, cy + off.Y, 0, false, game, 1)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.05)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
                         end)
+
+                        -- Đợi animation quăng cần thả xuống nước (Chống click phá động tác)
+                        task.wait(0.7)
+                        isCastingRod = false
                     end
                 end
 
