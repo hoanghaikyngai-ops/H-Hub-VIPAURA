@@ -953,17 +953,21 @@ local function clickBtn(keys)
 end
 
 local function closeMerchantDialog()
-    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}
+    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
     local startTime = tick()
+    
+    -- Vòng lặp quét liên tục mỗi 0.05 giây trong tối đa 3 giây
     repeat
         if not isRunning then break end
+        
         local clicked = clickBtn(byeKeywords)
         if clicked then 
-            task.wait(0.15)
+            task.wait(0.15) -- Bấm thành công thì nghỉ 0.15s rồi thoát hàm
             break 
         end
-        task.wait(1.0)
-    until (tick() - startTime > 1.2) or not isRunning
+        
+        task.wait(0.05) -- Quét với tần suất cao (20 lần/giây)
+    until (tick() - startTime > 3.0) or not isRunning
 end
 
 -- =========================================================
