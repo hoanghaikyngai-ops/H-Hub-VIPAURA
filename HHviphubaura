@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
--- Cập nhật: Tùy chỉnh khoảng cách click (Bỏ click dưới, Trái/Phải 90px, Trên 32px)
+-- Cập nhật: Sửa lỗi click Tạm biệt (Tối ưu tọa độ Inset & phím Escape thoát thoại)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -927,20 +927,24 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG
+-- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG (ĐÃ SỬA CHUẨN INSET X, Y)
 -- =========================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
         if not obj:IsDescendantOf(ScreenGui) then
-            if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
-                local txt = string.lower(obj.Text or "")
+            if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Visible and obj.AbsoluteSize.X > 0 then
+                local txt = string.lower(obj:IsA("TextButton") and obj.Text or obj.Name)
                 for _, kw in ipairs(keys) do
                     if txt:find(kw) then
                         local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
-                        local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
+                        local cx = pos.X + sz.X / 2 + inset.X
+                        local cy = pos.Y + sz.Y / 2 + inset.Y
                         pcall(function()
-                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1); task.wait(0.05)
+                            VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
+                            task.wait(0.02)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
+                            task.wait(0.03)
                             VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
                         end)
                         return true
@@ -952,6 +956,9 @@ local function clickBtn(keys)
     return false
 end
 
+-- =========================================================
+-- HÀM ĐÓNG THOẠI MERCHANT (ĐÃ THÊM PHÍM ESCAPE & CẬP NHẬT LOOP)
+-- =========================================================
 local function closeMerchantDialog()
     local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
     local startTime = tick()
@@ -959,14 +966,20 @@ local function closeMerchantDialog()
     repeat
         if not isRunning then break end
         
+        pcall(function()
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
+            task.wait(0.02)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
+        end)
+
         local clicked = clickBtn(byeKeywords)
         if clicked then 
-            task.wait(0.15)
+            task.wait(0.2)
             break 
         end
         
-        task.wait(0.05)
-    until (tick() - startTime > 3.0) or not isRunning
+        task.wait(0.1)
+    until (tick() - startTime > 2.5) or not isRunning
 end
 
 -- =========================================================
@@ -1148,9 +1161,6 @@ task.spawn(function()
                 local currentFishPos = getTargetFishPosition2D()
 
                 if currentFishPos then
-                    -- =========================================================
-                    -- ĐÃ THAY ĐỔI: BỎ CLICK DƯỚI, GIỮ TRÊN 32PX & TRÁI/PHẢI 90PX
-                    -- =========================================================
                     local offsets = {
                         Vector2.new(0, 0),    -- Tâm
                         Vector2.new(0, -32),  -- Trên (-32px)
