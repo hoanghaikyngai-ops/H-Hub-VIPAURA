@@ -734,7 +734,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (NOCLIP & AUTO UNSTUCK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Spam click 3 hướng (Trên, Trái 98px, Phải 98px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (NOCLIP & AUTO UNSTUCK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Đồng bộ Physics Server chống trượt CFrame khi quay về\n• Spam click 3 hướng (Trên -70px, Trái -98px, Phải +98px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -1174,12 +1174,20 @@ task.spawn(function()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
+                    -- ĐỒNG BỘ VỊ TRÍ BAY VỀ CHỐNG KHỰNG & LỆCH SERVER
                     if OriginalFishingSpotCFrame and isRunning then
                         safeTweenToTarget(OriginalFishingSpotCFrame, 55)
+                        setCharacterNoClip(false)
+                        root.Anchored = false
                         root.CFrame = OriginalFishingSpotCFrame
+                        task.wait(0.15)
+                        pcall(function()
+                            root.AssemblyLinearVelocity = Vector3.zero
+                            root.AssemblyAngularVelocity = Vector3.zero
+                        end)
                     end
 
-                    task.wait(0.5)
+                    task.wait(0.2)
                     isSellingFish = false
                     if isRunning then hum.WalkSpeed = 0 end
                 end
