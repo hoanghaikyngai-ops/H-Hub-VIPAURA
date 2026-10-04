@@ -1,6 +1,6 @@
 -- ==================================================== --
--- H-HUB MODERN UI v9.1.4 - SPAM CLICK TARGET ONLY
--- Cập nhật: Spam click 4 hướng (Trên, Trái, Phải - 90px & Giữa) CHỈ TRÊN CÁ CỦA BẠN
+-- H-HUB MODERN UI v9.1.4 - AUTO FISHING FIX
+-- Cập nhật: Sửa lỗi thả cần & Spam click 4 hướng chuẩn xác
 -- ==================================================== --
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -738,7 +738,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (NOCLIP & AUTO UNSTUCK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Đồng bộ Physics Server chống trượt CFrame khi quay về\n• Spam click 4 hướng (Giữa, Trên -90px, Trái -90px, Phải +90px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (FIX FISHING & TARGET CLICK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Đồng bộ Physics Server chống trượt CFrame khi quay về\n• Spam click 4 hướng (Giữa, Trên -90px, Trái -90px, Phải +90px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -833,7 +833,6 @@ switchTab(1)
 local isServerDmgOn = false
 local isSellingFish = false
 local merchantLockConnection = nil
-local isCastingRod = false
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
@@ -849,7 +848,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
-        OriginalFishingSpotCFrame = nil; isSellingFish = false; isCastingRod = false
+        OriginalFishingSpotCFrame = nil; isSellingFish = false
         if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
         pcall(function() if root then root.Anchored = false end; if hum then hum.WalkSpeed = 16 end end)
     end
@@ -884,9 +883,6 @@ local function getFishToSellCount()
     return count
 end
 
--- ========================================================= --
--- VÒNG LẶP CẬP NHẬT SỐ CÁ VÀO THẺ KHO & NÚT TOGGLE
--- ========================================================= --
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(1)
@@ -981,7 +977,7 @@ local function clickBtn(keys)
 end
 
 -- ========================================================= --
--- HÀM QUÉT NHẬN DIỆN CHÍNH XÁC PHAO/CÁ CHỈ CỦA BẠN
+-- HÀM QUÉT VỊ TRÍ CÁ / PHAO (SỬA LỖI TỐI ƯU)
 -- ========================================================= --
 local function getTargetFishPosition2D()
     if isSellingFish then return nil end
@@ -989,47 +985,30 @@ local function getTargetFishPosition2D()
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
 
-    local myName = string.lower(LocalPlayer.Name)
-    local myDisplayName = string.lower(LocalPlayer.DisplayName)
-    local closestDist = math.huge
+    local closestDist = 90
     local targetScreenPos = nil
 
     for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj and (obj:IsA("Model") or obj:IsA("BasePart")) and obj ~= char then
+        if obj and (obj:IsA("Model") or obj:IsA("BasePart")) and not obj:IsDescendantOf(char) then
             local name = string.lower(obj.Name)
-            if name:find("fish") or name:find("cá") or name:find("mob") or name:find("target") or name:find("bobber") then
+            if name:find("fish") or name:find("cá") or name:find("bobber") or name:find("target") or name:find("hook") then
                 
-                -- KIỂM TRA QUYỀN SỞ HỮU CÁ (CHỈ LẤY CÁ CỦA CHÍNH BẠN)
-                local isMyFish = false
-                if name:find(myName) or name:find(myDisplayName) then
-                    isMyFish = true
-                end
-
-                if not isMyFish then
-                    local ownerVal = obj:FindFirstChild("Owner") or obj:FindFirstChild("Player") or obj:FindFirstChild("OwnerValue") or obj:FindFirstChild("UserId")
-                    if ownerVal then
-                        if ownerVal:IsA("ObjectValue") and ownerVal.Value == LocalPlayer then
-                            isMyFish = true
-                        elseif ownerVal:IsA("StringValue") and (string.lower(ownerVal.Value) == myName or string.lower(ownerVal.Value) == myDisplayName) then
-                            isMyFish = true
-                        elseif ownerVal:IsA("IntValue") or ownerVal:IsA("NumberValue") then
-                            if ownerVal.Value == LocalPlayer.UserId then
-                                isMyFish = true
-                            end
+                -- Loại bỏ cá/phao thuộc về người chơi khác
+                local belongsToOther = false
+                for _, otherPlayer in ipairs(Players:GetPlayers()) do
+                    if otherPlayer ~= LocalPlayer and otherPlayer.Character then
+                        if obj:IsDescendantOf(otherPlayer.Character) then
+                            belongsToOther = true
+                            break
                         end
                     end
                 end
 
-                if not isMyFish and obj:IsDescendantOf(char) then
-                    isMyFish = true
-                end
-
-                -- NẾU LÀ CÁ CỦA BẠN THÌ MỚI LẤY TỌA ĐỘ
-                if isMyFish then
+                if not belongsToOther then
                     local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart"))
                     if part then
                         local dist = (part.Position - root.Position).Magnitude
-                        if dist <= 90 and dist < closestDist then
+                        if dist < closestDist then
                             local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
                             if onScreen then
                                 closestDist = dist
@@ -1045,7 +1024,7 @@ local function getTargetFishPosition2D()
 end
 
 -- ========================================================= --
--- LUỒNG SPAM Z-X-C-V ĐỘC LẬP
+-- LUỒNG SPAM KỸ NĂNG Z-X-C-V
 -- ========================================================= --
 task.spawn(function()
     local skillsList = {
@@ -1057,9 +1036,9 @@ task.spawn(function()
     local inset = GuiService:GetGuiInset()
     while ScreenGui.Parent do
         task.wait(0.01)
-        if isRunning and not isSellingFish and not isCastingRod then
+        if isRunning and not isSellingFish then
             for _, skill in ipairs(skillsList) do
-                if isSellingFish or isCastingRod then break end
+                if isSellingFish then break end
                 pcall(function()
                     VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.003)
                     VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.003)
@@ -1077,11 +1056,11 @@ task.spawn(function()
 end)
 
 -- ========================================================= --
--- VÒNG LẶP CÂU CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ CHÍNH (KHÔI PHỤC VÀ SỬA CHUẨN)
 -- ========================================================= --
 task.spawn(function()
     while ScreenGui.Parent do
-        task.wait(0.02)
+        task.wait(0.05)
         if isRunning and not isSellingFish then
             local char = LocalPlayer.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -1092,7 +1071,7 @@ task.spawn(function()
                     OriginalFishingSpotCFrame = root.CFrame
                 end
 
-                -- TỰ ĐỘNG BÁN CÁ
+                -- 1. KIỂM TRA & BÁN CÁ
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
@@ -1147,54 +1126,52 @@ task.spawn(function()
                     isSellingFish = false
                 end
 
-                -- THỦ TỤC THẢ CẦN & SPAM CLICK VÀO CÁ
+                -- 2. LOGIC CÂU CÁ & SPAM CLICK
                 if not isSellingFish then
                     root.Anchored = false; hum.WalkSpeed = 0
 
+                    -- Tự trang bị Cần nếu chưa cầm
                     local rod = char:FindFirstChildOfClass("Tool")
                     if not rod then
                         for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
                             if item:IsA("Tool") and (item.Name:lower():find("rod") or item.Name:lower():find("cần")) then
                                 hum:EquipTool(item)
-                                task.wait(0.3)
+                                task.wait(0.2)
                                 break
                             end
                         end
                     end
 
                     rod = char:FindFirstChildOfClass("Tool")
-                    local fishPos2D = getTargetFishPosition2D()
+                    if rod then
+                        local fishPos2D = getTargetFishPosition2D()
 
-                    -- NẾU PHÁT HIỆN CÁ CỦA BẠN TRÊN MÀN HÌNH -> SPAM CLICK 4 HƯỚNG (PX 90)
-                    if fishPos2D then
-                        isCastingRod = false
-                        local inset = GuiService:GetGuiInset()
-                        local cx = fishPos2D.X + inset.X
-                        local cy = fishPos2D.Y + inset.Y
+                        if fishPos2D then
+                            -- Nếu thấy cá/phao -> Thực hiện Spam Click 4 Hướng
+                            local inset = GuiService:GetGuiInset()
+                            local cx = fishPos2D.X + inset.X
+                            local cy = fishPos2D.Y + inset.Y
 
-                        -- Danh sách 4 vị trí spam: Giữa, Trên (-90px), Trái (-90px), Phải (+90px)
-                        local targets = {
-                            Vector2.new(cx, cy),          -- Tâm
-                            Vector2.new(cx, cy - 90),     -- Trên -90px
-                            Vector2.new(cx - 90, cy),     -- Trái -90px
-                            Vector2.new(cx + 90, cy)      -- Phải +90px
-                        }
+                            local targets = {
+                                Vector2.new(cx, cy),          -- Tâm cá
+                                Vector2.new(cx, cy - 90),     -- Trên -90px
+                                Vector2.new(cx - 90, cy),     -- Trái -90px
+                                Vector2.new(cx + 90, cy)      -- Phải +90px
+                            }
 
-                        for _, pt in ipairs(targets) do
+                            for _, pt in ipairs(targets) do
+                                pcall(function()
+                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 1)
+                                    task.wait(0.001)
+                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 1)
+                                end)
+                            end
+                        else
+                            -- Nếu không thấy cá -> Nhấn Activate để Thả Cần
                             pcall(function()
-                                VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 1)
-                                task.wait(0.002)
-                                VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 1)
+                                rod:Activate()
                             end)
                         end
-                    else
-                        -- NẾU CHƯA CÓ CÁ CỦA BẠN -> THỰC HIỆN THẢ CẦN VÀ CHỜ DÂN
-                        isCastingRod = true
-                        pcall(function()
-                            rod:Activate()
-                        end)
-                        task.wait(1.1) -- Delay chuẩn động tác quăng cần
-                        isCastingRod = false
                     end
                 end
             end
