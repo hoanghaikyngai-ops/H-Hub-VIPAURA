@@ -959,11 +959,11 @@ local function closeMerchantDialog()
         if not isRunning then break end
         local clicked = clickBtn(byeKeywords)
         if clicked then 
-            task.wait(0.5)
+            task.wait(0.15)
             break 
         end
         task.wait(1.0)
-    until (tick() - startTime > 2.0) or not isRunning
+    until (tick() - startTime > 1.2) or not isRunning
 end
 
 -- =========================================================
