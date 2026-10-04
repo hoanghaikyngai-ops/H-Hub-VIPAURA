@@ -962,8 +962,8 @@ local function closeMerchantDialog()
             task.wait(0.5)
             break 
         end
-        task.wait(0.2)
-    until (tick() - startTime > 4.0) or not isRunning
+        task.wait(1.0)
+    until (tick() - startTime > 2.0) or not isRunning
 end
 
 -- =========================================================
