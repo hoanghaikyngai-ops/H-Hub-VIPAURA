@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
--- Cập nhật: Sửa lỗi click Tạm biệt (Tối ưu tọa độ Inset & phím Escape thoát thoại)
+-- Cập nhật: Sửa lỗi click Tạm biệt (Tối ưu tọa độ Inset & phím E/Space thoát thoại)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -957,7 +957,7 @@ local function clickBtn(keys)
 end
 
 -- =========================================================
--- HÀM ĐÓNG THOẠI MERCHANT (ĐÃ THÊM PHÍM ESCAPE & CẬP NHẬT LOOP)
+-- HÀM ĐÓNG THOẠI MERCHANT (DÙNG PHÍM E / SPACE VÀ CLICK NÚT THOÁT)
 -- =========================================================
 local function closeMerchantDialog()
     local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
@@ -966,12 +966,18 @@ local function closeMerchantDialog()
     repeat
         if not isRunning then break end
         
+        -- Gửi phím E và Space để ép NPC đóng hội thoại nhanh
         pcall(function()
-            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Escape, false, game)
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
             task.wait(0.02)
-            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Escape, false, game)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+            task.wait(0.02)
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+            task.wait(0.02)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
         end)
 
+        -- Bấm trực tiếp vào nút UI
         local clicked = clickBtn(byeKeywords)
         if clicked then 
             task.wait(0.2)
