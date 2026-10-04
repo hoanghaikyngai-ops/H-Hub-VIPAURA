@@ -1,7 +1,7 @@
--- ==================================================== --
--- H-HUB MODERN UI v9.1.4 - AUTO FISHING FIX
--- Cập nhật: Sửa lỗi thả cần & Spam click 4 hướng chuẩn xác
--- ==================================================== --
+-- ====================================================
+-- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
+-- Cập nhật: Tùy chỉnh khoảng cách click (Bỏ click dưới, Trái/Phải 90px, Trên 32px)
+-- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local VirtualUser = game:GetService("VirtualUser")
@@ -25,6 +25,7 @@ end)
 -- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
 local FONT_BOLD = Enum.Font.GothamBold
+
 local C_BG      = Color3.fromRGB(10, 14, 26)
 local C_CARD    = Color3.fromRGB(17, 24, 40)
 local C_CYAN    = Color3.fromRGB(0, 229, 255)
@@ -56,10 +57,11 @@ ScreenGui.DisplayOrder = 99999
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.Parent = PlayerGui
 
--- ========================================================= --
+-- =========================================================
 -- INTRO BÁ KHÍ
--- ========================================================= --
+-- =========================================================
 local BirthdayIntroActive = true
+
 local BirthdayFrame = Instance.new("Frame", ScreenGui)
 BirthdayFrame.Name = "BirthdayIntro"
 BirthdayFrame.Size = UDim2.new(0, 520, 0, 135)
@@ -128,8 +130,10 @@ UserInputService.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         holdStartTime = tick()
         if holdThread then task.cancel(holdThread) end
+        
         HoldProgressBar.Size = UDim2.new(0, 0, 1, 0)
         TweenService:Create(HoldProgressBar, TweenInfo.new(3, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+        
         holdThread = task.delay(3, function()
             if BirthdayIntroActive and (tick() - holdStartTime >= 2.9) then
                 StopBirthdayIntro()
@@ -148,7 +152,7 @@ end)
 
 pcall(function() BirthdaySound:Play() end)
 
--- ============ NÚT MỞ MENU ============
+-- ============ NÚT MỞ MENU (CÓ HIỆN SỐ CÁ) ============
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 150, 0, 36)
 ToggleBtn.Position = UDim2.new(0, 14, 0.42, 0)
@@ -280,9 +284,7 @@ TopHeader.InputBegan:Connect(function(input)
     end
 end)
 UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end
 end)
 UserInputService.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
@@ -406,7 +408,6 @@ local IslandGrid = Instance.new("Frame", P1)
 IslandGrid.Size = UDim2.new(1, 0, 0, 150); IslandGrid.BackgroundTransparency = 1
 IslandGrid.AutomaticSize = Enum.AutomaticSize.Y; IslandGrid.LayoutOrder = 2
 IslandGrid.Active = false
-
 local gridP1 = Instance.new("UIGridLayout", IslandGrid)
 gridP1.CellSize = UDim2.new(0, 176, 0, 40); gridP1.CellPadding = UDim2.new(0, 8, 0, 8); gridP1.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -426,20 +427,24 @@ local function teleportAndRespawnAtIsland(targetPos)
         local char = LocalPlayer.Character
         local hum = char and char:FindFirstChildOfClass("Humanoid")
         if not hum then return end
+
         local isTeleporting = true
         local connection
         connection = LocalPlayer.CharacterAdded:Connect(function(newChar)
             if not isTeleporting then return end
             isTeleporting = false
             if connection then connection:Disconnect() end
+
             task.spawn(function()
                 local newRoot = newChar:WaitForChild("HumanoidRootPart", 10)
                 local newHum = newChar:WaitForChild("Humanoid", 10)
+                
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
                     newChar:PivotTo(targetCFrame)
                     newRoot.Anchored = false
                     newHum.WalkSpeed = 16
+
                     if isRunning then
                         OriginalFishingSpotCFrame = targetCFrame
                     else
@@ -462,11 +467,7 @@ for i, island in ipairs(Islands) do
     btn.LayoutOrder = i
     btn.Active = true
     corner(btn, 10); stroke(btn, C_CYAN, 1, 0.6)
-    btn.MouseButton1Click:Connect(function()
-        task.spawn(function()
-            teleportAndRespawnAtIsland(island.Pos)
-        end)
-    end)
+    btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
 
 -- ====================== TAB 2: THU HOẠCH ======================
@@ -487,10 +488,10 @@ FishStatus.LayoutOrder = 1; FishStatus.Text = "🎒 Kho cá: 0 / Ngưỡng bán:
 corner(FishStatus, 10); stroke(FishStatus, Color3.fromRGB(45,255,200), 1, 0.6)
 
 local MaxFishCapBtn = mkBtn(P3, "🔄  ĐỔI NGƯỠNG KHO: 50", 40, Color3.fromRGB(217, 119, 6), 2)
+
 local maxFishCapacity = 50
 local capacityOptions = {10, 20, 30, 40, 50}
 local currentCapIndex = 5
-
 MaxFishCapBtn.MouseButton1Click:Connect(function()
     currentCapIndex = (currentCapIndex % #capacityOptions) + 1
     maxFishCapacity = capacityOptions[currentCapIndex]
@@ -521,7 +522,6 @@ MarkersGui.Parent = PlayerGui; MarkersGui.Enabled = false
 local markerColors = {Color3.fromRGB(239, 68, 68), Color3.fromRGB(16, 185, 129), Color3.fromRGB(14, 165, 233), Color3.fromRGB(245, 158, 11)}
 local markerNames = {"Ω Z", "Ψ X", "Δ C", "Φ V"}
 local markerButtons = {}
-
 for i = 1, 4 do
     local mBtn = Instance.new("TextButton", MarkersGui)
     mBtn.Size = UDim2.new(0, 48, 0, 48); mBtn.Position = UDim2.new(0.6 + (i * 0.07), 0, 0.5, 0)
@@ -541,9 +541,7 @@ end)
 local isMarkersLocked = false
 LockMarkersBtn.MouseButton1Click:Connect(function()
     isMarkersLocked = not isMarkersLocked
-    for _, btn in ipairs(markerButtons) do
-        btn.Draggable = not isMarkersLocked
-    end
+    for _, btn in ipairs(markerButtons) do btn.Draggable = not isMarkersLocked end
     LockMarkersBtn.Text = isMarkersLocked and "🔒 KHÓA: ĐÃ KHÓA" or "🔓 KHÓA: MỞ"
     LockMarkersBtn.BackgroundColor3 = isMarkersLocked and Color3.fromRGB(16, 185, 129) or Color3.fromRGB(220, 38, 38)
 end)
@@ -581,7 +579,6 @@ corner(PresetContainer, 10); stroke(PresetContainer, Color3.fromRGB(255,255,255)
 
 local PresetLayout = Instance.new("UIListLayout", PresetContainer)
 PresetLayout.SortOrder = Enum.SortOrder.LayoutOrder; PresetLayout.Padding = UDim.new(0, 4)
-
 local PresetPad = Instance.new("UIPadding", PresetContainer)
 PresetPad.PaddingTop = UDim.new(0,6); PresetPad.PaddingLeft = UDim.new(0,6); PresetPad.PaddingRight = UDim.new(0,6); PresetPad.PaddingBottom = UDim.new(0,6)
 
@@ -628,7 +625,6 @@ for i, song in ipairs(PresetSongs) do
     pBtn.TextColor3 = Color3.fromRGB(220, 245, 255); pBtn.Font = FONT; pBtn.TextSize = 10
     pBtn.Text = "  ♫  " .. song.Name; pBtn.TextXAlignment = Enum.TextXAlignment.Left; pBtn.TextTruncate = Enum.TextTruncate.AtEnd
     pBtn.LayoutOrder = i; pBtn.Active = true; corner(pBtn, 8)
-    
     pBtn.MouseButton1Click:Connect(function()
         MusicInput.Text = song.Id; bgSound.SoundId = "rbxassetid://" .. song.Id; pcall(function() bgSound:Play() end)
         if MusicIcon then MusicIcon.Text = "⏸" end
@@ -644,7 +640,6 @@ PlayMusicBtn.MouseButton1Click:Connect(function()
         if currentTrackNameLabel then currentTrackNameLabel.Text = "Tùy chọn (" .. rawText .. ")" end
     end
 end)
-
 StopMusicBtn.MouseButton1Click:Connect(function()
     pcall(function() bgSound:Stop() end)
     if MusicIcon then MusicIcon.Text = "▶" end
@@ -664,12 +659,10 @@ local function updateHeadBillboard()
         headBillboard = Instance.new("BillboardGui")
         headBillboard.Name = "CustomHeadDisplay"; headBillboard.Size = UDim2.new(0, 180, 0, 90)
         headBillboard.StudsOffset = Vector3.new(0, 3.2, 0); headBillboard.AlwaysOnTop = true; headBillboard.Parent = head
-        
         local bgFrame = Instance.new("Frame", headBillboard)
         bgFrame.Size = UDim2.new(1, 0, 1, 0); bgFrame.BackgroundColor3 = Color3.fromRGB(6, 8, 14); bgFrame.BackgroundTransparency = 0.2; corner(bgFrame, 10)
         local uiStroke = Instance.new("UIStroke", bgFrame)
         uiStroke.Color = C_CYAN; uiStroke.Thickness = 1.2
-        
         local cortisolImage = Instance.new("ImageLabel", bgFrame)
         cortisolImage.Size = UDim2.new(1, -4, 1, -4); cortisolImage.Position = UDim2.new(0, 2, 0, 2); cortisolImage.BackgroundTransparency = 1
         cortisolImage.ScaleType = Enum.ScaleType.Fit; cortisolImage.Image = "rbxassetid://125752815379402"
@@ -702,28 +695,18 @@ createFixLagButton("XÓA HIỆU ỨNG HẠT", 1, function(enabled)
     pcall(function()
         Lighting.GlobalShadows = not enabled
         for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Fire") or v:IsA("Smoke") then
-                v.Enabled = not enabled
-            end
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Fire") or v:IsA("Smoke") then v.Enabled = not enabled end
         end
     end)
 end)
-
 createFixLagButton("GIẢM ĐỒ HỌA (TEXTURE)", 2, function(enabled)
     pcall(function()
         for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("BasePart") then
-                v.Material = enabled and Enum.Material.SmoothPlastic or Enum.Material.Plastic
-            end
+            if v:IsA("BasePart") then v.Material = enabled and Enum.Material.SmoothPlastic or Enum.Material.Plastic end
         end
     end)
 end)
-
-createFixLagButton("MỞ KHÓA FPS", 3, function(enabled)
-    pcall(function()
-        if setfpscap then setfpscap(enabled and 999 or 60) end
-    end)
-end)
+createFixLagButton("MỞ KHÓA FPS", 3, function(enabled) pcall(function() if setfpscap then setfpscap(enabled and 999 or 60) end end) end)
 
 -- ====================== TAB 7: HỆ THỐNG ======================
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -731,14 +714,12 @@ local sysCard = Instance.new("Frame", P7)
 sysCard.Size = UDim2.new(1, 0, 0, 285); sysCard.BackgroundColor3 = Color3.fromRGB(13, 20, 36)
 sysCard.Active = false
 corner(sysCard, 12); stroke(sysCard, C_CYAN, 1, 0.6)
-
 local sysPad = Instance.new("UIPadding", sysCard)
 sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.PaddingRight = UDim.new(0,12); sysPad.PaddingBottom = UDim.new(0,10)
-
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (FIX FISHING & TARGET CLICK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Đồng bộ Physics Server chống trượt CFrame khi quay về\n• Spam click 4 hướng (Giữa, Trên -90px, Trái -90px, Phải +90px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (NOCLIP & AUTO UNSTUCK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Spam click 3 hướng (Tâm, Trên 32px, Trái 90px, Phải 90px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -764,17 +745,12 @@ artistLbl.Font = FONT; artistLbl.TextSize = 9; artistLbl.TextXAlignment = Enum.T
 local ProgressBg = Instance.new("Frame", MusicBarContainer)
 ProgressBg.Size = UDim2.new(1, -62, 0, 5); ProgressBg.Position = UDim2.new(0, 50, 1, -11)
 ProgressBg.BackgroundColor3 = Color3.fromRGB(24, 36, 58); ProgressBg.BorderSizePixel = 0; corner(ProgressBg, 8)
-
 currentProgressBar = Instance.new("Frame", ProgressBg)
 currentProgressBar.Size = UDim2.new(0, 0, 1, 0); currentProgressBar.BackgroundColor3 = C_CYAN; currentProgressBar.BorderSizePixel = 0
 corner(currentProgressBar, 8)
 
 MusicIcon.MouseButton1Click:Connect(function()
-    if bgSound.IsPlaying then
-        pcall(function() bgSound:Pause() end); MusicIcon.Text = "▶"
-    else
-        pcall(function() bgSound:Resume() end); MusicIcon.Text = "⏸"
-    end
+    if bgSound.IsPlaying then pcall(function() bgSound:Pause() end); MusicIcon.Text = "▶" else pcall(function() bgSound:Resume() end); MusicIcon.Text = "⏸" end
 end)
 
 local FootNote = Instance.new("TextLabel", Main)
@@ -784,15 +760,11 @@ FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
 local tabDefs = {
-    {name = "BẢN ĐỒ", icon = "🗺", title = "◈ BẢN ĐỒ DỊCH CHUYỂN"},
-    {name = "THU HOẠCH", icon = "🎣", title = "◈ THU HOẠCH TỰ ĐỘNG"},
-    {name = "THƯƠNG MẠI", icon = "🛒", title = "◈ THƯƠNG MẠI & KHO CÁ"},
-    {name = "PHÍM ẢO", icon = "⌨", title = "◈ PHÍM KỸ NĂNG ẢO"},
-    {name = "ÂM THANH", icon = "🎵", title = "◈ ÂM THANH & NHẠC"},
-    {name = "TỐI ƯU", icon = "⚡", title = "◈ TỐI ƯU HIỆU NĂNG"},
+    {name = "BẢN ĐỒ", icon = "🗺", title = "◈ BẢN ĐỒ DỊCH CHUYỂN"}, {name = "THU HOẠCH", icon = "🎣", title = "◈ THU HOẠCH TỰ ĐỘNG"},
+    {name = "THƯƠNG MẠI", icon = "🛒", title = "◈ THƯƠNG MẠI & KHO CÁ"}, {name = "PHÍM ẢO", icon = "⌨", title = "◈ PHÍM KỸ NĂNG ẢO"},
+    {name = "ÂM THANH", icon = "🎵", title = "◈ ÂM THANH & NHẠC"}, {name = "TỐI ƯU", icon = "⚡", title = "◈ TỐI ƯU HIỆU NĂNG"},
     {name = "HỆ THỐNG", icon = "⚙", title = "◈ HỆ THỐNG"},
 }
-
 local tabs = {}
 for i, def in ipairs(tabDefs) do
     local btn = Instance.new("TextButton", SideBar)
@@ -800,7 +772,6 @@ for i, def in ipairs(tabDefs) do
     btn.Font = FONT_BOLD; btn.Text = def.icon .. "  " .. def.name; btn.TextSize = 10; btn.TextXAlignment = Enum.TextXAlignment.Left
     btn.LayoutOrder = i; btn.Active = true; corner(btn, 9); local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
     stroke(btn, Color3.fromRGB(0, 150, 220), 1, 0.75)
-    
     local bar = Instance.new("Frame", btn)
     bar.Name = "SelBar"; bar.Size = UDim2.new(0, 3, 0, 18); bar.Position = UDim2.new(0, 2, 0.5, -9)
     bar.BackgroundColor3 = C_CYAN; bar.BorderSizePixel = 0; bar.Visible = false; corner(bar, 4)
@@ -824,9 +795,7 @@ local function switchTab(index)
     end
 end
 
-for i, tBtn in ipairs(tabs) do
-    tBtn.MouseButton1Click:Connect(function() switchTab(i) end)
-end
+for i, tBtn in ipairs(tabs) do tBtn.MouseButton1Click:Connect(function() switchTab(i) end) end
 switchTab(1)
 
 -- ====================== LOGIC THU HOẠCH ======================
@@ -842,9 +811,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     if isRunning then
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: CHẠY"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
-        if root then
-            OriginalFishingSpotCFrame = root.CFrame; root.Anchored = false; if hum then hum.WalkSpeed = 0 end
-        end
+        if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = false; if hum then hum.WalkSpeed = 0 end end
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
@@ -861,7 +828,6 @@ ServerDmgBtn.MouseButton1Click:Connect(function()
 end)
 
 local ProtectedItems = {"rod", "cần", "bait", "mồi", "potion", "license", "cá hiếm", "legendary", "mythical"}
-
 local function getFishToSellCount()
     local count = 0
     pcall(function()
@@ -870,9 +836,7 @@ local function getFishToSellCount()
                 for _, i in ipairs(cont:GetChildren()) do
                     if i:IsA("Tool") then
                         local n = string.lower(i.Name); local isProtected = false
-                        for _, kw in ipairs(ProtectedItems) do
-                            if n:find(kw) then isProtected = true; break end
-                        end
+                        for _, kw in ipairs(ProtectedItems) do if n:find(kw) then isProtected = true; break end end
                         if not isProtected then count = count + 1 end
                     end
                 end
@@ -883,10 +847,13 @@ local function getFishToSellCount()
     return count
 end
 
+-- =========================================================
+-- VÒNG LẶP CẬP NHẬT SỐ CÁ VÀO THẺ KHO & NÚT TOGGLE
+-- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(1)
-        pcall(function()
+        pcall(function() 
             local fishCount = getFishToSellCount()
             FishStatus.Text = "🎒 Kho cá: " .. fishCount .. " / Ngưỡng bán: " .. maxFishCapacity
             ToggleBtn.Text = "  ◈  H-HUB (" .. fishCount .. "/" .. maxFishCapacity .. ")"
@@ -900,15 +867,16 @@ local function getMerchantPosition()
             local objName = string.lower(obj.Name)
             if objName:find("fish") and objName:find("merchant") then
                 local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
-                if primaryPart and primaryPart:IsA("BasePart") then
-                    return primaryPart.Position
-                end
+                if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
             end
         end
     end
     return Vector3.new(1929.41, 9.79, 1093.12)
 end
 
+-- =========================================================
+-- HÀM MỚI v9.1.4: BẬT / TẮT NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
+-- =========================================================
 local function setCharacterNoClip(enabled)
     pcall(function()
         local char = LocalPlayer.Character
@@ -926,19 +894,23 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return end
-    
+
     setCharacterNoClip(true)
     root.Anchored = false
+
     local dist = (root.Position - targetCFrame.Position).Magnitude
     local duration = math.max(dist / (travelSpeed or 55), 0.1)
     local tween = TweenService:Create(root, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
+
     tween:Play()
-    
+
     local lastCheckPos = root.Position
     local stuckCounter = 0
+
     while tween.PlaybackState == Enum.PlaybackState.Playing and isRunning do
         task.wait(0.2)
         setCharacterNoClip(true)
+
         if (root.Position - lastCheckPos).Magnitude < 0.8 then
             stuckCounter = stuckCounter + 0.2
             if stuckCounter >= 1.2 then
@@ -950,9 +922,13 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
         end
         lastCheckPos = root.Position
     end
+
     setCharacterNoClip(false)
 end
 
+-- =========================================================
+-- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG
+-- =========================================================
 local function clickBtn(keys)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
@@ -976,44 +952,47 @@ local function clickBtn(keys)
     return false
 end
 
--- ========================================================= --
--- HÀM QUÉT VỊ TRÍ CÁ / PHAO (SỬA LỖI TỐI ƯU)
--- ========================================================= --
+local function closeMerchantDialog()
+    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
+    local startTime = tick()
+    
+    repeat
+        if not isRunning then break end
+        
+        local clicked = clickBtn(byeKeywords)
+        if clicked then 
+            task.wait(0.15)
+            break 
+        end
+        
+        task.wait(0.05)
+    until (tick() - startTime > 3.0) or not isRunning
+end
+
+-- =========================================================
+-- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS
+-- =========================================================
 local function getTargetFishPosition2D()
     if isSellingFish then return nil end
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
 
-    local closestDist = 90
+    local closestDist = math.huge
     local targetScreenPos = nil
 
     for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj and (obj:IsA("Model") or obj:IsA("BasePart")) and not obj:IsDescendantOf(char) then
+        if obj and (obj:IsA("Model") or obj:IsA("BasePart")) and obj ~= char then
             local name = string.lower(obj.Name)
-            if name:find("fish") or name:find("cá") or name:find("bobber") or name:find("target") or name:find("hook") then
-                
-                -- Loại bỏ cá/phao thuộc về người chơi khác
-                local belongsToOther = false
-                for _, otherPlayer in ipairs(Players:GetPlayers()) do
-                    if otherPlayer ~= LocalPlayer and otherPlayer.Character then
-                        if obj:IsDescendantOf(otherPlayer.Character) then
-                            belongsToOther = true
-                            break
-                        end
-                    end
-                end
-
-                if not belongsToOther then
-                    local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart"))
-                    if part then
-                        local dist = (part.Position - root.Position).Magnitude
-                        if dist < closestDist then
-                            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
-                            if onScreen then
-                                closestDist = dist
-                                targetScreenPos = Vector2.new(screenPos.X, screenPos.Y)
-                            end
+            if name:find("fish") or name:find("cá") or name:find("mob") or name:find("target") or name:find("bobber") then
+                local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart"))
+                if part then
+                    local dist = (part.Position - root.Position).Magnitude
+                    if dist <= 90 and dist < closestDist then
+                        local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+                        if onScreen then
+                            closestDist = dist
+                            targetScreenPos = Vector2.new(screenPos.X, screenPos.Y)
                         end
                     end
                 end
@@ -1023,17 +1002,16 @@ local function getTargetFishPosition2D()
     return targetScreenPos
 end
 
--- ========================================================= --
--- LUỒNG SPAM KỸ NĂNG Z-X-C-V
--- ========================================================= --
+-- =========================================================
+-- LUỒNG SPAM Z-X-C-V ĐỘC LẬP
+-- =========================================================
 task.spawn(function()
     local skillsList = {
-        {key = Enum.KeyCode.Z, index = 1},
-        {key = Enum.KeyCode.X, index = 2},
-        {key = Enum.KeyCode.C, index = 3},
-        {key = Enum.KeyCode.V, index = 4}
+        {key = Enum.KeyCode.Z, index = 1}, {key = Enum.KeyCode.X, index = 2},
+        {key = Enum.KeyCode.C, index = 3}, {key = Enum.KeyCode.V, index = 4}
     }
     local inset = GuiService:GetGuiInset()
+
     while ScreenGui.Parent do
         task.wait(0.01)
         if isRunning and not isSellingFish then
@@ -1042,7 +1020,7 @@ task.spawn(function()
                 pcall(function()
                     VirtualInputManager:SendKeyEvent(true, skill.key, false, game); task.wait(0.003)
                     VirtualInputManager:SendKeyEvent(false, skill.key, false, game); task.wait(0.003)
-                    
+
                     local btn = markerButtons[skill.index]
                     if btn and MarkersGui.Enabled then
                         local pos, sz = btn.AbsolutePosition, btn.AbsoluteSize
@@ -1055,30 +1033,37 @@ task.spawn(function()
     end
 end)
 
--- ========================================================= --
--- VÒNG LẶP CÂU CÁ CHÍNH (KHÔI PHỤC VÀ SỬA CHUẨN)
--- ========================================================= --
+-- =========================================================
+-- VÒNG LẶP CÂU CÁ CHÍNH
+-- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
-        task.wait(0.05)
+        task.wait(0.02)
         if isRunning and not isSellingFish then
             local char = LocalPlayer.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
             local hum = char and char:FindFirstChildOfClass("Humanoid")
-
+            
             if root and hum then
-                if not OriginalFishingSpotCFrame then
-                    OriginalFishingSpotCFrame = root.CFrame
-                end
+                if not OriginalFishingSpotCFrame then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- 1. KIỂM TRA & BÁN CÁ
+                -- TỰ ĐỘNG BÁN CÁ CÓ CHỐNG KẸT & NOCLIP
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
+                    
+                    local vp = Camera.ViewportSize
+                    pcall(function()
+                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
+                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
+                    end)
+
                     root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
+
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
-
+                    
                     if merchantLockConnection then merchantLockConnection:Disconnect() end
+
                     merchantLockConnection = RunService.RenderStepped:Connect(function()
                         pcall(function()
                             local cc = LocalPlayer.Character
@@ -1093,6 +1078,7 @@ task.spawn(function()
                     end)
 
                     safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
+                    
                     root.Anchored = false
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                     task.wait(0.35)
@@ -1105,76 +1091,157 @@ task.spawn(function()
                     local sellStartTime = tick()
                     repeat
                         if not isRunning then break end
-                        pcall(function()
-                            root.Anchored = false; hum.WalkSpeed = 0;
-                            root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
-                        end)
+                        pcall(function() root.Anchored = false; hum.WalkSpeed = 0; root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos) end)
                         clickBtn({"bán tất cả", "sell all", "bán", "sell"}); task.wait(0.25)
-                        clickBtn({"xác nhận", "confirm", "đồng ý", "yes"}); task.wait(0.25)
-                    until getFishToSellCount() == 0 or (tick() - sellStartTime > 6.0) or not isRunning
+                        clickBtn({"xác nhận", "confirm", "đồng ý", "yes", "ok"}); task.wait(0.4)
+                        if getFishToSellCount() <= 0 then task.wait(0.3); break end
+                    until (tick() - sellStartTime > 10) or not isRunning
+
+                    task.wait(0.5)
+                    closeMerchantDialog()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
-                    if OriginalFishingSpotCFrame then
-                        safeTweenToTarget(OriginalFishingSpotCFrame, 55)
-                        root.Anchored = false
-                        root.CFrame = OriginalFishingSpotCFrame
-                    end
-
+                    pcall(function() hum.Jump = true end)
                     task.wait(0.2)
-                    root.Anchored = false; hum.WalkSpeed = 0
+
+                    if OriginalFishingSpotCFrame then
+                        root.Anchored = false; hum.WalkSpeed = 16
+                        
+                        safeTweenToTarget(OriginalFishingSpotCFrame, 55)
+                        
+                        pcall(function()
+                            char:PivotTo(OriginalFishingSpotCFrame)
+                            root.CFrame = OriginalFishingSpotCFrame
+                            root.AssemblyLinearVelocity = Vector3.zero
+                            root.AssemblyAngularVelocity = Vector3.zero
+                        end)
+
+                        pcall(function()
+                            Camera.CameraType = Enum.CameraType.Scriptable
+                            local targetLook = OriginalFishingSpotCFrame.LookVector
+                            local headPos = (char:FindFirstChild("Head") or root).Position
+                            local camPos = headPos - (targetLook * 10) + Vector3.new(0, 3, 0)
+                            
+                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                CFrame = CFrame.lookAt(camPos, headPos + (targetLook * 5))
+                            })
+                            camTween:Play()
+                            camTween.Completed:Wait()
+                            Camera.CameraType = Enum.CameraType.Custom
+                        end)
+
+                        root.Anchored = false
+                        task.wait(0.2)
+                    end
+                    
                     isSellingFish = false
+                    continue
                 end
 
-                -- 2. LOGIC CÂU CÁ & SPAM CLICK
-                if not isSellingFish then
-                    root.Anchored = false; hum.WalkSpeed = 0
+                pcall(function()
+                    root.CFrame = OriginalFishingSpotCFrame
+                    root.AssemblyLinearVelocity = Vector3.zero
+                end)
+                hum.WalkSpeed = 0
 
-                    -- Tự trang bị Cần nếu chưa cầm
-                    local rod = char:FindFirstChildOfClass("Tool")
-                    if not rod then
-                        for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
-                            if item:IsA("Tool") and (item.Name:lower():find("rod") or item.Name:lower():find("cần")) then
-                                hum:EquipTool(item)
-                                task.wait(0.2)
-                                break
-                            end
-                        end
+                local currentFishPos = getTargetFishPosition2D()
+
+                if currentFishPos then
+                    -- =========================================================
+                    -- ĐÃ THAY ĐỔI: BỎ CLICK DƯỚI, GIỮ TRÊN 32PX & TRÁI/PHẢI 90PX
+                    -- =========================================================
+                    local offsets = {
+                        Vector2.new(0, 0),    -- Tâm
+                        Vector2.new(0, -32),  -- Trên (-32px)
+                        Vector2.new(-90, 0),  -- Trái (-90px)
+                        Vector2.new(90, 0)    -- Phải (+90px)
+                    }
+
+                    for _, offset in ipairs(offsets) do
+                        if not isRunning or isSellingFish then break end
+                        local latestPos = getTargetFishPosition2D() or currentFishPos
+                        if not latestPos then break end
+                        local targetClickPos = latestPos + offset
+
+                        pcall(function()
+                            VirtualInputManager:SendMouseMoveEvent(targetClickPos.X, targetClickPos.Y, game)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, true, game, 1)
+                            task.wait(0.005)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, false, game, 1)
+                        end)
+                        task.wait(0.005)
+                    end
+                else
+                    local activeTool = char and char:FindFirstChildOfClass("Tool")
+                    local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
+                    
+                    if not isHoldingRod then
+                        pcall(function()
+                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
+                            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
+                        end)
                     end
 
-                    rod = char:FindFirstChildOfClass("Tool")
-                    if rod then
-                        local fishPos2D = getTargetFishPosition2D()
+                    local vp = Camera.ViewportSize
+                    local centerPos = Vector2.new(vp.X / 2, vp.Y / 2)
 
-                        if fishPos2D then
-                            -- Nếu thấy cá/phao -> Thực hiện Spam Click 4 Hướng
-                            local inset = GuiService:GetGuiInset()
-                            local cx = fishPos2D.X + inset.X
-                            local cy = fishPos2D.Y + inset.Y
+                    pcall(function()
+                        VirtualUser:CaptureController()
+                        VirtualUser:Button1Down(centerPos)
+                        VirtualInputManager:SendMouseMoveEvent(centerPos.X, centerPos.Y, game)
+                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, true, game, 1)
+                    end)
 
-                            local targets = {
-                                Vector2.new(cx, cy),          -- Tâm cá
-                                Vector2.new(cx, cy - 90),     -- Trên -90px
-                                Vector2.new(cx - 90, cy),     -- Trái -90px
-                                Vector2.new(cx + 90, cy)      -- Phải +90px
-                            }
-
-                            for _, pt in ipairs(targets) do
-                                pcall(function()
-                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 1)
-                                    task.wait(0.001)
-                                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 1)
-                                end)
-                            end
-                        else
-                            -- Nếu không thấy cá -> Nhấn Activate để Thả Cần
-                            pcall(function()
-                                rod:Activate()
-                            end)
-                        end
+                    local holdStart = tick()
+                    while (tick() - holdStart < 1.8) and isRunning and not isSellingFish do
+                        if getTargetFishPosition2D() then break end
+                        activeTool = char and char:FindFirstChildOfClass("Tool")
+                        if activeTool then pcall(function() activeTool:Activate() end) end
+                        task.wait(0.04)
                     end
+
+                    pcall(function()
+                        VirtualUser:Button1Up(centerPos)
+                        VirtualInputManager:SendMouseButtonEvent(centerPos.X, centerPos.Y, 0, false, game, 1)
+                    end)
+                    task.wait(0.1)
                 end
             end
         end
     end
+end)
+
+-- ================= VÒNG LẶP RENDER =================
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        updateHeadBillboard()
+        local timeVal = tick() * 2
+        local neonColor = Color3.fromRGB(
+            math.floor(math.sin(timeVal) * 35 + 35),
+            math.floor(math.sin(timeVal) * 110 + 145), 255
+        )
+        MainStroke.Color = neonColor
+        CenterStroke.Color = neonColor
+        MusicBarStroke.Color = neonColor
+        ToggleStroke.Color = neonColor
+        TopGlow.BackgroundColor3 = neonColor
+
+        if bgSound and bgSound.IsPlaying and bgSound.TimeLength > 0 and currentProgressBar then
+            local percent = math.clamp(bgSound.TimePosition / bgSound.TimeLength, 0, 1)
+            currentProgressBar.Size = UDim2.new(percent, 0, 1, 0)
+        end
+
+        local char = LocalPlayer.Character
+        local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+        local rootJoint = rootPart and rootPart:FindFirstChild("RootJoint")
+
+        if rootJoint and isHipSwayEnabled then
+            local t = tick() * 6.5
+            local bodySwayX = math.sin(t * 2) * 0.25
+            local bodySwayY = math.cos(t) * 0.35
+            local bodySwayZ = math.sin(t) * 0.75
+            rootJoint.C0 = rootJoint.C0:Lerp(CFrame.new(0, bodySwayY, 0) * CFrame.Angles(math.rad(bodySwayX * 20), 0, bodySwayZ), 0.4)
+        end
+    end)
 end)
