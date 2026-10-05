@@ -511,6 +511,93 @@ corner(ShowMarkersBtn, 10); stroke(ShowMarkersBtn, Color3.fromRGB(255,255,255), 
 
 local LockMarkersBtn = Instance.new("TextButton", KeyRow)
 LockMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); LockMarkersBtn.Position = UDim2.new(0.51, 0, 0, 0)
+LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
+LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"; LockMarkersBtn.Active = true
+corner(LockMarkersBtn, 10); stroke(LockMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
+
+local MarkersGui = Instance.new("ScreenGui")
+MarkersGui.Name = "SkillMarkersUI"; MarkersGui.ResetOnSpawn = false; MarkersGui.DisplayOrder = 10000
+MarkersGui.Parent = PlayerGui; MarkersGui.Enabled = false
+
+local markerColors = {Color3.fromRGB(239, 68, 68), Color3.fromRGB(16, 185, 129), Color3.fromRGB(14, 165, 233), Color3.fromRGB(245, 158, 11)}
+local markerNames = {"Ω Z", "Ψ X", "Δ C", "Φ V"}
+local markerButtons = {}
+for i = 1, 4 do
+    local mBtn = Instance.new("TextButton", MarkersGui)
+    mBtn.Size = UDim2.new(0, 48, 0, 48); mBtn.Position = UDim2.new(0.6 + (i * 0.07), 0, 0.5, 0)
+    mBtn.BackgroundColor3 = markerColors[i]; mBtn.BackgroundTransparency = 0.05
+    mBtn.Text = markerNames[i]; mBtn.TextColor3 = Color3.fromRGB(255, 255, 255); mBtn.TextSize = 13; mBtn.Font = FONT_BOLD
+    mBtn.Active = true; mBtn.Draggable = true
+    corner(mBtn, 14); stroke(mBtn, Color3.fromRGB(255,255,255), 1.5, 0.3)
+    table.insert(markerButtons, mBtn)
+end
+
+ShowMarkersBtn.MouseButton1Click:Connect(function()
+    MarkersGui.Enabled = not MarkersGui.Enabled
+    ShowMarkersBtn.Text = MarkersGui.Enabled and "⌨ PHÍM ẢO: HIỆN" or "⌨ PHÍM ẢO: TẮT"
+    ShowMarkersBtn.BackgroundColor3 = MarkersGui.Enabled and Color3.fromRGB(16, 185, 129) or Color3.fromRGB(13, 110, 253)
+end)
+
+local isMarkersLocked = false
+LockMarkersBtn.MouseButton1Click:Connect(function()
+    isMarkersLocked = not isMarkersLocked
+    for _, btn in ipairs(markerButtons) do btn.Draggable = not isMarkersLocked end
+    LockMarkersBtn.Text = isMarkersLocked and "🔒 KHÓA: ĐÃ KHÓA" or "🔓 KHÓA: MỞ"
+    LockMarkersBtn.BackgroundColor3 = isMarkersLocked and Color3.fromRGB(16, 185, 129) or Color3.fromRGB(220, 38, 38)
+end)
+
+-- ====================== TAB 5: ÂM THANH ======================
+sectionLabel(P5, "  NHẠC NỀN", 0)
+local MusicInput = Instance.new("TextBox", P5)
+MusicInput.Size = UDim2.new(1, -4, 0, 34); MusicInput.BackgroundColor3 = Color3.fromRGB(10, 16, 30)
+MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255); MusicInput.PlaceholderText = "🔎  Nhập ID nhạc..."; MusicInput.PlaceholderColor3 = C_SUB
+MusicInput.Text = ""; MusicInput.Font = FONT; MusicInput.TextSize = 11; MusicInput.LayoutOrder = 1; MusicInput.ClearTextOnFocus = false; MusicInput.Active = true
+corner(MusicInput, 10); stroke(MusicInput, C_CYAN, 1, 0.6)
+
+local MusicRow = Instance.new("Frame", P5)
+MusicRow.Size = UDim2.new(1, -4, 0, 36); MusicRow.BackgroundTransparency = 1; MusicRow.LayoutOrder = 2; MusicRow.Active = false
+
+local PlayMusicBtn = Instance.new("TextButton", MusicRow)
+PlayMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
+PlayMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); PlayMusicBtn.Font = FONT_BOLD; PlayMusicBtn.TextSize = 11
+PlayMusicBtn.Text = "▶ PHÁT NHẠC"; PlayMusicBtn.Active = true; corner(PlayMusicBtn, 10)
+
+local StopMusicBtn = Instance.new("TextButton", MusicRow)
+StopMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); StopMusicBtn.Position = UDim2.new(0.51, 0, 0, 0)
+StopMusicBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
+StopMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); StopMusicBtn.Font = FONT_BOLD; StopMusicBtn.TextSize = 11
+StopMusicBtn.Text = "⏹ DỪNG"; StopMusicBtn.Active = true; corner(StopMusicBtn, 10)
+
+local HipSwayToggleBtn = mkBtn(P5, "⚡ LẮC HÔNG & HUD TRÊN ĐẦU: TẮT", 34, Color3.fromRGB(220, 38, 38), 3)
+
+local PresetContainer = Instance.new("ScrollingFrame", P5)
+PresetContainer.Size = UDim2.new(1, -4, 0, 110); PresetContainer.BackgroundColor3 = Color3.fromRGB(8, 12, 24)
+PresetContainer.BackgroundTransparency = 0.1; PresetContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+PresetContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y; PresetContainer.ScrollBarThickness = 3
+PresetContainer.ScrollBarImageColor3 = C_CYAN; PresetContainer.BorderSizePixel = 0; PresetContainer.LayoutOrder = 4; PresetContainer.Active = false
+corner(PresetContainer, 10); stroke(PresetContainer, Color3.fromRGB(255,255,255), 1, 0.85)
+
+local PresetLayout = Instance.new("UIListLayout", PresetContainer)
+PresetLayout.SortOrder = Enum.SortOrder.LayoutOrder; PresetLayout.Padding = UDim.new(0, 4)
+local PresetPad = Instance.new("UIPadding", PresetContainer)
+PresetPad.PaddingTop = UDim.new(0,6); PresetPad.PaddingLeft = UDim.new(0,6); PresetPad.PaddingRight = UDim.new(0,6); PresetPad.PaddingBottom = UDim.new(0,6)
+
+local PresetSongs = {
+    {Name = "💔 DJ Hối Hận Trong Anh", Id = "80415307715259"},
+    {Name = "⏳ Thế Gian Xoay Vòng Remix", Id = "113675312413032"},
+    {Name = "💔 Phía Sau 1 Cô Gái Remix", Id = "109743636792463"},
+    {Name = "🌸 Khuê Mộc Lan", Id = "98361989582185"},
+    {Name = "🌙 Chỉ Còn Là Giấc Mơ", Id = "121051113937228"},
+    {Name = "🏙 Phố Cũ Còn Anh Remix", Id = "107810773290624"},
+    {Name = "🍃 Lạc Chốn Hồng Trần", Id = "116260601379194"},
+    {Name = "👑 I wan you crazy for me", Id = "125230341990848"},
+    {Name = "🥀 Mất Anh Rồi", Id = "118574601343022"},
+    {Name = "🎤 Katy Katy Remix", Id = "95300067259927"},
+    {Name = "🌊 Sóng và Gió Remix", Id = "90113853563664"},
+    {Name = "🇻🇳 Vietnamese Song Roblox ID", Id = "110404768256690"},
+    {Name = "🚶 Anh Cứ Đi Đi", Id = "103475172398501"},
+    {Name = "🌧 Mưa Đợi Chờ", Id = "82627558368623"},
+    {Name = "👰 Chuyện Nàng Trinh Nữ Remix", Id = "119526323504077"},
     {Name = "💞 Người Đến Sau", Id = "114580872442958"},
     {Name = "💎 Vạn Vật Thay Đổi", Id = "108477308631109"},
     {Name = "🏃 Chạy Về Với Anh", Id = "127667093795280"},
@@ -790,7 +877,115 @@ end
 -- =========================================================
 -- HÀM MỚI v9.1.4: BẬT / TẮT NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
 -- =========================================================
-    until (tick() - startTime > 3) or not isRunning
+local function setCharacterNoClip(enabled)
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in ipairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = not enabled
+                end
+            end
+        end
+    end)
+end
+
+local function safeTweenToTarget(targetCFrame, travelSpeed)
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    setCharacterNoClip(true)
+    root.Anchored = false
+
+    local dist = (root.Position - targetCFrame.Position).Magnitude
+    local duration = math.max(dist / (travelSpeed or 55), 0.1)
+    local tween = TweenService:Create(root, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
+
+    tween:Play()
+
+    local lastCheckPos = root.Position
+    local stuckCounter = 0
+
+    while tween.PlaybackState == Enum.PlaybackState.Playing and isRunning do
+        task.wait(0.2)
+        setCharacterNoClip(true)
+
+        if (root.Position - lastCheckPos).Magnitude < 0.8 then
+            stuckCounter = stuckCounter + 0.2
+            if stuckCounter >= 1.2 then
+                root.CFrame = root.CFrame + Vector3.new(0, 10, 0)
+                stuckCounter = 0
+            end
+        else
+            stuckCounter = 0
+        end
+        lastCheckPos = root.Position
+    end
+
+    setCharacterNoClip(false)
+end
+
+-- =========================================================
+-- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG (ĐÃ SỬA CHUẨN INSET X, Y)
+-- =========================================================
+local function clickBtn(keys)
+    local inset = GuiService:GetGuiInset()
+    for _, obj in pairs(PlayerGui:GetDescendants()) do
+        if not obj:IsDescendantOf(ScreenGui) then
+            if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Visible and obj.AbsoluteSize.X > 0 then
+                local txt = string.lower(obj:IsA("TextButton") and obj.Text or obj.Name)
+                for _, kw in ipairs(keys) do
+                    if txt:find(kw) then
+                        local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
+                        local cx = pos.X + sz.X / 2 + inset.X
+                        local cy = pos.Y + sz.Y / 2 + inset.Y
+                        pcall(function()
+                            VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
+                            task.wait(0.02)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
+                            task.wait(0.03)
+                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
+                        end)
+                        return true
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
+-- =========================================================
+-- HÀM ĐÓNG THOẠI MERCHANT (DÙNG PHÍM E / SPACE VÀ CLICK NÚT THOÁT)
+-- =========================================================
+local function closeMerchantDialog()
+    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
+    local startTime = tick()
+    
+    repeat
+        if not isRunning then break end
+        
+        -- Gửi phím E và Space để ép NPC đóng hội thoại nhanh
+        pcall(function()
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            task.wait(0.02)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+            task.wait(0.02)
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+            task.wait(0.02)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+        end)
+
+        -- Bấm trực tiếp vào nút UI
+        local clicked = clickBtn(byeKeywords)
+        if clicked then 
+            task.wait(0.2)
+            break 
+        end
+        
+        task.wait(0.1)
+    until (tick() - startTime > 2.5) or not isRunning
 end
 
 -- =========================================================
@@ -860,6 +1055,180 @@ end)
 -- =========================================================
 -- VÒNG LẶP CÂU CÁ CHÍNH
 -- =========================================================
+task.spawn(function()
+    while ScreenGui.Parent do
+        task.wait(0.02)
+        if isRunning and not isSellingFish then
+            local char = LocalPlayer.Character
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            
+            if root and hum then
+                if not OriginalFishingSpotCFrame then OriginalFishingSpotCFrame = root.CFrame end
+
+                -- TỰ ĐỘNG BÁN CÁ CÓ CHỐNG KẸT & NOCLIP
+                if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
+                    isSellingFish = true
+                    
+                    local vp = Camera.ViewportSize
+                    pcall(function()
+                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, true, game, 1); task.wait(0.08)
+                        VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
+                    end)
+
+                    root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
+
+                    local dynamicMerchantPos = getMerchantPosition()
+                    local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
+                    
+                    if merchantLockConnection then merchantLockConnection:Disconnect() end
+
+                    merchantLockConnection = RunService.RenderStepped:Connect(function()
+                        pcall(function()
+                            local cc = LocalPlayer.Character
+                            local cr = cc and cc:FindFirstChild("HumanoidRootPart")
+                            local ch = cc and cc:FindFirstChildOfClass("Humanoid")
+                            if cr and dynamicMerchantPos then
+                                cr.Anchored = false; if ch then ch.WalkSpeed = 0 end
+                                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
+                                cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
+                            end
+                        end)
+                    end)
+
+                    safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
+                    
+                    root.Anchored = false
+                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                    task.wait(0.35)
+
+                    pcall(function()
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
+                    end)
+
+                    -- TRÌNH TỰ BÁN CÁ: BÁN TẤT CẢ -> XÁC NHẬN BÁN TẤT CẢ -> TẠM BIỆT
+                    -- Chỉ thay phần xử lý bán cá; các chức năng khác giữ nguyên.
+                    local sellStartTime = tick()
+                    local sellFinished = false
+
+                    repeat
+                        if not isRunning then break end
+
+                        pcall(function()
+                            root.Anchored = false
+                            hum.WalkSpeed = 0
+                            root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                        end)
+
+                        -- BƯỚC 1: BÁN TẤT CẢ
+                        local clickedSell = clickBtn({"bán tất cả", "sell all"})
+                        if clickedSell then
+                            task.wait(0.35)
+
+                            -- BƯỚC 2: XÁC NHẬN BÁN TẤT CẢ
+                            local clickedConfirm = clickBtn({
+                                "xác nhận bán tất cả",
+                                "xac nhan ban tat ca",
+                                "xác nhận",
+                                "xac nhan",
+                                "confirm",
+                                "đồng ý"
+                            })
+
+                            if clickedConfirm then
+                                task.wait(0.6)
+                                sellFinished = getFishToSellCount() <= 0
+                            end
+                        end
+
+                        if sellFinished then
+                            break
+                        end
+
+                        task.wait(0.2)
+                    until (tick() - sellStartTime > 10) or not isRunning
+
+                    -- BƯỚC 3: TẠM BIỆT
+                    task.wait(0.3)
+                    closeMerchantDialog()
+
+                    if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
+
+                    pcall(function() hum.Jump = true end)
+                    task.wait(0.2)
+
+                    if OriginalFishingSpotCFrame then
+                        root.Anchored = false; hum.WalkSpeed = 16
+                        
+                        safeTweenToTarget(OriginalFishingSpotCFrame, 55)
+                        
+                        pcall(function()
+                            char:PivotTo(OriginalFishingSpotCFrame)
+                            root.CFrame = OriginalFishingSpotCFrame
+                            root.AssemblyLinearVelocity = Vector3.zero
+                            root.AssemblyAngularVelocity = Vector3.zero
+                        end)
+
+                        pcall(function()
+                            Camera.CameraType = Enum.CameraType.Scriptable
+                            local targetLook = OriginalFishingSpotCFrame.LookVector
+                            local headPos = (char:FindFirstChild("Head") or root).Position
+                            local camPos = headPos - (targetLook * 10) + Vector3.new(0, 3, 0)
+                            
+                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                                CFrame = CFrame.lookAt(camPos, headPos + (targetLook * 5))
+                            })
+                            camTween:Play()
+                            camTween.Completed:Wait()
+                            Camera.CameraType = Enum.CameraType.Custom
+                        end)
+
+                        root.Anchored = false
+                        task.wait(0.2)
+                    end
+                    
+                    isSellingFish = false
+                    continue
+                end
+
+                pcall(function()
+                    root.CFrame = OriginalFishingSpotCFrame
+                    root.AssemblyLinearVelocity = Vector3.zero
+                end)
+                hum.WalkSpeed = 0
+
+                local currentFishPos = getTargetFishPosition2D()
+
+                if currentFishPos then
+                    local offsets = {
+                        Vector2.new(0, 0),    -- Tâm
+                        Vector2.new(0, -32),  -- Trên (-32px)
+                        Vector2.new(-90, 0),  -- Trái (-90px)
+                        Vector2.new(90, 0)    -- Phải (+90px)
+                    }
+
+                    for _, offset in ipairs(offsets) do
+                        if not isRunning or isSellingFish then break end
+                        local latestPos = getTargetFishPosition2D() or currentFishPos
+                        if not latestPos then break end
+                        local targetClickPos = latestPos + offset
+
+                        pcall(function()
+                            VirtualInputManager:SendMouseMoveEvent(targetClickPos.X, targetClickPos.Y, game)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, true, game, 1)
+                            task.wait(0.005)
+                            VirtualInputManager:SendMouseButtonEvent(targetClickPos.X, targetClickPos.Y, 0, false, game, 1)
+                        end)
+                        task.wait(0.005)
+                    end
+                else
+                    local activeTool = char and char:FindFirstChildOfClass("Tool")
+                    local isHoldingRod = activeTool and (string.lower(activeTool.Name):find("rod") or string.lower(activeTool.Name):find("cần"))
+                    
+                    if not isHoldingRod then
+                        pcall(function()
+                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.One, false, game); task.wait(0.02)
                             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.One, false, game); task.wait(0.1)
                         end)
                     end
