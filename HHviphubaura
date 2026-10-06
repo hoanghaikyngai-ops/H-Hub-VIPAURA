@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
--- Cập nhật: Tích hợp vòng lặp quét bấm NPC liên tục (Ngừng quét ngay khi Tạm biệt)
+-- Cập nhật: Sửa quét chữ liên tục (Bán tất cả -> Xác nhận bán tất cả -> Tạm biệt)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -875,7 +875,7 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- HÀM MỚI v9.1.4: BẬT / TẮT NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
+-- NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
 -- =========================================================
 local function setCharacterNoClip(enabled)
     pcall(function()
@@ -927,16 +927,22 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- HÀM ẤN NÚT CLICK GIAO DIỆN CHUNG (ĐÃ SỬA CHUẨN INSET X, Y)
+-- HÀM QUÉT CHỮ TRONG GIAO DIỆN VÀ TỰ ĐỘNG CLICK VÀO CHỮ
 -- =========================================================
-local function clickBtn(keys)
+local function clickText(targetTextKeywords)
     local inset = GuiService:GetGuiInset()
     for _, obj in pairs(PlayerGui:GetDescendants()) do
         if not obj:IsDescendantOf(ScreenGui) then
-            if (obj:IsA("TextButton") or obj:IsA("ImageButton")) and obj.Visible and obj.AbsoluteSize.X > 0 then
-                local txt = string.lower(obj:IsA("TextButton") and obj.Text or obj.Name)
-                for _, kw in ipairs(keys) do
-                    if txt:find(kw) then
+            if obj:IsA("GuiObject") and obj.Visible and obj.AbsoluteSize.X > 0 and obj.AbsoluteSize.Y > 0 then
+                local contentText = ""
+                if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                    contentText = string.lower(obj.Text)
+                else
+                    contentText = string.lower(obj.Name)
+                end
+
+                for _, kw in ipairs(targetTextKeywords) do
+                    if contentText:find(string.lower(kw)) then
                         local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
                         local cx = pos.X + sz.X / 2 + inset.X
                         local cy = pos.Y + sz.Y / 2 + inset.Y
@@ -1021,7 +1027,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1034,7 +1040,7 @@ task.spawn(function()
             if root and hum then
                 if not OriginalFishingSpotCFrame then OriginalFishingSpotCFrame = root.CFrame end
 
-                -- TỰ ĐỘNG BÁN CÁ CÓ CHỐNG KẸT & NOCLIP
+                -- TỰ ĐỘNG BÁN CÁ KHI ĐỦ NGƯỠNG
                 if getFishToSellCount() >= maxFishCapacity and not isSellingFish then
                     isSellingFish = true
                     
@@ -1070,66 +1076,65 @@ task.spawn(function()
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                     task.wait(0.35)
 
+                    -- BẮT ĐẦU MỞ THOẠI MERCHANT BẰNG PHÍM E
                     pcall(function()
                         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.3)
                     end)
 
-                    -- =========================================================
-                    -- CHU TRÌNH BÁN CÁ LIÊN TỤC (TỰ ĐỘNG DỪNG KHI BẤM "TẠM BIỆT")
-                    -- =========================================================
+                    -- QUÉT LIÊN TỤC CÁC CHỮ: "BÁN TẤT CẢ" -> "XÁC NHẬN BÁN TẤT CẢ" -> "TẠM BIỆT"
                     local sellStartTime = tick()
-                    local maxSellTimeout = 12
-                    local isCompleted = false
-                    
-                    local clickedSell = false
-                    local clickedConfirm = false
+                    local state = "BAN_TAT_CA" -- Bắt đầu quét chữ bán tất cả
 
-                    while isRunning and (tick() - sellStartTime < maxSellTimeout) do
+                    repeat
+                        if not isRunning then break end
+
                         pcall(function()
                             root.Anchored = false
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                         end)
 
-                        -- BƯỚC 1: Quét nút "Bán tất cả"
-                        if not clickedSell then
-                            if clickBtn({"bán tất cả", "sell all"}) then
-                                clickedSell = true
+                        -- BƯỚC 1: Quét và bấm chữ "bán tất cả"
+                        if state == "BAN_TAT_CA" then
+                            local clicked = clickText({"bán tất cả", "sell all"})
+                            if clicked then
+                                state = "XAC_NHAN"
+                                task.wait(0.3)
+                            end
+
+                        -- BƯỚC 2: Quét và bấm chữ "xác nhận bán tất cả"
+                        elseif state == "XAC_NHAN" then
+                            local clicked = clickText({
+                                "xác nhận bán tất cả",
+                                "xac nhan ban tat ca",
+                                "xác nhận",
+                                "xac nhan",
+                                "confirm"
+                            })
+                            if clicked then
+                                state = "TAM_BIET"
+                                task.wait(0.4)
+                            end
+
+                        -- BƯỚC 3: Quét và bấm chữ "tạm biệt" -> Xong ngưng quét
+                        elseif state == "TAM_BIET" then
+                            local clicked = clickText({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng"})
+                            if clicked then
                                 task.wait(0.2)
+                                break -- Dừng ngưng quét ngay lập tức
                             end
                         end
 
-                        -- BƯỚC 2: Quét nút "Xác nhận bán tất cả"
-                        if clickedSell and not clickedConfirm then
-                            if clickBtn({"xác nhận bán tất cả", "xac nhan ban tat ca", "xác nhận", "xac nhan", "confirm", "đồng ý"}) then
-                                clickedConfirm = true
-                                task.wait(0.2)
-                            end
-                        end
-
-                        -- BƯỚC 3: Quét nút "Tạm biệt" -> Bấm và DỪNG VÒNG LẶP QUÉT NGAY LẬP TỨC
-                        local goodbyeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
-                        if clickBtn(goodbyeKeywords) then
-                            isCompleted = true
-                            break -- Dừng hoàn toàn vòng lặp quét
-                        end
-
-                        -- Hoặc bấm phím E/Space phòng trường hợp UI hội thoại thoại mặc định của Roblox
-                        pcall(function()
-                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            task.wait(0.01)
-                            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                        end)
-
-                        task.wait(0.05) -- Tần số quét lặp lại 50ms
-                    end
+                        task.wait(0.1)
+                    until (tick() - sellStartTime > 12) or not isRunning
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
                     pcall(function() hum.Jump = true end)
                     task.wait(0.2)
 
+                    -- DỊCH CHUYỂN QUAY VỀ ĐIỂM CÂU
                     if OriginalFishingSpotCFrame then
                         root.Anchored = false; hum.WalkSpeed = 16
                         
