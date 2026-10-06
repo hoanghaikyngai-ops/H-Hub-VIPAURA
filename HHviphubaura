@@ -1120,7 +1120,7 @@ task.spawn(function()
                         local currentFishCount = getFishToSellCount()
 
                         -- ĐIỀU KIỆN CHUYỂN NGAY SANG LUỒNG TẠM BIỆT: Cá giảm số lượng HOẶC dưới 2 con
-                        if (currentFishCount < initialFishCount) or (currentFishCount <= 2) then
+                        if (currentFishCount < initialFishCount) or (currentFishCount <= 4) then
                             state = "TAM_BIET"
                         end
 
