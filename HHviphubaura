@@ -1,6 +1,6 @@
 -- ====================================================
 -- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
--- Cập nhật: Sửa lỗi click Tạm biệt (Tối ưu tọa độ Inset & phím E/Space thoát thoại)
+-- Cập nhật: Tích hợp vòng lặp quét bấm NPC liên tục (Ngừng quét ngay khi Tạm biệt)
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -957,38 +957,6 @@ local function clickBtn(keys)
 end
 
 -- =========================================================
--- HÀM ĐÓNG THOẠI MERCHANT (DÙNG PHÍM E / SPACE VÀ CLICK NÚT THOÁT)
--- =========================================================
-local function closeMerchantDialog()
-    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
-    local startTime = tick()
-    
-    repeat
-        if not isRunning then break end
-        
-        -- Gửi phím E và Space để ép NPC đóng hội thoại nhanh
-        pcall(function()
-            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-            task.wait(0.02)
-            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-            task.wait(0.02)
-            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
-            task.wait(0.02)
-            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
-        end)
-
-        -- Bấm trực tiếp vào nút UI
-        local clicked = clickBtn(byeKeywords)
-        if clicked then 
-            task.wait(0.2)
-            break 
-        end
-        
-        task.wait(0.1)
-    until (tick() - startTime > 2.5) or not isRunning
-end
-
--- =========================================================
 -- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS
 -- =========================================================
 local function getTargetFishPosition2D()
@@ -1107,50 +1075,55 @@ task.spawn(function()
                         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
                     end)
 
-                    -- TRÌNH TỰ BÁN CÁ 3 BƯỚC: BÁN TẤT CẢ -> XÁC NHẬN BÁN TẤT CẢ -> TẠM BIỆT
+                    -- =========================================================
+                    -- CHU TRÌNH BÁN CÁ LIÊN TỤC (TỰ ĐỘNG DỪNG KHI BẤM "TẠM BIỆT")
+                    -- =========================================================
                     local sellStartTime = tick()
-                    local sellFinished = false
+                    local maxSellTimeout = 12
+                    local isCompleted = false
+                    
+                    local clickedSell = false
+                    local clickedConfirm = false
 
-                    repeat
-                        if not isRunning then break end
-
+                    while isRunning and (tick() - sellStartTime < maxSellTimeout) do
                         pcall(function()
                             root.Anchored = false
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                         end)
 
-                        -- BƯỚC 1: BÁN TẤT CẢ
-                        local clickedSell = clickBtn({"bán tất cả", "sell all"})
-                        if clickedSell then
-                            task.wait(0.35)
-
-                            -- BƯỚC 2: XÁC NHẬN BÁN TẤT CẢ
-                            local clickedConfirm = clickBtn({
-                                "xác nhận bán tất cả",
-                                "xac nhan ban tat ca",
-                                "xác nhận",
-                                "xac nhan",
-                                "confirm",
-                                "đồng ý"
-                            })
-
-                            if clickedConfirm then
-                                task.wait(0.6)
-                                sellFinished = getFishToSellCount() <= 0
+                        -- BƯỚC 1: Quét nút "Bán tất cả"
+                        if not clickedSell then
+                            if clickBtn({"bán tất cả", "sell all"}) then
+                                clickedSell = true
+                                task.wait(0.2)
                             end
                         end
 
-                        if sellFinished then
-                            break
+                        -- BƯỚC 2: Quét nút "Xác nhận bán tất cả"
+                        if clickedSell and not clickedConfirm then
+                            if clickBtn({"xác nhận bán tất cả", "xac nhan ban tat ca", "xác nhận", "xac nhan", "confirm", "đồng ý"}) then
+                                clickedConfirm = true
+                                task.wait(0.2)
+                            end
                         end
 
-                        task.wait(0.2)
-                    until (tick() - sellStartTime > 10) or not isRunning
+                        -- BƯỚC 3: Quét nút "Tạm biệt" -> Bấm và DỪNG VÒNG LẶP QUÉT NGAY LẬP TỨC
+                        local goodbyeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x", "leave"}
+                        if clickBtn(goodbyeKeywords) then
+                            isCompleted = true
+                            break -- Dừng hoàn toàn vòng lặp quét
+                        end
 
-                    -- BƯỚC 3: TẠM BIỆT
-                    task.wait(0.3)
-                    closeMerchantDialog()
+                        -- Hoặc bấm phím E/Space phòng trường hợp UI hội thoại thoại mặc định của Roblox
+                        pcall(function()
+                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                            task.wait(0.01)
+                            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                        end)
+
+                        task.wait(0.05) -- Tần số quét lặp lại 50ms
+                    end
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
