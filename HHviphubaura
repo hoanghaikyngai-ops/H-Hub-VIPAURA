@@ -1,6 +1,6 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.4 - NOCLIP & AUTO UNSTUCK INTEGRATED
--- Cập nhật: Sửa quét chữ liên tục (Bán tất cả -> Xác nhận bán tất cả -> Tạm biệt)
+-- H-HUB MODERN UI v9.1.5 - INDEPENDENT BYE-THREAD INTEGRATED
+-- Cập nhật: Tách luồng "Tạm biệt" riêng, quét & spam click liên tục 3s ngay khi cá giảm
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -220,7 +220,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.4"
+HeaderText.Text = "H-HUB  •  v9.1.5"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -719,7 +719,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.4 (NOCLIP & AUTO UNSTUCK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Spam click 3 hướng (Tâm, Trên 32px, Trái 90px, Phải 90px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.5 (INDEPENDENT BYE-THREAD)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Luồng TẠM BIỆT độc lập, quét bấm liên tục 3 giây ngay khi cá giảm\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Spam click 3 hướng (Tâm, Trên 32px, Trái 90px, Phải 90px)\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -755,7 +755,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.4\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.5\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -963,6 +963,19 @@ local function clickText(targetTextKeywords)
 end
 
 -- =========================================================
+-- HÀM SPAM CLICK RIÊNG CHO NÚT TẠM BIỆT TRONG 3 GIÂY
+-- =========================================================
+local function triggerIndependentByeLoop()
+    local byeKeywords = {"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"}
+    local startTime = tick()
+    
+    while (tick() - startTime < 3.0) and isRunning do
+        local clicked = clickText(byeKeywords)
+        task.wait(0.1)
+    end
+end
+
+-- =========================================================
 -- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS
 -- =========================================================
 local function getTargetFishPosition2D()
@@ -1082,6 +1095,7 @@ task.spawn(function()
                         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
                     end)
 
+                    local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
                     local state = "BAN_TAT_CA"
 
@@ -1094,17 +1108,20 @@ task.spawn(function()
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                         end)
 
-                        -- BƯỚC 1: Quét bấm "Bán tất cả"
-                        if state == "BAN_TAT_CA" then
-                            local clicked = clickText({"bán tất cả", "sell all", "bán hết", "sell"})
-                            if clicked then
-                                state = "XAC_NHAN"
-                                task.wait(0.4)
-                            end
+                        local currentFishCount = getFishToSellCount()
 
-                        -- BƯỚC 2: Quét bấm "Xác nhận bán tất cả"
+                        -- ĐIỀU KIỆN CHUYỂN NGAY SANG LUỒNG TẠM BIỆT: Cá giảm số lượng HOẶC dưới 2 con
+                        if (currentFishCount < initialFishCount) or (currentFishCount <= 2) then
+                            state = "TAM_BIET"
+                        end
+
+                        if state == "BAN_TAT_CA" then
+                            clickText({"bán tất cả", "sell all", "bán hết", "sell"})
+                            task.wait(0.3)
+                            state = "XAC_NHAN"
+
                         elseif state == "XAC_NHAN" then
-                            local clicked = clickText({
+                            clickText({
                                 "xác nhận bán tất cả",
                                 "xac nhan ban tat ca",
                                 "xác nhận",
@@ -1112,45 +1129,20 @@ task.spawn(function()
                                 "confirm",
                                 "yes"
                             })
-                            if clicked then
-                                state = "KIEM_TRA_SO_CA"
-                                task.wait(0.5)
-                            else
-                                state = "KIEM_TRA_SO_CA"
-                            end
+                            task.wait(0.3)
 
-                        -- BƯỚC 3: Đợi số cá bán giảm xuống dưới 2 con (đã giữ lại cá hiếm)
-                        elseif state == "KIEM_TRA_SO_CA" then
-                            local currentFish = getFishToSellCount()
-                            if currentFish < 2 or (tick() - sellStartTime > 6) then
-                                state = "TAM_BIET"
-                            else
-                                clickText({"bán tất cả", "sell all", "xác nhận", "confirm"})
-                            end
-
-                        -- BƯỚC 4: Quét liên tục trong 3 giây tìm bấm nút "Tạm biệt"
                         elseif state == "TAM_BIET" then
-                            local startByeTime = tick()
-
-                            while (tick() - startByeTime < 3) and isRunning do
-                                local clicked = clickText({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"})
-                                if clicked then
-                                    task.wait(0.3)
-                                    clickText({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"})
-                                    break
-                                end
-                                task.wait(0.15)
-                            end
-
+                            -- KÍCH HOẠT LUỒNG QUÉT C LICK TẠM BIỆT ĐỘC LẬP TRONG 3 GIÂY
+                            triggerIndependentByeLoop()
                             break
                         end
 
                         task.wait(0.15)
-                    until (tick() - sellStartTime > 14) or not isRunning
+                    until (tick() - sellStartTime > 12) or not isRunning
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
-                    task.wait(1.0)
+                    task.wait(0.5)
 
                     pcall(function() hum.Jump = true end)
                     task.wait(0.2)
