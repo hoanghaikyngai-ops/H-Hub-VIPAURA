@@ -1078,13 +1078,12 @@ task.spawn(function()
 
                     -- BẮT ĐẦU MỞ THOẠI MERCHANT BẰNG PHÍM E
                     pcall(function()
-                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.05)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.3)
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.08)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.5)
                     end)
 
-                    -- QUÉT LIÊN TỤC CÁC CHỮ: "BÁN TẤT CẢ" -> "XÁC NHẬN BÁN TẤT CẢ" -> "TẠM BIỆT"
                     local sellStartTime = tick()
-                    local state = "BAN_TAT_CA" -- Bắt đầu quét chữ bán tất cả
+                    local state = "BAN_TAT_CA"
 
                     repeat
                         if not isRunning then break end
@@ -1095,41 +1094,63 @@ task.spawn(function()
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                         end)
 
-                        -- BƯỚC 1: Quét và bấm chữ "bán tất cả"
+                        -- BƯỚC 1: Quét bấm "Bán tất cả"
                         if state == "BAN_TAT_CA" then
-                            local clicked = clickText({"bán tất cả", "sell all"})
+                            local clicked = clickText({"bán tất cả", "sell all", "bán hết", "sell"})
                             if clicked then
                                 state = "XAC_NHAN"
-                                task.wait(0.3)
+                                task.wait(0.4)
                             end
 
-                        -- BƯỚC 2: Quét và bấm chữ "xác nhận bán tất cả"
+                        -- BƯỚC 2: Quét bấm "Xác nhận bán tất cả"
                         elseif state == "XAC_NHAN" then
                             local clicked = clickText({
                                 "xác nhận bán tất cả",
                                 "xac nhan ban tat ca",
                                 "xác nhận",
                                 "xac nhan",
-                                "confirm"
+                                "confirm",
+                                "yes"
                             })
                             if clicked then
-                                state = "TAM_BIET"
-                                task.wait(0.4)
+                                state = "KIEM_TRA_SO_CA"
+                                task.wait(0.5)
+                            else
+                                state = "KIEM_TRA_SO_CA"
                             end
 
-                        -- BƯỚC 3: Quét và bấm chữ "tạm biệt" -> Xong ngưng quét
-                        elseif state == "TAM_BIET" then
-                            local clicked = clickText({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng"})
-                            if clicked then
-                                task.wait(0.2)
-                                break -- Dừng ngưng quét ngay lập tức
+                        -- BƯỚC 3: Đợi số cá bán giảm xuống dưới 2 con (đã giữ lại cá hiếm)
+                        elseif state == "KIEM_TRA_SO_CA" then
+                            local currentFish = getFishToSellCount()
+                            if currentFish < 2 or (tick() - sellStartTime > 6) then
+                                state = "TAM_BIET"
+                            else
+                                clickText({"bán tất cả", "sell all", "xác nhận", "confirm"})
                             end
+
+                        -- BƯỚC 4: Quét liên tục trong 3 giây tìm bấm nút "Tạm biệt"
+                        elseif state == "TAM_BIET" then
+                            local startByeTime = tick()
+
+                            while (tick() - startByeTime < 3) and isRunning do
+                                local clicked = clickText({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"})
+                                if clicked then
+                                    task.wait(0.3)
+                                    clickText({"tạm biệt", "tam biet", "goodbye", "bye", "thoát", "close", "đóng", "x"})
+                                    break
+                                end
+                                task.wait(0.15)
+                            end
+
+                            break
                         end
 
-                        task.wait(0.1)
-                    until (tick() - sellStartTime > 12) or not isRunning
+                        task.wait(0.15)
+                    until (tick() - sellStartTime > 14) or not isRunning
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
+
+                    task.wait(1.0)
 
                     pcall(function() hum.Jump = true end)
                     task.wait(0.2)
@@ -1162,7 +1183,7 @@ task.spawn(function()
                         end)
 
                         root.Anchored = false
-                        task.wait(0.2)
+                        task.wait(0.5)
                     end
                     
                     isSellingFish = false
