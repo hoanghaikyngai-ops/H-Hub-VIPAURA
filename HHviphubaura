@@ -1,6 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.6 - FLEXIBLE TEXT MATCHING INTEGRATED
--- Cập nhật: Chuẩn hóa quét chữ "Tạm biệt.", chấp nhận dấu chấm/dấu câu đi kèm
+-- H-HUB MODERN UI v9.1.7 - CUSTOM MERCHANT LOGIC INTEGRATED
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -220,7 +219,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.6"
+HeaderText.Text = "H-HUB  •  v9.1.7"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -719,7 +718,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.6 (MATCHING PUNCTUATION FIX)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tối ưu quét chữ linh hoạt (tự động loại bỏ dấu chấm/dấu câu)\n• Luồng TẠM BIỆT độc lập, quét bấm liên tục 3 giây ngay khi cá giảm\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle mở/đóng UI\n• Spam click 4 vị trí quanh mục tiêu cá\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.7 (CUSTOM MERCHANT TIMING)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Đợi 2s sau phím E -> Quét Bán Tất Cả\n• Ngừng bán khi số cá giảm > 2 con -> Đợi 2s -> Quét Tạm Biệt trong 3s\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -755,7 +754,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.6\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.7\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -927,7 +926,7 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- HÀM QUÉT CHỮ TRONG GIAO DIỆN VÀ TỰ ĐỘNG CLICK (LINH HOẠT DẤU CÂU)
+-- HÀM QUÉT CHỮ TRONG GIAO DIỆN VÀ TỰ ĐỘNG CLICK
 -- =========================================================
 local function clickText(targetTextKeywords)
     local inset = GuiService:GetGuiInset()
@@ -941,7 +940,6 @@ local function clickText(targetTextKeywords)
                     rawContentText = string.lower(obj.Name)
                 end
 
-                -- Loại bỏ ký tự đặc biệt/dấu câu để so sánh linh hoạt (ví dụ: "tạm biệt." -> "tạm biệt")
                 local cleanedText = string.gsub(rawContentText, "[%c%p%s]+", " ")
 
                 for _, kw in ipairs(targetTextKeywords) do
@@ -968,18 +966,17 @@ local function clickText(targetTextKeywords)
 end
 
 -- =========================================================
--- HÀM SPAM CLICK RIÊNG CHO NÚT TẠM BIỆT TRONG 3 GIÂY
+-- HÀM QUÉT CHỮ TẠM BIỆT LIÊN TỤC TRONG 3 GIÂY
 -- =========================================================
-local function triggerIndependentByeLoop()
+local function scanByeTextFor3Seconds()
     local byeKeywords = {
         "tạm biệt", "tam biet", "tạm biệt.", "tam biet.", 
         "goodbye", "goodbye.", "bye", "bye.", 
         "thoát", "close", "close.", "đóng", "đóng.", "x"
     }
     local startTime = tick()
-    
     while (tick() - startTime < 3.0) and isRunning do
-        local clicked = clickText(byeKeywords)
+        clickText(byeKeywords)
         task.wait(0.1)
     end
 end
@@ -1098,16 +1095,20 @@ task.spawn(function()
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                     task.wait(0.35)
 
-                    -- BẮT ĐẦU MỞ THOẠI MERCHANT BẰNG PHÍM E
+                    -- 1. BẤM E ĐỂ MỞ HỘI THOẠI MERCHANT
                     pcall(function()
                         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.08)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(1.0)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.08)
                     end)
+
+                    -- ĐỢI ĐÚNG 2 GIÂY SAU KHU BẤM E
+                    task.wait(2.0)
 
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
-                    local state = "BAN_TAT_CA"
+                    local fishLostEnough = false
 
+                    -- 2. QUÉT BÁN TẤT CẢ & XÁC NHẬN BÁN TẤT CẢ
                     repeat
                         if not isRunning then break end
 
@@ -1117,47 +1118,40 @@ task.spawn(function()
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                         end)
 
+                        -- Nhấp chọn bán tất cả và xác nhận
+                        clickText({"bán tất cả", "sell all", "bán hết", "sell"})
+                        task.wait(0.2)
+                        clickText({"xác nhận bán tất cả", "xac nhan ban tat ca", "xác nhận", "xac nhan", "confirm", "yes"})
+
                         local currentFishCount = getFishToSellCount()
 
-                        -- ĐIỀU KIỆN CHUYỂN NGAY SANG LUỒNG TẠM BIỆT: Cá giảm số lượng HOẶC dưới 2 con
-                        if (currentFishCount < initialFishCount) or (currentFishCount <= 4) then
-                            state = "TAM_BIET"
-                        end
-
-                        if state == "BAN_TAT_CA" then
-                            clickText({"bán tất cả", "sell all", "bán hết", "sell"})
-                            task.wait(0.3)
-                            state = "XAC_NHAN"
-
-                        elseif state == "XAC_NHAN" then
-                            clickText({
-                                "xác nhận bán tất cả",
-                                "xac nhan ban tat ca",
-                                "xác nhận",
-                                "xac nhan",
-                                "confirm",
-                                "yes"
-                            })
-                            task.wait(0.3)
-
-                        elseif state == "TAM_BIET" then
-                            -- KÍCH HOẠT LUỒNG QUÉT CLICK TẠM BIỆT ĐỘC LẬP TRONG 3 GIÂY
-                            triggerIndependentByeLoop()
+                        -- KIỂM TRA SỐ CÁ MẤT ĐI NHIỀU HƠN 2 CON
+                        if (initialFishCount - currentFishCount) > 2 then
+                            fishLostEnough = true
                             break
                         end
 
-                        task.wait(0.5)
+                        task.wait(0.3)
                     until (tick() - sellStartTime > 12) or not isRunning
+
+                    -- 3. ĐỢI 2 GIÂY SAU KHI SỐ CÁ MẤT > 2 CON
+                    if fishLostEnough then
+                        task.wait(2.0)
+                    end
+
+                    -- 4. QUÉT LIÊN TỤC CHỮ TẠM BIỆT TRONG 3 GIÂY
+                    scanByeTextFor3Seconds()
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
-                    task.wait(0.5)
-
-                    pcall(function() hum.Jump = true end)
                     task.wait(0.2)
 
-                    -- DỊCH CHUYỂN QUAY VỀ ĐIỂM CÂU
-                    if OriginalFishingSpotCFrame then
+                    -- 5. CHỈ BAY VỀ CHỖ CÂU NẾU SỐ CÁ THỰC SỰ ĐÃ GIẢM
+                    local finalFishCount = getFishToSellCount()
+                    if (finalFishCount < initialFishCount) and OriginalFishingSpotCFrame and isRunning then
+                        pcall(function() hum.Jump = true end)
+                        task.wait(0.2)
+
                         root.Anchored = false; hum.WalkSpeed = 16
                         
                         safeTweenToTarget(OriginalFishingSpotCFrame, 55)
@@ -1169,22 +1163,29 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
+                        -- =========================================================
+                        -- XOAY CAMERA CHUẨN XÁC VỀ HƯỚNG TRƯỚC MẶT NHÂN VẬT
+                        -- =========================================================
                         pcall(function()
-                            Camera.CameraType = Enum.CameraType.Scriptable
-                            local targetLook = OriginalFishingSpotCFrame.LookVector
-                            local headPos = (char:FindFirstChild("Head") or root).Position
-                            local camPos = headPos - (targetLook * 10) + Vector3.new(0, 3, 0)
+                            local head = char:FindFirstChild("Head") or root
+                            local lookVector = OriginalFishingSpotCFrame.LookVector
                             
-                            local camTween = TweenService:Create(Camera, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                                CFrame = CFrame.lookAt(camPos, headPos + (targetLook * 5))
-                            })
-                            camTween:Play()
-                            camTween.Completed:Wait()
+                            local targetCamPos = head.Position - (lookVector * 8) + Vector3.new(0, 2.5, 0)
+                            local targetFocus = head.Position + (lookVector * 10)
+                            
+                            Camera.CameraType = Enum.CameraType.Scriptable
+                            Camera.CFrame = CFrame.lookAt(targetCamPos, targetFocus)
+                            task.wait(0.05)
+                            
+                            Camera.Focus = CFrame.new(targetFocus)
                             Camera.CameraType = Enum.CameraType.Custom
                         end)
 
                         root.Anchored = false
                         task.wait(0.5)
+                    else
+                        -- NẾU CÁ KHÔNG GIẢM: GIỮ NGUYÊN VỊ TRÍ ĐỨNG TẠI NPC
+                        root.Anchored = false
                     end
                     
                     isSellingFish = false
