@@ -926,10 +926,12 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- HÀM QUÉT CHỮ TRONG GIAO DIỆN VÀ TỰ ĐỘNG CLICK
+-- HÀM QUÉT CHỮ TRONG GIAO DIỆN VÀ TỰ ĐỘNG CLICK (ĐÃ SỬA LỖI ĐẮC LỰC)
 -- =========================================================
 local function clickText(targetTextKeywords)
     local inset = GuiService:GetGuiInset()
+    local clicked = false
+
     for _, obj in pairs(PlayerGui:GetDescendants()) do
         if not obj:IsDescendantOf(ScreenGui) then
             if obj:IsA("GuiObject") and obj.Visible and obj.AbsoluteSize.X > 0 and obj.AbsoluteSize.Y > 0 then
@@ -946,9 +948,11 @@ local function clickText(targetTextKeywords)
                     local cleanKw = string.gsub(string.lower(kw), "[%c%p%s]+", " ")
                     
                     if rawContentText:find(string.lower(kw), 1, true) or (cleanKw ~= "" and cleanedText:find(cleanKw, 1, true)) then
+                        -- Lựa chọn 1: Giả lập click chuột ảo theo tọa độ
                         local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
                         local cx = pos.X + sz.X / 2 + inset.X
                         local cy = pos.Y + sz.Y / 2 + inset.Y
+                        
                         pcall(function()
                             VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
                             task.wait(0.02)
@@ -956,23 +960,35 @@ local function clickText(targetTextKeywords)
                             task.wait(0.03)
                             VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
                         end)
+
+                        -- Lựa chọn 2: Trigger trực tiếp sự kiện của nút Roblox nếu có
+                        pcall(function()
+                            local btn = obj:IsA("TextButton") or obj:IsA("ImageButton") and obj or obj:FindFirstAncestorOfClass("TextButton") or obj:FindFirstAncestorOfClass("ImageButton")
+                            if btn then
+                                for _, con in ipairs(getconnections(btn.MouseButton1Click)) do con:Fire() end
+                                for _, con in ipairs(getconnections(btn.Activated)) do con:Fire() end
+                            end
+                        end)
+
+                        clicked = true
                         return true
                     end
                 end
             end
         end
     end
-    return false
+    return clicked
 end
 
 -- =========================================================
--- HÀM QUÉT CHỮ TẠM BIỆT LIÊN TỤC TRONG 3 GIÂY
+-- HÀM QUÉT CHỮ TẠM BIỆT LIÊN TỤC TRONG 3 GIÂY (ĐÃ MỞ RỘNG TỪ KHÓA)
 -- =========================================================
 local function scanByeTextFor3Seconds()
     local byeKeywords = {
         "tạm biệt", "tam biet", "tạm biệt.", "tam biet.", 
+        "tạm biệt!", "tam biet!", "tạm biệt...", "tam biet...",
         "goodbye", "goodbye.", "bye", "bye.", 
-        "thoát", "close", "close.", "đóng", "đóng.", "x"
+        "thoát", "close", "close.", "đóng", "đóng.", "x", "leave"
     }
     local startTime = tick()
     while (tick() - startTime < 3.0) and isRunning do
