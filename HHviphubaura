@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.7 - STARDUST PACKET REMOTE INTEGRATED
+-- H-HUB MODERN UI v9.1.8 - INTERACTION 'E' & STARDUST REMOTE INTEGRATED
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -226,7 +226,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.7"
+HeaderText.Text = "H-HUB  •  v9.1.8"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -725,7 +725,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.7 (STARDUST PACKET REMOTE)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động gửi Remote Packet Stardust bán cá\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.8 (E KEY & STARDUST REMOTE)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Giả lập phím E tương tác + Gửi Remote Stardust\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -761,7 +761,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.7\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.8\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -1049,7 +1049,7 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- THỰC THI GỬI REMOTE BÁN CÁ VÀ LIÊN TỤC QUÉT SỐ CÁ
+                    -- THỰC THI ẤN PHÍM E MỞ HỘI THOẠI & GỬI REMOTE BÁN CÁ
                     repeat
                         if not isRunning then break end
 
@@ -1058,7 +1058,12 @@ task.spawn(function()
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                             
-                            -- Gửi RemoteEvent bán cá liên tục
+                            -- Giả lập ấn phím E để mở hội thoại / ProximityPrompt NPC
+                            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                            task.wait(0.05)
+                            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                            
+                            -- Gửi RemoteEvent bán cá
                             SellFishRemote:FireServer("SellAll")
                         end)
 
