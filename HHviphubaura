@@ -22,6 +22,15 @@ pcall(function()
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
+-- ============ TRẠNG THÁI TOÀN CỤC (FIX LỖI NIL VALUE) ============
+local isRunning = false
+local isSellingFish = false
+local isServerDmgOn = false
+local isHipSwayEnabled = false
+local OriginalFishingSpotCFrame = nil
+local merchantLockConnection = nil
+local maxFishCapacity = 50
+
 -- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
 local FONT_BOLD = Enum.Font.GothamBold
@@ -419,9 +428,6 @@ local Islands = {
     {Name = "🌋  Đảo Núi Lửa", Pos = Vector3.new(1807.50, 9.17, 1073.44)}
 }
 
-local isRunning = false
-local OriginalFishingSpotCFrame = nil
-
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -489,7 +495,6 @@ corner(FishStatus, 10); stroke(FishStatus, Color3.fromRGB(45,255,200), 1, 0.6)
 
 local MaxFishCapBtn = mkBtn(P3, "🔄  ĐỔI NGƯỠNG KHO: 50", 40, Color3.fromRGB(217, 119, 6), 2)
 
-local maxFishCapacity = 50
 local capacityOptions = {10, 20, 30, 40, 50}
 local currentCapIndex = 5
 MaxFishCapBtn.MouseButton1Click:Connect(function()
@@ -646,7 +651,7 @@ StopMusicBtn.MouseButton1Click:Connect(function()
     if currentTrackNameLabel then currentTrackNameLabel.Text = "Đã dừng" end
 end)
 
-local isHipSwayEnabled = false; local headBillboard = nil
+local headBillboard = nil
 local function updateHeadBillboard()
     local char = LocalPlayer.Character
     local head = char and char:FindFirstChild("Head")
@@ -799,10 +804,6 @@ for i, tBtn in ipairs(tabs) do tBtn.MouseButton1Click:Connect(function() switchT
 switchTab(1)
 
 -- ====================== LOGIC THU HOẠCH ======================
-local isServerDmgOn = false
-local isSellingFish = false
-local merchantLockConnection = nil
-
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
     local char = LocalPlayer.Character
@@ -871,7 +872,7 @@ local function getMerchantPosition()
             end
         end
     end
-    return vector3.new(-758.6, 18.4, 2343.3)
+    return Vector3.new(-758.6, 18.4, 2343.3)
 end
 
 -- =========================================================
@@ -927,7 +928,7 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI (FIXED)
+-- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI
 -- =========================================================
 local function clickTextUI(targetText)
     local clicked = false
@@ -941,7 +942,6 @@ local function clickTextUI(targetText)
                             local absPos = element.AbsolutePosition
                             local absSize = element.AbsoluteSize
                             
-                            -- SỬA LỖI: Không cộng inset vì VirtualInputManager đã tự động tính theo toàn bộ màn hình
                             local clickX = absPos.X + (absSize.X / 2)
                             local clickY = absPos.Y + (absSize.Y / 2)
 
@@ -1025,7 +1025,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (CẬP NHẬT LUỒNG BÁN CÁ)
+-- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
