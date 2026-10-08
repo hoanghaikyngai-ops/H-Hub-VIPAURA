@@ -855,7 +855,7 @@ task.spawn(function()
         task.wait(1)
         pcall(function() 
             local fishCount = getFishToSellCount()
-            FishStatus.Text = "🎒 Kho cá: " .. fishCount .. " / Ngưỡng bán: 50"
+            FishStatus.Text = "🎒 Kho cá: " .. fishCount .. " / Ngưỡng bán: " .. maxFishCapacity
             ToggleBtn.Text = "  ◈  H-HUB (" .. fishCount .. "/" .. maxFishCapacity .. ")"
         end)
     end
@@ -1026,7 +1026,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (CẬP NHẬT THỜI GIAN CHỜ)
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1078,7 +1078,7 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- THỰC THI ẤN E & BẤM VÀO CÁC CHỮ VĂN BẢN HỘI THOẠI
+                    -- THỰC THI QUY TRÌNH HỘI THOẠI CÓ DELAY CHÍNH XÁC
                     repeat
                         if not isRunning then break end
 
@@ -1087,11 +1087,13 @@ task.spawn(function()
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                             
-                            -- 1. Giả lập ấn phím E để mở cuộc trò chuyện NPC
+                            -- 1. Giả lập ấn phím E để mở cuộc trò chuyện với NPC
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                             task.wait(0.05)
                             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                            task.wait(0.3)
+                            
+                            -- ⏳ ĐỜI ĐÚNG 2 GIÂY TRƯỚC KHI BẤM BÁN TẤT CẢ
+                            task.wait(2)
 
                             -- 2. Click vào chữ "Bán tất cả"
                             clickTextUI("bán tất cả")
@@ -1099,14 +1101,16 @@ task.spawn(function()
 
                             -- 3. Click vào chữ "Xác nhận bán tất cả" hoặc "Xác nhận"
                             clickTextUI("xác nhận")
-                            task.wait(0.3)
+                            
+                            -- ⏳ ĐỜI ĐÚNG 3 GIÂY TRƯỚC KHI BẤM TẠM BIỆT
+                            task.wait(3)
 
                             -- 4. Click vào chữ "Tạm biệt"
                             clickTextUI("tạm biệt")
                         end)
 
                         task.wait(0.25)
-                    until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 10) or not isRunning
+                    until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 15) or not isRunning
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
