@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.9 - CLICK TEXT INTERACTION INTEGRATED (FIXED)
+-- H-HUB MODERN UI v9.1.9 - CLICK TEXT INTERACTION INTEGRATED
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -21,15 +21,6 @@ pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
-
--- ============ TRẠNG THÁI TOÀN CỤC (FIX LỖI NIL VALUE) ============
-local isRunning = false
-local isSellingFish = false
-local isServerDmgOn = false
-local isHipSwayEnabled = false
-local OriginalFishingSpotCFrame = nil
-local merchantLockConnection = nil
-local maxFishCapacity = 50
 
 -- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
@@ -428,6 +419,9 @@ local Islands = {
     {Name = "🌋  Đảo Núi Lửa", Pos = Vector3.new(1807.50, 9.17, 1073.44)}
 }
 
+local isRunning = false
+local OriginalFishingSpotCFrame = nil
+
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -495,6 +489,7 @@ corner(FishStatus, 10); stroke(FishStatus, Color3.fromRGB(45,255,200), 1, 0.6)
 
 local MaxFishCapBtn = mkBtn(P3, "🔄  ĐỔI NGƯỠNG KHO: 50", 40, Color3.fromRGB(217, 119, 6), 2)
 
+local maxFishCapacity = 50
 local capacityOptions = {10, 20, 30, 40, 50}
 local currentCapIndex = 5
 MaxFishCapBtn.MouseButton1Click:Connect(function()
@@ -651,7 +646,7 @@ StopMusicBtn.MouseButton1Click:Connect(function()
     if currentTrackNameLabel then currentTrackNameLabel.Text = "Đã dừng" end
 end)
 
-local headBillboard = nil
+local isHipSwayEnabled = false; local headBillboard = nil
 local function updateHeadBillboard()
     local char = LocalPlayer.Character
     local head = char and char:FindFirstChild("Head")
@@ -804,6 +799,10 @@ for i, tBtn in ipairs(tabs) do tBtn.MouseButton1Click:Connect(function() switchT
 switchTab(1)
 
 -- ====================== LOGIC THU HOẠCH ======================
+local isServerDmgOn = false
+local isSellingFish = false
+local merchantLockConnection = nil
+
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
     local char = LocalPlayer.Character
@@ -872,7 +871,7 @@ local function getMerchantPosition()
             end
         end
     end
-    return Vector3.new(-758.6, 18.4, 2343.3)
+    return Vector3.new(-758.1, 18.8, 2344.3)
 end
 
 -- =========================================================
@@ -941,9 +940,10 @@ local function clickTextUI(targetText)
                         if textVal:find(string.lower(targetText)) then
                             local absPos = element.AbsolutePosition
                             local absSize = element.AbsoluteSize
+                            local inset = GuiService:GetGuiInset()
                             
-                            local clickX = absPos.X + (absSize.X / 2)
-                            local clickY = absPos.Y + (absSize.Y / 2)
+                            local clickX = absPos.X + (absSize.X / 2) + inset.X
+                            local clickY = absPos.Y + (absSize.Y / 2) + inset.Y
 
                             VirtualInputManager:SendMouseMoveEvent(clickX, clickY, game)
                             VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, game, 1)
@@ -1002,6 +1002,7 @@ task.spawn(function()
         {key = Enum.KeyCode.Z, index = 1}, {key = Enum.KeyCode.X, index = 2},
         {key = Enum.KeyCode.C, index = 3}, {key = Enum.KeyCode.V, index = 4}
     }
+    local inset = GuiService:GetGuiInset()
 
     while ScreenGui.Parent do
         task.wait(0.01)
@@ -1015,8 +1016,8 @@ task.spawn(function()
                     local btn = markerButtons[skill.index]
                     if btn and MarkersGui.Enabled then
                         local pos, sz = btn.AbsolutePosition, btn.AbsoluteSize
-                        VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2, pos.Y + sz.Y/2, 0, true, game, 1); task.wait(0.003)
-                        VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2, pos.Y + sz.Y/2, 0, false, game, 1); task.wait(0.003)
+                        VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, true, game, 1); task.wait(0.003)
+                        VirtualInputManager:SendMouseButtonEvent(pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y, 0, false, game, 1); task.wait(0.003)
                     end
                 end)
             end
@@ -1025,7 +1026,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (ĐÃ CẬP NHẬT QUY TRÌNH BÁN CÁ)
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1077,7 +1078,7 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- THỰC THI QUY TRÌNH HỘI THOẠI CÓ KIỂM TRA LINH HOẠT
+                    -- THỰC THI QUY TRÌNH HỘI THOẠI MỚI CHÍNH XÁC
                     repeat
                         if not isRunning then break end
 
@@ -1086,31 +1087,29 @@ task.spawn(function()
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                             
-                            -- 1. Giả lập ấn phím E để mở cuộc trò chuyện
+                            -- 1. Giả lập ấn phím E để mở cuộc trò chuyện với NPC
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                             task.wait(0.05)
                             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                             
-                            -- 2. Thử bấm "Bán tất cả"
-                            local t0 = tick()
-                            repeat
-                                if clickTextUI("bán") or clickTextUI("sell") then break end
-                                task.wait(0.15)
-                            until tick() - t0 > 2
+                            -- ⏳ Chờ 1 giây cho NPC hiện hội thoại
+                            task.wait(1)
 
+                            -- 2. Click vào chữ "Bán tất cả"
+                            clickTextUI("bán tất cả")
                             task.wait(0.3)
 
-                            -- 3. Bấm "Xác nhận"
-                            clickTextUI("xác nhận") or clickTextUI("confirm")
+                            -- 3. Click vào chữ "Xác nhận bán tất cả" hoặc "Xác nhận"
+                            clickTextUI("xác nhận")
                             
-                            task.wait(0.4)
+                            -- ⏳ Chờ 1.5 giây sau khi xác nhận bán
+                            task.wait(1.5)
 
-                            -- 4. Quét và bấm "Tạm biệt" liên tục trong 2.5 giây
-                            local t1 = tick()
-                            repeat
-                                if clickTextUI("tạm biệt") or clickTextUI("bye") or clickTextUI("đóng") then break end
-                                task.wait(0.15)
-                            until tick() - t1 > 2.5
+                            -- 4. Click vào chữ "Tạm biệt"
+                            clickTextUI("tạm biệt")
+                            
+                            -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
+                            task.wait(0.5)
                         end)
 
                         task.wait(0.25)
