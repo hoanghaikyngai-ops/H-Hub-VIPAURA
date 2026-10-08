@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.7 - CUSTOM MERCHANT LOGIC INTEGRATED
+-- H-HUB MODERN UI v9.1.7 - STARDUST PACKET REMOTE INTEGRATED
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -11,6 +11,7 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -20,6 +21,12 @@ pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
+
+-- ============ REMOTE BÁN CÁ CHÍNH XÁC TỪ CONSOLE ============
+local SellFishRemote = ReplicatedStorage:WaitForChild("Stardust")
+    :WaitForChild("Packages")
+    :WaitForChild("Packet")
+    :WaitForChild("RemoteEvent")
 
 -- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
@@ -718,7 +725,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.7 (CUSTOM MERCHANT TIMING)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Đợi 2s sau phím E -> Quét Bán Tất Cả\n• Ngừng bán khi số cá giảm > 2 con -> Đợi 2s -> Quét Tạm Biệt trong 3s\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.7 (STARDUST PACKET REMOTE)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động gửi Remote Packet Stardust bán cá\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Tự động nảy gỡ kẹt khi bị chặn đè bởi địa hình\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -926,78 +933,6 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- HÀM QUÉT CHỮ TRONG GIAO DIỆN VÀ TỰ ĐỘNG CLICK (ĐÃ SỬA LỖI ĐẮC LỰC)
--- =========================================================
-local function clickText(targetTextKeywords)
-    local inset = GuiService:GetGuiInset()
-    local clicked = false
-
-    for _, obj in pairs(PlayerGui:GetDescendants()) do
-        if not obj:IsDescendantOf(ScreenGui) then
-            if obj:IsA("GuiObject") and obj.Visible and obj.AbsoluteSize.X > 0 and obj.AbsoluteSize.Y > 0 then
-                local rawContentText = ""
-                if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
-                    rawContentText = string.lower(obj.Text)
-                else
-                    rawContentText = string.lower(obj.Name)
-                end
-
-                local cleanedText = string.gsub(rawContentText, "[%c%p%s]+", " ")
-
-                for _, kw in ipairs(targetTextKeywords) do
-                    local cleanKw = string.gsub(string.lower(kw), "[%c%p%s]+", " ")
-                    
-                    if rawContentText:find(string.lower(kw), 1, true) or (cleanKw ~= "" and cleanedText:find(cleanKw, 1, true)) then
-                        -- Lựa chọn 1: Giả lập click chuột ảo theo tọa độ
-                        local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
-                        local cx = pos.X + sz.X / 2 + inset.X
-                        local cy = pos.Y + sz.Y / 2 + inset.Y
-                        
-                        pcall(function()
-                            VirtualInputManager:SendMouseMoveEvent(cx, cy, game)
-                            task.wait(0.02)
-                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
-                            task.wait(0.03)
-                            VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                        end)
-
-                        -- Lựa chọn 2: Trigger trực tiếp sự kiện của nút Roblox nếu có
-                        pcall(function()
-                            local btn = obj:IsA("TextButton") or obj:IsA("ImageButton") and obj or obj:FindFirstAncestorOfClass("TextButton") or obj:FindFirstAncestorOfClass("ImageButton")
-                            if btn then
-                                for _, con in ipairs(getconnections(btn.MouseButton1Click)) do con:Fire() end
-                                for _, con in ipairs(getconnections(btn.Activated)) do con:Fire() end
-                            end
-                        end)
-
-                        clicked = true
-                        return true
-                    end
-                end
-            end
-        end
-    end
-    return clicked
-end
-
--- =========================================================
--- HÀM QUÉT CHỮ TẠM BIỆT LIÊN TỤC TRONG 3 GIÂY (ĐÃ MỞ RỘNG TỪ KHÓA)
--- =========================================================
-local function scanByeTextFor3Seconds()
-    local byeKeywords = {
-        "tạm biệt", "tam biet", "tạm biệt.", "tam biet.", 
-        "tạm biệt!", "tam biet!", "tạm biệt...", "tam biet...",
-        "goodbye", "goodbye.", "bye", "bye.", 
-        "thoát", "close", "close.", "đóng", "đóng.", "x", "leave"
-    }
-    local startTime = tick()
-    while (tick() - startTime < 3.0) and isRunning do
-        clickText(byeKeywords)
-        task.wait(0.1)
-    end
-end
-
--- =========================================================
 -- HÀM QUÉT CÁ TRONG BÁN KÍNH 90 STUDS
 -- =========================================================
 local function getTargetFishPosition2D()
@@ -1111,20 +1046,10 @@ task.spawn(function()
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                     task.wait(0.35)
 
-                    -- 1. BẤM E ĐỂ MỞ HỘI THOẠI MERCHANT
-                    pcall(function()
-                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game); task.wait(0.08)
-                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game); task.wait(0.08)
-                    end)
-
-                    -- ĐỢI ĐÚNG 2 GIÂY SAU KHU BẤM E
-                    task.wait(2.0)
-
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
-                    local fishLostEnough = false
 
-                    -- 2. QUÉT BÁN TẤT CẢ & XÁC NHẬN BÁN TẤT CẢ
+                    -- THỰC THI GỬI REMOTE BÁN CÁ (PACKET STARDUST)
                     repeat
                         if not isRunning then break end
 
@@ -1132,37 +1057,19 @@ task.spawn(function()
                             root.Anchored = false
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                            
+                            -- Bắn tín hiệu bán tất cả cá
+                            SellFishRemote:FireServer("SellAll")
                         end)
 
-                        -- Nhấp chọn bán tất cả và xác nhận
-                        clickText({"bán tất cả", "sell all", "bán hết", "sell"})
-                        task.wait(0.2)
-                        clickText({"xác nhận bán tất cả", "xac nhan ban tat ca", "xác nhận", "xac nhan", "confirm", "yes"})
-
-                        local currentFishCount = getFishToSellCount()
-
-                        -- KIỂM TRA SỐ CÁ MẤT ĐI NHIỀU HƠN 2 CON
-                        if (initialFishCount - currentFishCount) > 2 then
-                            fishLostEnough = true
-                            break
-                        end
-
-                        task.wait(0.3)
-                    until (tick() - sellStartTime > 12) or not isRunning
-
-                    -- 3. ĐỢI 2 GIÂY SAU KHI SỐ CÁ MẤT > 2 CON
-                    if fishLostEnough then
-                        task.wait(2.0)
-                    end
-
-                    -- 4. QUÉT LIÊN TỤC CHỮ TẠM BIỆT TRONG 3 GIÂY
-                    scanByeTextFor3Seconds()
+                        task.wait(0.5)
+                    until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 10) or not isRunning
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
                     task.wait(0.2)
 
-                    -- 5. CHỈ BAY VỀ CHỖ CÂU NẾU SỐ CÁ THỰC SỰ ĐÃ GIẢM
+                    -- CHỈ BAY VỀ CHỖ CÂU NẾU SỐ CÁ THỰC SỰ ĐÃ GIẢM
                     local finalFishCount = getFishToSellCount()
                     if (finalFishCount < initialFishCount) and OriginalFishingSpotCFrame and isRunning then
                         pcall(function() hum.Jump = true end)
@@ -1179,9 +1086,7 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- =========================================================
-                        -- XOAY CAMERA CHUẨN XÁC VỀ HƯỚNG TRƯỚC MẶT NHÂN VẬT
-                        -- =========================================================
+                        -- XOAY CAMERA VỀ HƯỚNG TRƯỚC MẶT NHÂN VẬT
                         pcall(function()
                             local head = char:FindFirstChild("Head") or root
                             local lookVector = OriginalFishingSpotCFrame.LookVector
