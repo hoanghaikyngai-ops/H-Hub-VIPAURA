@@ -1049,7 +1049,7 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- THỰC THI GỬI REMOTE BÁN CÁ (PACKET STARDUST)
+                    -- THỰC THI GỬI REMOTE BÁN CÁ VÀ LIÊN TỤC QUÉT SỐ CÁ
                     repeat
                         if not isRunning then break end
 
@@ -1058,11 +1058,11 @@ task.spawn(function()
                             hum.WalkSpeed = 0
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                             
-                            -- Bắn tín hiệu bán tất cả cá
+                            -- Gửi RemoteEvent bán cá liên tục
                             SellFishRemote:FireServer("SellAll")
                         end)
 
-                        task.wait(0.5)
+                        task.wait(0.2)
                     until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 10) or not isRunning
 
                     if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
