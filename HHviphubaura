@@ -871,7 +871,7 @@ local function getMerchantPosition()
             end
         end
     end
-    return Vector3.new(-758.6, 18.4, 2343.3)
+    return vector3.new(-758.6, 18.4, 2343.3)
 end
 
 -- =========================================================
