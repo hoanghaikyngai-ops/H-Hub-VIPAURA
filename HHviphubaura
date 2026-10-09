@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.9 - CLICK TEXT INTERACTION INTEGRATED
+-- H-HUB MODERN UI v9.1.9 - UI CLICK OFFSET ADJUSTED
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -941,9 +941,10 @@ local function clickTextUI(targetText)
                             local absPos = element.AbsolutePosition
                             local absSize = element.AbsoluteSize
                             local inset = GuiService:GetGuiInset()
-                            
-                            local clickX = absPos.X + (absSize.X / 2) + inset.X
-                            local clickY = absPos.Y + (absSize.Y / 2) + inset.Y
+
+                            -- Bỏ inset do IgnoreGuiInset = true, đẩy tâm click dịch lên trên 25px và sang phải 15px để sửa lệch
+                            local clickX = absPos.X + (absSize.X / 2) + 15
+                            local clickY = absPos.Y + (absSize.Y / 2) - 25
 
                             VirtualInputManager:SendMouseMoveEvent(clickX, clickY, game)
                             VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, game, 1)
@@ -1115,7 +1116,7 @@ task.spawn(function()
                             -- ⏳ Chờ khoảng 1 giây để load full thoại
                             task.wait(1)
 
-                            -- 4. Click vào chữ "Tạm biệt."
+                            -- 4. Click vào chữ "Tạm biệt"
                             clickTextUI("tạm biệt")
                             
                             -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
