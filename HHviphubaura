@@ -1145,7 +1145,7 @@ task.spawn(function()
                             task.wait(1)
 
                             -- Tạm biệt
-                            clickTextUI("tạm biệt")
+                            clickTextUI("tạm biệt.")
                             
                             task.wait(0.5)
                         end)
