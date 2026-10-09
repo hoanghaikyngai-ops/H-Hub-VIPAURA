@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.2.1 - REALTIME SERVER SYNC & PRECISION CLICK
+-- H-HUB MODERN UI v9.2.2 - NO-DESYNC & PERFECT UI CLICK
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -220,7 +220,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.2.1"
+HeaderText.Text = "H-HUB  •  v9.2.2"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -649,7 +649,7 @@ end)
 local isHipSwayEnabled = false; local headBillboard = nil
 local function updateHeadBillboard()
     local char = LocalPlayer.Character
-    local head = char and char:FindFirst("Head")
+    local head = char and char:FindFirstChild("Head")
     if not isHipSwayEnabled or not head then
         if headBillboard then headBillboard:Destroy(); headBillboard = nil end
         return
@@ -719,7 +719,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.1 (REALTIME SERVER SYNC & PRECISION CLICK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Mở khóa hoàn toàn Anchored = false và WalkSpeed = 16 liên tục khi Tween\n• Bỏ lực đẩy AssemblyVelocity tránh giật ngược vị trí\n• Nhấp nhả nhảy (Jump) và NoClip liên tục khi di chuyển\n• Điểm click UI nâng chuẩn 6px vào chính tâm dòng chữ hội thoại\n• Bán cá hoàn tất mới bay về vị trí cũ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.2 (NO-DESYNC & PERFECT UI CLICK)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Đã khắc phục triệt để lỗi giật lùi vị trí khi Tween bay đi bán cá\n• Tự động xả vận tốc tồn dư và mở thả khóa chân trong suốt quá trình di chuyển\n• Căn chỉnh vị trí click UI nâng thêm 3px rơi thẳng vào trọng tâm ô thoại\n• Bán cá xong hoàn tất mới bay về điểm câu cũ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -755,7 +755,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.1\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.2\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -801,7 +801,6 @@ switchTab(1)
 -- ====================== LOGIC THU HOẠCH ======================
 local isServerDmgOn = false
 local isSellingFish = false
-local merchantLockConnection = nil
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
@@ -816,7 +815,6 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
         OriginalFishingSpotCFrame = nil; isSellingFish = false
-        if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
         pcall(function() if root then root.Anchored = false end; if hum then hum.WalkSpeed = 16 end end)
     end
 end)
@@ -875,7 +873,7 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- NOCLIP VÀ TWEEN CHỐNG GIẬT (MỞ THẢ KHÓA CHÂN RÕ RÀNG)
+-- NOCLIP VÀ TWEEN CHỐNG GIẬT HOÀN HẢO (NO-DESYNC)
 -- =========================================================
 local function setCharacterNoClip(enabled)
     pcall(function()
@@ -896,7 +894,7 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if not root then return end
 
-    -- BỎ HOÀN TOÀN KHÓA CHÂN TRƯỚC KHI TWEEN
+    -- BỎ HOÀN TOÀN KHÓA CHÂN TRƯỚC VÀ TRONG KHI TWEEN
     root.Anchored = false
     if hum then hum.WalkSpeed = 16 end
     root.AssemblyLinearVelocity = Vector3.zero
@@ -917,13 +915,19 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
         task.wait(0.05)
         setCharacterNoClip(true)
 
-        -- ĐẢM BẢO LUÔN MỞ CHÂN TRONG SUỐT QUÁ TRÌNH TWEEN
+        -- GIỮ CHÂN KHÔNG BỊ KHÓA LIÊN TỤC VÀ HỦY LỰC ĐẨY
         root.Anchored = false
         if hum then hum.WalkSpeed = 16 end
+        root.AssemblyLinearVelocity = Vector3.zero
 
-        -- NHẤP NHẢ JUMP MỖI 0.3 GIÂY ĐỂ ĐỒNG BỘ TỌA ĐỘ VỚI SERVER
+        -- XOAY CAMERA VỀ HƯỚNG ĐIỂM ĐẾN MỘT CÁCH MƯỢT MÀ
+        pcall(function()
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetCFrame.Position)
+        end)
+
+        -- NHẤP NHẢ JUMP MỖI 0.35 GIÂY ĐỂ ĐỒNG BỘ TỌA ĐỘ CHUẨN XÁC VỚI SERVER
         jumpTimer = jumpTimer + 0.05
-        if jumpTimer >= 0.3 then
+        if jumpTimer >= 0.35 then
             jumpTimer = 0
             if hum then hum.Jump = true end
         end
@@ -949,7 +953,7 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- LOGIC QUÉT VÀ CLICK TỌA ĐỘ CHÍNH XÁC (TĂNG 2PX TỪ MỨC THẤP)
+-- LOGIC QUÉT VÀ CLICK TỌA ĐỘ CHÍNH XÁC (NÂNG THÊM 3PX LÊN -3PX)
 -- =========================================================
 local function clickTextUI(targetText)
     local clicked = false
@@ -964,9 +968,9 @@ local function clickTextUI(targetText)
                             local absSize = element.AbsoluteSize
                             local inset = GuiService:GetGuiInset()
 
-                            -- Nâng tọa độ Y lên 2px chuẩn xác (từ -8px lên -6px)
+                            -- Nâng tọa độ Y thêm 3px (từ -6px lên -3px)
                             local clickX = absPos.X + (absSize.X / 2) + inset.X
-                            local clickY = absPos.Y + (absSize.Y / 2) + inset.Y - 6
+                            local clickY = absPos.Y + (absSize.Y / 2) + inset.Y - 3
 
                             VirtualInputManager:SendMouseMoveEvent(clickX, clickY, game)
                             VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, game, 1)
@@ -1072,7 +1076,7 @@ task.spawn(function()
                         VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
                     end)
 
-                    -- ĐẢM BẢO THẢ KHÓA CHÂN RÕ RÀNG TRƯỚC KHI MỞ CÂU LỆNH BAY
+                    -- MỞ THẢ KHÓA CHÂN RÕ RÀNG TRƯỚC KHI BAY
                     root.Anchored = false
                     hum.WalkSpeed = 16
                     root.AssemblyLinearVelocity = Vector3.zero
@@ -1080,30 +1084,14 @@ task.spawn(function()
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
-                    
-                    if merchantLockConnection then merchantLockConnection:Disconnect() end
 
-                    merchantLockConnection = RunService.RenderStepped:Connect(function()
-                        pcall(function()
-                            local cc = LocalPlayer.Character
-                            local cr = cc and cc:FindFirstChild("HumanoidRootPart")
-                            local ch = cc and cc:FindFirstChildOfClass("Humanoid")
-                            if cr and dynamicMerchantPos then
-                                cr.Anchored = false
-                                if ch then ch.WalkSpeed = 16 end
-                                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
-                                cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
-                            end
-                        end)
-                    end)
-
-                    -- 1. BAY ĐẾN NPC (MỞ KHÓA CHÂN TRONG SUỐT QUÁ TRÌNH TWEEN)
+                    -- 1. BAY ĐẾN NPC (MỞ KHÓA CHÂN TRONG SUỐT QUÁ TRÌNH TWEEN, CÓ NOCLIP & JUMP)
                     safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
                     
-                    -- ĐẾN NƠI -> ĐỒNG BỘ LẠI TỌA ĐỘ CHUẨN XÁC
+                    -- ĐẾN NƠI -> ĐỒNG BỘ VỊ TRÍ VÀ HƯỚNG NHÌN NPC
                     root.Anchored = false
                     hum.WalkSpeed = 16
-                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                    root.CFrame = CFrame.lookAt(safeTargetPos, Vector3.new(dynamicMerchantPos.X, safeTargetPos.Y, dynamicMerchantPos.Z))
                     pcall(function() hum.Jump = true end)
                     task.wait(0.35)
 
@@ -1117,7 +1105,7 @@ task.spawn(function()
                         pcall(function()
                             root.Anchored = false
                             hum.WalkSpeed = 16
-                            root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                            root.CFrame = CFrame.lookAt(safeTargetPos, Vector3.new(dynamicMerchantPos.X, safeTargetPos.Y, dynamicMerchantPos.Z))
                             
                             -- Giả lập phím E
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
@@ -1145,15 +1133,13 @@ task.spawn(function()
                             task.wait(1)
 
                             -- Tạm biệt
-                            clickTextUI("tạm biệt.")
+                            clickTextUI("tạm biệt")
                             
                             task.wait(0.5)
                         end)
 
                         task.wait(0.25)
                     until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 15) or not isRunning
-
-                    if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
 
                     task.wait(0.2)
 
