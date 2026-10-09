@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.9 - UI CLICK OFFSET ADJUSTED
+-- H-HUB MODERN UI v9.1.9 - FINE-TUNED UI CLICK OFFSET
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -927,7 +927,7 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 end
 
 -- =========================================================
--- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI
+-- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI (ĐÃ CHỈNH LẠI OFFSET NÂNG CAO CỰC CHUẨN)
 -- =========================================================
 local function clickTextUI(targetText)
     local clicked = false
@@ -942,9 +942,11 @@ local function clickTextUI(targetText)
                             local absSize = element.AbsoluteSize
                             local inset = GuiService:GetGuiInset()
 
-                            -- Bỏ inset do IgnoreGuiInset = true, đẩy tâm click dịch lên trên 25px và sang phải 15px để sửa lệch
-                            local clickX = absPos.X + (absSize.X / 2) + 15
-                            local clickY = absPos.Y + (absSize.Y / 2) - 25
+                            -- Tính toán lại độ lệch chuẩn:
+                            -- Tinh chỉnh hạ độ lệch Y từ -25px xuống còn -8px (tính theo inset chuẩn hệ thống)
+                            -- Giữ offset X = 0 để căn đúng giữa tâm chữ
+                            local clickX = absPos.X + (absSize.X / 2) + inset.X
+                            local clickY = absPos.Y + (absSize.Y / 2) + inset.Y - 8
 
                             VirtualInputManager:SendMouseMoveEvent(clickX, clickY, game)
                             VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, game, 1)
@@ -1117,7 +1119,7 @@ task.spawn(function()
                             task.wait(1)
 
                             -- 4. Click vào chữ "Tạm biệt"
-                            clickTextUI("tạm biệt.")
+                            clickTextUI("tạm biệt")
                             
                             -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
                             task.wait(0.5)
@@ -1193,7 +1195,7 @@ task.spawn(function()
                     for _, offset in ipairs(offsets) do
                         if not isRunning or isSellingFish then break end
                         local latestPos = getTargetFishPosition2D() or currentFishPos
-                        if not latestPos then break end
+                        if not latestPos me
                         local targetClickPos = latestPos + offset
 
                         pcall(function()
