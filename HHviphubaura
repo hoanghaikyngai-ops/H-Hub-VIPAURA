@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.9 - CLICK TEXT INTERACTION INTEGRATED
+-- H-HUB MODERN UI v9.2.4 - DIRECT UI CLICK & FORCE UNFREEZE
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -21,6 +21,12 @@ pcall(function()
     if PlayerGui:FindFirstChild("HHubVipUI") then PlayerGui.HHubVipUI:Destroy() end
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
+
+-- ============ REMOTE BÁN CÁ STARDUST ============
+local SellFishRemote = ReplicatedStorage:WaitForChild("Stardust")
+    :WaitForChild("Packages")
+    :WaitForChild("Packet")
+    :WaitForChild("RemoteEvent")
 
 -- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
@@ -220,7 +226,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.9"
+HeaderText.Text = "H-HUB  •  v9.2.4"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -422,6 +428,19 @@ local Islands = {
 local isRunning = false
 local OriginalFishingSpotCFrame = nil
 
+local function forceUnfreezeCharacter()
+    pcall(function()
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if root then root.Anchored = false end
+        if hum then
+            hum.WalkSpeed = 16
+            hum.PlatformStand = false
+        end
+    end)
+end
+
 local function teleportAndRespawnAtIsland(targetPos)
     pcall(function()
         local char = LocalPlayer.Character
@@ -442,8 +461,7 @@ local function teleportAndRespawnAtIsland(targetPos)
                 if newRoot and newHum then
                     local targetCFrame = CFrame.new(targetPos + Vector3.new(0, 2, 0))
                     newChar:PivotTo(targetCFrame)
-                    newRoot.Anchored = false
-                    newHum.WalkSpeed = 16
+                    forceUnfreezeCharacter()
 
                     if isRunning then
                         OriginalFishingSpotCFrame = targetCFrame
@@ -719,7 +737,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.9 (UI TEXT CLICKING INTEGRATED)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động quét và click chữ 'Bán tất cả', 'Xác nhận', 'Tạm biệt'\n• Giả lập phím E tương tác ban đầu\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.4 (DIRECT UI CLICK & FORCE UNFREEZE)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Kích hoạt event UI trực tiếp không sợ lệch tọa độ màn hình\n• Khóa mở chân liên tục từng khung hình bằng forceUnfreezeCharacter\n• Tự động xả vận tốc tồn dư và nhấp nhả Jump kích hoạt tự do\n• Bán cá xong hoàn tất mới bay về điểm câu cũ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -755,7 +773,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.9\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.4\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -801,23 +819,21 @@ switchTab(1)
 -- ====================== LOGIC THU HOẠCH ======================
 local isServerDmgOn = false
 local isSellingFish = false
-local merchantLockConnection = nil
 
 AutoToggleBtn.MouseButton1Click:Connect(function()
     isRunning = not isRunning
-    local char = LocalPlayer.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
     if isRunning then
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: CHẠY"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
-        if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = false; if hum then hum.WalkSpeed = 0 end end
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if root then OriginalFishingSpotCFrame = root.CFrame end
+        forceUnfreezeCharacter()
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
         OriginalFishingSpotCFrame = nil; isSellingFish = false
-        if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
-        pcall(function() if root then root.Anchored = false end; if hum then hum.WalkSpeed = 16 end end)
+        forceUnfreezeCharacter()
     end
 end)
 
@@ -871,11 +887,11 @@ local function getMerchantPosition()
             end
         end
     end
-    return Vector3.new(-758.1, 18.8, 2344.3)
+    return Vector3.new(1929.41, 9.79, 1093.12)
 end
 
 -- =========================================================
--- NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
+-- NOCLIP VÀ TWEEN KHÔNG GIẬT LÙI
 -- =========================================================
 local function setCharacterNoClip(enabled)
     pcall(function()
@@ -893,10 +909,14 @@ end
 local function safeTweenToTarget(targetCFrame, travelSpeed)
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
     if not root then return end
 
+    forceUnfreezeCharacter()
+    if hum then hum.Jump = true end
+    root.AssemblyLinearVelocity = Vector3.zero
+    root.AssemblyAngularVelocity = Vector3.zero
     setCharacterNoClip(true)
-    root.Anchored = false
 
     local dist = (root.Position - targetCFrame.Position).Magnitude
     local duration = math.max(dist / (travelSpeed or 55), 0.1)
@@ -906,14 +926,27 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 
     local lastCheckPos = root.Position
     local stuckCounter = 0
+    local jumpTimer = 0
 
     while tween.PlaybackState == Enum.PlaybackState.Playing and isRunning do
-        task.wait(0.2)
+        task.wait(0.05)
         setCharacterNoClip(true)
+        forceUnfreezeCharacter()
+        root.AssemblyLinearVelocity = Vector3.zero
+
+        pcall(function()
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetCFrame.Position)
+        end)
+
+        jumpTimer = jumpTimer + 0.05
+        if jumpTimer >= 0.35 then
+            jumpTimer = 0
+            if hum then hum.Jump = true end
+        end
 
         if (root.Position - lastCheckPos).Magnitude < 0.8 then
-            stuckCounter = stuckCounter + 0.2
-            if stuckCounter >= 1.2 then
+            stuckCounter = stuckCounter + 0.05
+            if stuckCounter >= 1.0 then
                 root.CFrame = root.CFrame + Vector3.new(0, 10, 0)
                 stuckCounter = 0
             end
@@ -923,14 +956,17 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
         lastCheckPos = root.Position
     end
 
+    tween:Cancel()
     setCharacterNoClip(false)
+    forceUnfreezeCharacter()
+    root.AssemblyLinearVelocity = Vector3.zero
 end
 
 -- =========================================================
--- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI
+-- LOGIC KÍCH HOẠT UI TRỰC TIẾP (DIRECT EVENT + VIRTUAL CLICK)
 -- =========================================================
-local function clickTextUI(targetText)
-    local clicked = false
+local function triggerTargetUI(targetText)
+    local triggered = false
     pcall(function()
         for _, gui in ipairs(PlayerGui:GetChildren()) do
             if gui:IsA("ScreenGui") and gui.Enabled and gui.Name ~= "HHubVipUI" and gui.Name ~= "SkillMarkersUI" then
@@ -938,27 +974,40 @@ local function clickTextUI(targetText)
                     if (element:IsA("TextLabel") or element:IsA("TextButton")) and element.Visible then
                         local textVal = string.lower(element.Text)
                         if textVal:find(string.lower(targetText)) then
+                            
+                            -- 1. Ưu tiên Kích hoạt Event của Roblox UI trực tiếp
+                            local clickableObj = element:IsA("TextButton") and element or element.Parent
+                            if clickableObj and clickableObj:IsA("TextButton") then
+                                for _, conn in ipairs(getconnections and getconnections(clickableObj.MouseButton1Click) or {}) do
+                                    conn:Fire()
+                                    triggered = true
+                                end
+                                for _, conn in ipairs(getconnections and getconnections(clickableObj.Activated) or {}) do
+                                    conn:Fire()
+                                    triggered = true
+                                end
+                            end
+
+                            -- 2. Fallback Click ảo tính tâm thực tế đối tượng
                             local absPos = element.AbsolutePosition
                             local absSize = element.AbsoluteSize
-                            local inset = GuiService:GetGuiInset()
-                            
-                            local clickX = absPos.X + (absSize.X / 2) + inset.X
-                            local clickY = absPos.Y + (absSize.Y / 2) + inset.Y
+                            local centerClickX = absPos.X + (absSize.X / 2)
+                            local centerClickY = absPos.Y + (absSize.Y / 2)
 
-                            VirtualInputManager:SendMouseMoveEvent(clickX, clickY, game)
-                            VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, game, 1)
+                            VirtualInputManager:SendMouseMoveEvent(centerClickX, centerClickY, game)
+                            VirtualInputManager:SendMouseButtonEvent(centerClickX, centerClickY, 0, true, game, 1)
                             task.wait(0.05)
-                            VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, false, game, 1)
-                            clicked = true
+                            VirtualInputManager:SendMouseButtonEvent(centerClickX, centerClickY, 0, false, game, 1)
+                            triggered = true
                             break
                         end
                     end
                 end
             end
-            if clicked then break end
+            if triggered then break end
         end
     end)
-    return clicked
+    return triggered
 end
 
 -- =========================================================
@@ -1026,7 +1075,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (ĐÃ CẬP NHẬT QUY TRÌNH BÁN CÁ)
+-- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1049,93 +1098,58 @@ task.spawn(function()
                         VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
                     end)
 
-                    root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
+                    forceUnfreezeCharacter()
+                    root.AssemblyLinearVelocity = Vector3.zero
+                    task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
-                    
-                    if merchantLockConnection then merchantLockConnection:Disconnect() end
 
-                    merchantLockConnection = RunService.RenderStepped:Connect(function()
-                        pcall(function()
-                            local cc = LocalPlayer.Character
-                            local cr = cc and cc:FindFirstChild("HumanoidRootPart")
-                            local ch = cc and cc:FindFirstChildOfClass("Humanoid")
-                            if cr and dynamicMerchantPos then
-                                cr.Anchored = false; if ch then ch.WalkSpeed = 0 end
-                                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
-                                cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
-                            end
-                        end)
-                    end)
-
+                    -- 1. BAY ĐẾN NPC BÁN CÁ
                     safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
                     
-                    root.Anchored = false
-                    root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                    forceUnfreezeCharacter()
+                    root.CFrame = CFrame.lookAt(safeTargetPos, Vector3.new(dynamicMerchantPos.X, safeTargetPos.Y, dynamicMerchantPos.Z))
+                    pcall(function() hum.Jump = true end)
                     task.wait(0.35)
 
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- THỰC THI QUY TRÌNH HỘI THOẠI MỚI CHÍNH XÁC
+                    -- 2. BÁN CÁ VỚI REMOTE HOẶC TRIGGER UI TRỰC TIẾP
                     repeat
                         if not isRunning then break end
 
                         pcall(function()
-                            root.Anchored = false
-                            hum.WalkSpeed = 0
-                            root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                            forceUnfreezeCharacter()
+                            root.CFrame = CFrame.lookAt(safeTargetPos, Vector3.new(dynamicMerchantPos.X, safeTargetPos.Y, dynamicMerchantPos.Z))
                             
-                            -- 1. Giả lập ấn phím E để mở cuộc trò chuyện với NPC
+                            -- Remote bán Stardust Packet gốc
+                            SellFishRemote:FireServer("SellAll")
+
+                            -- Mở E tương tác
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                             task.wait(0.05)
                             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                             
-                            -- ⏳ Chờ 1 giây cho NPC hiện hội thoại
-                            task.wait(1)
-
-                            -- 2. Click vào chữ "Bán tất cả"
-                            clickTextUI("bán tất cả")
-                            task.wait(0.3)
-
-                            -- 3. Click vào chữ "Xác nhận bán tất cả" hoặc "Xác nhận"
-                            clickTextUI("xác nhận")
-                            
-                            -- ⏳ Chờ 1.5 giây sau khi xác nhận bán
-                            task.wait(1.5)
-
-                            -- Click 1 cái vào giữa màn hình để load full hội thoại tạm biệt
-                            local currentVp = Camera.ViewportSize
-                            VirtualInputManager:SendMouseMoveEvent(currentVp.X / 2, currentVp.Y / 2, game)
-                            VirtualInputManager:SendMouseButtonEvent(currentVp.X / 2, currentVp.Y / 2, 0, true, game, 1)
-                            task.wait(0.05)
-                            VirtualInputManager:SendMouseButtonEvent(currentVp.X / 2, currentVp.Y / 2, 0, false, game, 1)
-
-                            -- ⏳ Chờ khoảng 1 giây để load full thoại
-                            task.wait(1)
-
-                            -- 4. Click vào chữ "Tạm biệt"
-                            clickTextUI("tạm biệt")
-                            
-                            -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
-                            task.wait(0.5)
+                            -- Kích hoạt UI trực tiếp
+                            triggerTargetUI("bán tất cả")
+                            triggerTargetUI("xác nhận")
+                            triggerTargetUI("tạm biệt")
                         end)
 
-                        task.wait(0.25)
-                    until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 15) or not isRunning
-
-                    if merchantLockConnection then merchantLockConnection:Disconnect(); merchantLockConnection = nil end
+                        task.wait(0.4)
+                    until (getFishToSellCount() < initialFishCount) or (tick() - sellStartTime > 12) or not isRunning
 
                     task.wait(0.2)
 
-                    -- CHỈ BAY VỀ CHỖ CÂU NẾU SỐ CÁ THỰC SỰ ĐÃ GIẢM
+                    -- 3. CHỈ BAY VỀ CHỖ CÂU NẾU KHO CÁ ĐÃ GIẢM
                     local finalFishCount = getFishToSellCount()
                     if (finalFishCount < initialFishCount) and OriginalFishingSpotCFrame and isRunning then
                         pcall(function() hum.Jump = true end)
                         task.wait(0.2)
 
-                        root.Anchored = false; hum.WalkSpeed = 16
+                        forceUnfreezeCharacter()
                         
                         safeTweenToTarget(OriginalFishingSpotCFrame, 55)
                         
@@ -1146,7 +1160,6 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- XOAY CAMERA VỀ HƯỚNG TRƯỚC MẶT NHÂN VẬT
                         pcall(function()
                             local head = char:FindFirstChild("Head") or root
                             local lookVector = OriginalFishingSpotCFrame.LookVector
@@ -1162,22 +1175,26 @@ task.spawn(function()
                             Camera.CameraType = Enum.CameraType.Custom
                         end)
 
-                        root.Anchored = false
+                        forceUnfreezeCharacter()
+                        hum.WalkSpeed = 0
                         task.wait(0.5)
                     else
-                        -- NẾU CÁ KHÔNG GIẢM: GIỮ NGUYÊN VỊ TRÍ ĐỨNG TẠI NPC
-                        root.Anchored = false
+                        forceUnfreezeCharacter()
+                        hum.WalkSpeed = 0
                     end
                     
                     isSellingFish = false
                     continue
                 end
 
-                pcall(function()
-                    root.CFrame = OriginalFishingSpotCFrame
-                    root.AssemblyLinearVelocity = Vector3.zero
-                end)
-                hum.WalkSpeed = 0
+                -- CHỈ NEO VỊ TRÍ KHI ĐANG Ở BẢN ĐỒ CÂU
+                if not isSellingFish then
+                    pcall(function()
+                        root.CFrame = OriginalFishingSpotCFrame
+                        root.AssemblyLinearVelocity = Vector3.zero
+                    end)
+                    hum.WalkSpeed = 0
+                end
 
                 local currentFishPos = getTargetFishPosition2D()
 
@@ -1247,6 +1264,12 @@ end)
 RunService.RenderStepped:Connect(function()
     pcall(function()
         updateHeadBillboard()
+        
+        -- Mở thả khóa chân liên tục nếu đang bay bán cá
+        if isSellingFish then
+            forceUnfreezeCharacter()
+        end
+
         local timeVal = tick() * 2
         local neonColor = Color3.fromRGB(
             math.floor(math.sin(timeVal) * 35 + 35),
