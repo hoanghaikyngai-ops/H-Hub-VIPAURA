@@ -1105,7 +1105,17 @@ task.spawn(function()
                             -- ⏳ Chờ 1.5 giây sau khi xác nhận bán
                             task.wait(1.5)
 
-                            -- 4. Click vào chữ "Tạm biệt"
+                            -- Click 1 cái vào giữa màn hình để load full hội thoại tạm biệt
+                            local currentVp = Camera.ViewportSize
+                            VirtualInputManager:SendMouseMoveEvent(currentVp.X / 2, currentVp.Y / 2, game)
+                            VirtualInputManager:SendMouseButtonEvent(currentVp.X / 2, currentVp.Y / 2, 0, true, game, 1)
+                            task.wait(0.05)
+                            VirtualInputManager:SendMouseButtonEvent(currentVp.X / 2, currentVp.Y / 2, 0, false, game, 1)
+
+                            -- ⏳ Chờ khoảng 1 giây để load full thoại
+                            task.wait(1)
+
+                            -- 4. Click vào chữ "Tạm biệt."
                             clickTextUI("tạm biệt")
                             
                             -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
