@@ -1,5 +1,5 @@
 -- ====================================================
--- H-HUB MODERN UI v9.1.9 - FINE-TUNED UI CLICK OFFSET
+-- H-HUB MODERN UI v9.2.0 - ANTI-STUCK & FULL SERVER SYNC
 -- ====================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -220,7 +220,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.1.9"
+HeaderText.Text = "H-HUB  •  v9.2.0"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -719,7 +719,7 @@ sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.1.9 (UI TEXT CLICKING INTEGRATED)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động quét và click chữ 'Bán tất cả', 'Xác nhận', 'Tạm biệt'\n• Giả lập phím E tương tác ban đầu\n• Kiểm tra cá thực tế giảm mới bay về chỗ cũ\n• Tích hợp NoClip xuyên tường khi đi bán cá\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.0 (ANTI-STUCK & FULL SERVER SYNC)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động nhấp nhả nhún nhảy và NoClip khi bay\n• Bỏ khóa chân (WalkSpeed = 16) đồng bộ Server liên tục\n• Ngưng bay về đến khi thực hiện bán cá thành công\n• Căn chỉnh tâm click UI cực chuẩn\n• Cập nhật số cá realtime trên nút Toggle\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -755,7 +755,7 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.1.9\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.0\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -811,7 +811,7 @@ AutoToggleBtn.MouseButton1Click:Connect(function()
     if isRunning then
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: CHẠY"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
-        if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = false; if hum then hum.WalkSpeed = 0 end end
+        if root then OriginalFishingSpotCFrame = root.CFrame; root.Anchored = false; if hum then hum.WalkSpeed = 16 end end
     else
         AutoToggleBtn.Text = "🎣  TỰ ĐỘNG CÂU: TẮT"
         AutoToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
@@ -875,7 +875,7 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT
+-- NOCLIP VÀ TWEEN AN TOÀN CHỐNG KẸT + KHÔNG KHÓA CHÂN + NHẤP NHẢ NHẢY
 -- =========================================================
 local function setCharacterNoClip(enabled)
     pcall(function()
@@ -893,10 +893,13 @@ end
 local function safeTweenToTarget(targetCFrame, travelSpeed)
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
     if not root then return end
 
-    setCharacterNoClip(true)
+    -- BỎ KHÓA CHÂN ĐỂ ĐỒNG BỘ VỊ TRÍ VỚI SERVER
     root.Anchored = false
+    if hum then hum.WalkSpeed = 16 end
+    setCharacterNoClip(true)
 
     local dist = (root.Position - targetCFrame.Position).Magnitude
     local duration = math.max(dist / (travelSpeed or 55), 0.1)
@@ -906,15 +909,28 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
 
     local lastCheckPos = root.Position
     local stuckCounter = 0
+    local jumpTimer = 0
 
     while tween.PlaybackState == Enum.PlaybackState.Playing and isRunning do
-        task.wait(0.2)
+        task.wait(0.1)
         setCharacterNoClip(true)
 
+        -- BỎ KHÓA CHÂN LIÊN TỤC TRONG KHI BAY
+        if hum then hum.WalkSpeed = 16 end
+        root.Anchored = false
+
+        -- NHẤP NHẢ NHẢY (JUMP) MỖI 0.4 GIÂY ĐỂ CHỐNG KẸT VẬT CẢN
+        jumpTimer = jumpTimer + 0.1
+        if jumpTimer >= 0.4 then
+            jumpTimer = 0
+            if hum then hum.Jump = true end
+        end
+
+        -- KHI BỊ MẮC KẸT TẠI MỘT ĐIỂM QUÁ 1.2 GIÂY -> ĐẨY LÊN TRÊN NÓC
         if (root.Position - lastCheckPos).Magnitude < 0.8 then
-            stuckCounter = stuckCounter + 0.2
+            stuckCounter = stuckCounter + 0.1
             if stuckCounter >= 1.2 then
-                root.CFrame = root.CFrame + Vector3.new(0, 10, 0)
+                root.CFrame = root.CFrame + Vector3.new(0, 12, 0)
                 stuckCounter = 0
             end
         else
@@ -924,10 +940,12 @@ local function safeTweenToTarget(targetCFrame, travelSpeed)
     end
 
     setCharacterNoClip(false)
+    if hum then hum.WalkSpeed = 16 end
+    root.Anchored = false
 end
 
 -- =========================================================
--- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI (ĐÃ CHỈNH LẠI OFFSET NÂNG CAO CỰC CHUẨN)
+-- LOGIC QUÉT VÀ CLICK CHÍNH XÁC VÀO CÁC DÒNG CHỮ HỘI THOẠI
 -- =========================================================
 local function clickTextUI(targetText)
     local clicked = false
@@ -942,9 +960,6 @@ local function clickTextUI(targetText)
                             local absSize = element.AbsoluteSize
                             local inset = GuiService:GetGuiInset()
 
-                            -- Tính toán lại độ lệch chuẩn:
-                            -- Tinh chỉnh hạ độ lệch Y từ -25px xuống còn -8px (tính theo inset chuẩn hệ thống)
-                            -- Giữ offset X = 0 để căn đúng giữa tâm chữ
                             local clickX = absPos.X + (absSize.X / 2) + inset.X
                             local clickY = absPos.Y + (absSize.Y / 2) + inset.Y - 8
 
@@ -1029,7 +1044,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (ĐÃ CẬP NHẬT QUY TRÌNH BÁN CÁ)
+-- VÒNG LẶP CÂU CÁ & QUY TRÌNH BÁN CÁ HOÀN CHỈNH
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1052,7 +1067,8 @@ task.spawn(function()
                         VirtualInputManager:SendMouseButtonEvent(vp.X/2, vp.Y/2, 0, false, game, 1); task.wait(0.25)
                     end)
 
-                    root.Anchored = false; hum.WalkSpeed = 0; task.wait(0.05)
+                    -- TẮT KHÓA CHÂN TRƯỚC KHI BAY
+                    root.Anchored = false; hum.WalkSpeed = 16; task.wait(0.05)
 
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
@@ -1065,63 +1081,64 @@ task.spawn(function()
                             local cr = cc and cc:FindFirstChild("HumanoidRootPart")
                             local ch = cc and cc:FindFirstChildOfClass("Humanoid")
                             if cr and dynamicMerchantPos then
-                                cr.Anchored = false; if ch then ch.WalkSpeed = 0 end
+                                cr.Anchored = false
+                                if ch then ch.WalkSpeed = 16 end
                                 Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
                                 cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
                             end
                         end)
                     end)
 
+                    -- 1. BAY ĐẾN NPC (CÓ NOCLIP, NHẤP NHẢ NHẢY VÀ KHÔNG KHÓA CHÂN)
                     safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
                     
+                    -- TỚI NƠI -> ĐỒNG BỘ VỊ TRÍ SERVER
                     root.Anchored = false
+                    hum.WalkSpeed = 16
                     root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
+                    pcall(function() hum.Jump = true end)
                     task.wait(0.35)
 
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- THỰC THI QUY TRÌNH HỘI THOẠI MỚI CHÍNH XÁC
+                    -- 2. NGƯNG HOÀN TOÀN LOGIC BAY VỀ VÀ CHỈ THỰC THI THOẠI BÁN CÁ VỚI NPC
                     repeat
                         if not isRunning then break end
 
                         pcall(function()
                             root.Anchored = false
-                            hum.WalkSpeed = 0
+                            hum.WalkSpeed = 16
                             root.CFrame = CFrame.new(safeTargetPos, dynamicMerchantPos)
                             
-                            -- 1. Giả lập ấn phím E để mở cuộc trò chuyện với NPC
+                            -- Giả lập ấn phím E mở thoại
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                             task.wait(0.05)
                             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                             
-                            -- ⏳ Chờ 1 giây cho NPC hiện hội thoại
                             task.wait(1)
 
-                            -- 2. Click vào chữ "Bán tất cả"
+                            -- Bán tất cả
                             clickTextUI("bán tất cả")
                             task.wait(0.3)
 
-                            -- 3. Click vào chữ "Xác nhận bán tất cả" hoặc "Xác nhận"
+                            -- Xác nhận
                             clickTextUI("xác nhận")
                             
-                            -- ⏳ Chờ 1.5 giây sau khi xác nhận bán
                             task.wait(1.5)
 
-                            -- Click 1 cái vào giữa màn hình để load full hội thoại tạm biệt
+                            -- Click giữa màn hình load thoại
                             local currentVp = Camera.ViewportSize
                             VirtualInputManager:SendMouseMoveEvent(currentVp.X / 2, currentVp.Y / 2, game)
                             VirtualInputManager:SendMouseButtonEvent(currentVp.X / 2, currentVp.Y / 2, 0, true, game, 1)
                             task.wait(0.05)
                             VirtualInputManager:SendMouseButtonEvent(currentVp.X / 2, currentVp.Y / 2, 0, false, game, 1)
 
-                            -- ⏳ Chờ khoảng 1 giây để load full thoại
                             task.wait(1)
 
-                            -- 4. Click vào chữ "Tạm biệt"
-                            clickTextUI("tạm biệt")
+                            -- Tạm biệt
+                            clickTextUI("tạm biệt.")
                             
-                            -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
                             task.wait(0.5)
                         end)
 
@@ -1132,7 +1149,7 @@ task.spawn(function()
 
                     task.wait(0.2)
 
-                    -- CHỈ BAY VỀ CHỖ CÂU NẾU SỐ CÁ THỰC SỰ ĐÃ GIẢM
+                    -- 3. BÁN XONG CÁ -> MỚI BẮT ĐẦU BAY QUAY VỀ CHỖ CÂU CŨ
                     local finalFishCount = getFishToSellCount()
                     if (finalFishCount < initialFishCount) and OriginalFishingSpotCFrame and isRunning then
                         pcall(function() hum.Jump = true end)
@@ -1140,6 +1157,7 @@ task.spawn(function()
 
                         root.Anchored = false; hum.WalkSpeed = 16
                         
+                        -- Bay về điểm câu
                         safeTweenToTarget(OriginalFishingSpotCFrame, 55)
                         
                         pcall(function()
@@ -1149,7 +1167,7 @@ task.spawn(function()
                             root.AssemblyAngularVelocity = Vector3.zero
                         end)
 
-                        -- XOAY CAMERA VỀ HƯỚNG TRƯỚC MẶT NHÂN VẬT
+                        -- Xoay Camera lại hướng trước mặt
                         pcall(function()
                             local head = char:FindFirstChild("Head") or root
                             local lookVector = OriginalFishingSpotCFrame.LookVector
@@ -1165,11 +1183,14 @@ task.spawn(function()
                             Camera.CameraType = Enum.CameraType.Custom
                         end)
 
+                        -- TẮT KHÓA CHÂN KHI ĐÃ VỀ CHỖ CÂU ĐỂ ĐỒNG BỘ CHUẨN XÁC
                         root.Anchored = false
+                        hum.WalkSpeed = 0
                         task.wait(0.5)
                     else
-                        -- NẾU CÁ KHÔNG GIẢM: GIỮ NGUYÊN VỊ TRÍ ĐỨNG TẠI NPC
+                        -- Giữ nguyên vị trí nếu bán không thành công
                         root.Anchored = false
+                        hum.WalkSpeed = 0
                     end
                     
                     isSellingFish = false
@@ -1195,7 +1216,7 @@ task.spawn(function()
                     for _, offset in ipairs(offsets) do
                         if not isRunning or isSellingFish then break end
                         local latestPos = getTargetFishPosition2D() or currentFishPos
-                        if not latestPos me
+                        if not latestPos then break end
                         local targetClickPos = latestPos + offset
 
                         pcall(function()
