@@ -1117,7 +1117,7 @@ task.spawn(function()
                             task.wait(1)
 
                             -- 4. Click vào chữ "Tạm biệt"
-                            clickTextUI("tạm biệt")
+                            clickTextUI("tạm biệt.")
                             
                             -- ⏳ Chờ 0.5 giây trước khi kết thúc lượt
                             task.wait(0.5)
