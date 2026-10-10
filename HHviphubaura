@@ -1,5 +1,5 @@
 -- =====================================================================
--- H-HUB MODERN UI v9.2.5 - FULL ADVANCED FEATURES (AUTO SELL & LAYER UI)
+-- H-HUB MODERN UI v9.2.6 - FIX MERCHANT SCANNER & WALK TO TARGET
 -- =====================================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -23,7 +23,6 @@ pcall(function()
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
--- ============ REMOTE BÁN CÁ STARDUST (DYNAMIC FALLBACK) ============
 local SellFishRemote = nil
 pcall(function()
     SellFishRemote = ReplicatedStorage:WaitForChild("Stardust", 2)
@@ -32,7 +31,6 @@ pcall(function()
         :WaitForChild("RemoteEvent", 2)
 end)
 
--- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
 local FONT_BOLD = Enum.Font.GothamBold
 
@@ -60,9 +58,6 @@ local function stroke(obj, color, thick, transp)
     return s
 end
 
--- =========================================================================
--- KHẮC PHỤC LỖI ẤN NHẦM GAME: SỬ DỤNG PROTECT_GUI HOẶC CORE GUI
--- =========================================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HHubVipUI"
 ScreenGui.ResetOnSpawn = false
@@ -85,11 +80,8 @@ BlockInputFrame.Text = ""
 BlockInputFrame.AutoButtonColor = false
 BlockInputFrame.Active = true
 
--- =========================================================
--- INTRO BÁ KHÍ
--- =========================================================
+-- ================= INTRO BÁ KHÍ =================
 local BirthdayIntroActive = true
-
 local BirthdayFrame = Instance.new("Frame", ScreenGui)
 BirthdayFrame.Name = "BirthdayIntro"
 BirthdayFrame.Size = UDim2.new(0, 520, 0, 135)
@@ -147,29 +139,22 @@ local function StopBirthdayIntro()
     pcall(function() BirthdaySound:Stop() end)
     BirthdayFrame.Visible = false
 end
-
 BirthdaySound.Ended:Connect(StopBirthdayIntro)
 
 local holdThread = nil
 local holdStartTime = 0
-
 UserInputService.InputBegan:Connect(function(input)
     if not BirthdayIntroActive then return end
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         holdStartTime = tick()
         if holdThread then task.cancel(holdThread) end
-        
         HoldProgressBar.Size = UDim2.new(0, 0, 1, 0)
         TweenService:Create(HoldProgressBar, TweenInfo.new(3, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)}):Play()
-        
         holdThread = task.delay(3, function()
-            if BirthdayIntroActive and (tick() - holdStartTime >= 2.9) then
-                StopBirthdayIntro()
-            end
+            if BirthdayIntroActive and (tick() - holdStartTime >= 2.9) then StopBirthdayIntro() end
         end)
     end
 end)
-
 UserInputService.InputEnded:Connect(function(input)
     if not BirthdayIntroActive then return end
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -177,10 +162,8 @@ UserInputService.InputEnded:Connect(function(input)
         TweenService:Create(HoldProgressBar, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 1, 0)}):Play()
     end
 end)
-
 pcall(function() BirthdaySound:Play() end)
 
--- ============ NÚT MỞ MENU ============
 local ToggleBtn = Instance.new("TextButton", ScreenGui)
 ToggleBtn.Size = UDim2.new(0, 150, 0, 36)
 ToggleBtn.Position = UDim2.new(0, 14, 0.42, 0)
@@ -203,7 +186,6 @@ ToggleDot.BorderSizePixel = 0
 ToggleDot.ZIndex = 501
 corner(ToggleDot, 8)
 
--- ============ KHUNG CHÍNH ============
 local Main = Instance.new("Frame", ScreenGui)
 Main.Size = UDim2.new(0, 580, 0, 360)
 Main.Position = UDim2.new(0.5, -290, 0.5, -180)
@@ -223,7 +205,6 @@ TopGlow.BorderSizePixel = 0
 TopGlow.ZIndex = 101
 corner(TopGlow, 2)
 
--- ============ HEADER ============
 local TopHeader = Instance.new("Frame", Main)
 TopHeader.Size = UDim2.new(1, -24, 0, 52)
 TopHeader.Position = UDim2.new(0, 12, 0, 10)
@@ -255,7 +236,7 @@ local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.2.5"
+HeaderText.Text = "H-HUB  •  v9.2.6"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
@@ -341,7 +322,6 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- ============ SIDEBAR & CENTER ============
 local SideBar = Instance.new("Frame", Main)
 SideBar.Size = UDim2.new(0, 148, 1, -142)
 SideBar.Position = UDim2.new(0, 12, 0, 70)
@@ -453,7 +433,6 @@ local function sectionLabel(parent, text, order)
     return l
 end
 
--- ====================== TAB 1: BẢN ĐỒ ======================
 local mapInfo = Instance.new("TextLabel", P1)
 mapInfo.Size = UDim2.new(1, -4, 0, 30); mapInfo.BackgroundColor3 = Color3.fromRGB(12, 30, 48)
 mapInfo.TextColor3 = C_CYAN; mapInfo.Font = FONT_BOLD; mapInfo.TextSize = 11
@@ -539,7 +518,6 @@ for i, island in ipairs(Islands) do
     btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
 
--- ====================== TAB 2: THU HOẠCH ======================
 sectionLabel(P2, "  CHẾ ĐỘ TỰ ĐỘNG", 0)
 local AutoToggleBtn = mkBtn(P2, "🎣  TỰ ĐỘNG CÂU: TẮT", 40, Color3.fromRGB(220, 38, 38), 1)
 local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(30, 41, 59), 2)
@@ -548,7 +526,6 @@ tip2.Size = UDim2.new(1,-4,0,28); tip2.BackgroundColor3 = Color3.fromRGB(14,22,3
 tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và spam click"
 tip2.LayoutOrder = 3; tip2.ZIndex = 105; corner(tip2, 8)
 
--- ====================== TAB 3: THƯƠNG MẠI ======================
 sectionLabel(P3, "  KHO & BÁN TỰ ĐỘNG", 0)
 local FishStatus = Instance.new("TextLabel", P3)
 FishStatus.Size = UDim2.new(1, -4, 0, 36); FishStatus.BackgroundColor3 = Color3.fromRGB(12, 40, 44)
@@ -567,7 +544,6 @@ MaxFishCapBtn.MouseButton1Click:Connect(function()
     MaxFishCapBtn.Text = "🔄  ĐỔI NGƯỠNG KHO: " .. maxFishCapacity
 end)
 
--- ====================== TAB 4: PHÍM ẢO ======================
 sectionLabel(P4, "  PHÍM KỸ NĂNG ẢO", 0)
 local KeyRow = Instance.new("Frame", P4)
 KeyRow.Size = UDim2.new(1, -4, 0, 40); KeyRow.BackgroundTransparency = 1; KeyRow.LayoutOrder = 1; KeyRow.Active = true; KeyRow.ZIndex = 105
@@ -615,7 +591,6 @@ LockMarkersBtn.MouseButton1Click:Connect(function()
     LockMarkersBtn.BackgroundColor3 = isMarkersLocked and Color3.fromRGB(16, 185, 129) or Color3.fromRGB(220, 38, 38)
 end)
 
--- ====================== TAB 5: ÂM THANH ======================
 sectionLabel(P5, "  NHẠC NỀN", 0)
 local MusicInput = Instance.new("TextBox", P5)
 MusicInput.Size = UDim2.new(1, -4, 0, 34); MusicInput.BackgroundColor3 = Color3.fromRGB(10, 16, 30)
@@ -746,7 +721,6 @@ HipSwayToggleBtn.MouseButton1Click:Connect(function()
     updateHeadBillboard()
 end)
 
--- ====================== TAB 6: TỐI ƯU ======================
 sectionLabel(P6, "  HIỆU NĂNG & FPS", 0)
 local function createFixLagButton(name, order, callback)
     local btn = mkBtn(P6, "◇ " .. name .. ": TẮT", 36, Color3.fromRGB(50, 60, 80), order)
@@ -777,7 +751,6 @@ createFixLagButton("GIẢM ĐỒ HỌA (TEXTURE)", 2, function(enabled)
 end)
 createFixLagButton("MỞ KHÓA FPS", 3, function(enabled) pcall(function() if setfpscap then setfpscap(enabled and 999 or 60) end end) end)
 
--- ====================== TAB 7: HỆ THỐNG ======================
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
 local sysCard = Instance.new("Frame", P7)
 sysCard.Size = UDim2.new(1, 0, 0, 285); sysCard.BackgroundColor3 = Color3.fromRGB(13, 20, 36)
@@ -789,9 +762,8 @@ local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
 t7Lbl.ZIndex = 106
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.5 (ADVANCED AUTO SELL & LAYER UI)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động tìm đúng NPC 'Fish Merchant' toàn map\n• Đi bộ tốc độ 25 (Noclip vật cản ngang, không rớt đất, waypoint 5s)\n• Chặn tương tác click xuyên thấu giao diện game nhờ Layer ZIndex tối đa\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.6 (FIX MERCHANT FINDER)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Thuật toán tìm NPC Fish Merchant linh hoạt (Quét cả tên gần đúng)\n• Đi bộ tốc độ 25 (Noclip vật cản ngang, không rớt đất)\n• Chặn tương tác click xuyên thấu giao diện game nhờ Layer ZIndex tối đa"
 
--- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
 MusicBarContainer.Size = UDim2.new(0, 396, 0, 52); MusicBarContainer.Position = UDim2.new(0, 168, 1, -64)
 MusicBarContainer.BackgroundColor3 = Color3.fromRGB(13, 20, 36); MusicBarContainer.BackgroundTransparency = 0.1; MusicBarContainer.Active = true; MusicBarContainer.ZIndex = 102
@@ -827,10 +799,9 @@ end)
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
 FootNote.Active = true; FootNote.ZIndex = 102
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.5\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.6\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
--- ====================== NÚT TAB ======================
 local tabDefs = {
     {name = "BẢN ĐỒ", icon = "🗺", title = "◈ BẢN ĐỒ DỊCH CHUYỂN"}, {name = "THU HOẠCH", icon = "🎣", title = "◈ THU HOẠCH TỰ ĐỘNG"},
     {name = "THƯƠNG MẠI", icon = "🛒", title = "◈ THƯƠNG MẠI & KHO CÁ"}, {name = "PHÍM ẢO", icon = "⌨", title = "◈ PHÍM KỸ NĂNG ẢO"},
@@ -871,7 +842,6 @@ end
 for i, tBtn in ipairs(tabs) do tBtn.MouseButton1Click:Connect(function() switchTab(i) end) end
 switchTab(1)
 
--- ====================== LOGIC THU HOẠCH ======================
 local isServerDmgOn = false
 local isSellingFish = false
 
@@ -954,36 +924,37 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- HỆ THỐNG QUÉT CHUẨN XÁC 100% - CHỈ TÌM ĐÚNG NPC "FISH MERCHANT"
+-- HỆ THỐNG QUÉT TÌM NPC "FISH MERCHANT" THÔNG MINH (KHÔNG BỊ TRÔI TỌA ĐỘ)
 -- =========================================================
 local function getMerchantPosition()
-    local closestPos = Vector3.new(1929.41, 9.79, 1093.12) 
-    local shortestDist = math.huge
     local char = LocalPlayer.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
+    
+    -- Nếu không tìm thấy nhân vật, trả về vị trí hiện tại của root
+    if not root then return Vector3.new(0, 0, 0) end
+    
+    local closestPos = root.Position -- Mặc định lấy vị trí hiện tại nếu không quét được để tránh tele đi xa
+    local shortestDist = math.huge
 
     pcall(function()
         for _, obj in pairs(Workspace:GetDescendants()) do
             if obj and (obj:IsA("Model") or obj:IsA("Part")) then
                 local objName = string.lower(obj.Name)
                 
-                -- Khớp chính xác tên "fish merchant" (có khoảng trắng / viết hoa chuẩn game)
-                local isFishMerchant = (objName:find("fish merchant") or objName:find("fish_merchant") or objName:find("fishmerchant"))
-                
-                if (objName:find("fish") and objName:find("merchant")) or (objName:find("fish") and objName:find("buyer")) then
-                    isFishMerchant = true
+                -- Nới lỏng điều kiện: Tìm bất kỳ vật thể nào có chứa chữ "merchant" hoặc "shop" hoặc "fish" kết hợp
+                local isMatch = false
+                if objName:find("merchant") or objName:find("fish") or objName:find("buyer") or objName:find("shop") or objName:find("sell") then
+                    isMatch = true
                 end
 
-                if isFishMerchant then
+                if isMatch then
                     local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("BasePart")) or obj
                     if primaryPart and primaryPart:IsA("BasePart") then
-                        if root then
-                            local dist = (primaryPart.Position - root.Position).Magnitude
-                            -- Quét toàn map không giới hạn khoảng cách gần
-                            if dist < shortestDist and dist < 99999 then
-                                shortestDist = dist
-                                closestPos = primaryPart.Position
-                            end
+                        local dist = (primaryPart.Position - root.Position).Magnitude
+                        -- Ưu tiên chọn NPC gần nhất (trong bán kính hợp lý quanh đảo bạn đang đứng)
+                        if dist < shortestDist and dist < 1500 then
+                            shortestDist = dist
+                            closestPos = primaryPart.Position
                         end
                     end
                 end
@@ -994,7 +965,7 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- HÀM ĐI BỘ TỐC ĐỘ 25, NHẢY & NOCLIP THÔNG MINH (KHÔNG RƠI ĐẤT, KHÔNG TELE GIỮA CHỪNG)
+-- HÀM ĐI BỘ TỐC ĐỘ 25, NHẢY & NOCLIP THÔNG MINH
 -- =========================================================
 local function walkToTarget(targetPosition)
     local char = LocalPlayer.Character
@@ -1067,7 +1038,6 @@ local function walkToTarget(targetPosition)
                 if connection then connection:Disconnect() end
             end)
 
-            -- ⭐ Tăng thời gian chờ waypoint lên 5 giây để nhân vật đi bộ liên tục trọn vẹn quãng đường không bị cắt ngang
             local waitTime = 0
             while not reached and waitTime < 5 do
                 task.wait(0.1)
@@ -1080,7 +1050,7 @@ local function walkToTarget(targetPosition)
         end
     else
         hum:MoveTo(targetPosition)
-        task.wait(5)
+        task.wait(3)
     end
 
     noclipActive = false
@@ -1095,7 +1065,6 @@ local function triggerTargetUI(targetText)
                     if (element:IsA("TextLabel") or element:IsA("TextButton")) and element.Visible then
                         local textVal = string.lower(element.Text)
                         if textVal:find(string.lower(targetText)) then
-                            
                             local clickableObj = element:IsA("TextButton") and element or element.Parent
                             if clickableObj and clickableObj:IsA("TextButton") then
                                 if getconnections then
@@ -1113,7 +1082,6 @@ local function triggerTargetUI(targetText)
                                     triggered = true
                                 end)
                             end
-                            
                             if triggered then break end
                         end
                     end
@@ -1183,9 +1151,7 @@ task.spawn(function()
     end
 end)
 
--- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (ĐI BỘ ĐI & VỀ HOÀN CHỈNH)
--- =========================================================
+-- ================= VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH =================
 task.spawn(function()
     while ScreenGui.Parent do
         task.wait(0.02)
@@ -1213,7 +1179,7 @@ task.spawn(function()
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
 
-                    -- 1. ĐI BỘ ĐẾN NƠI BÁN CÁ
+                    -- 1. ĐI BỘ ĐẾN NƠI BÁN CÁ GẦN NHẤT
                     walkToTarget(safeTargetPos)
                     
                     forceUnfreezeCharacter()
