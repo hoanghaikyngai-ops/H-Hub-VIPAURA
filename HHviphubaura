@@ -1,6 +1,6 @@
--- ====================================================
--- H-HUB MODERN UI v9.2.4 - DIRECT UI CLICK & FORCE UNFREEZE
--- ====================================================
+-- =====================================================================
+-- H-HUB MODERN UI v9.2.5 - FULL ADVANCED FEATURES (AUTO SELL & LAYER UI)
+-- =====================================================================
 local Players = game:GetService("Players")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local VirtualUser = game:GetService("VirtualUser")
@@ -22,11 +22,14 @@ pcall(function()
     if PlayerGui:FindFirstChild("SkillMarkersUI") then PlayerGui.SkillMarkersUI:Destroy() end
 end)
 
--- ============ REMOTE BÁN CÁ STARDUST ============
-local SellFishRemote = ReplicatedStorage:WaitForChild("Stardust")
-    :WaitForChild("Packages")
-    :WaitForChild("Packet")
-    :WaitForChild("RemoteEvent")
+-- ============ REMOTE BÁN CÁ STARDUST (DYNAMIC FALLBACK) ============
+local SellFishRemote = nil
+pcall(function()
+    SellFishRemote = ReplicatedStorage:WaitForChild("Stardust", 2)
+        :WaitForChild("Packages", 2)
+        :WaitForChild("Packet", 2)
+        :WaitForChild("RemoteEvent", 2)
+end)
 
 -- ============ PHONG CÁCH HIỆN ĐẠI ============
 local FONT = Enum.Font.GothamMedium
@@ -56,12 +59,31 @@ local function stroke(obj, color, thick, transp)
     return s
 end
 
+-- =========================================================================
+-- KHẮC PHỤC LỖI ẤN NHẦM GAME: SỬ DỤNG PROTECT_GUI HOẶC CORE GUI
+-- =========================================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "HHubVipUI"
 ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 99999
+ScreenGui.DisplayOrder = 99999 -- Độ ưu tiên hiển thị cao nhất
 ScreenGui.IgnoreGuiInset = true
-ScreenGui.Parent = PlayerGui
+
+if syn and syn.protect_gui then
+    syn.protect_gui(ScreenGui)
+    ScreenGui.Parent = game:GetService("CoreGui")
+elseif gethui then
+    ScreenGui.Parent = gethui()
+else
+    ScreenGui.Parent = PlayerGui
+end
+
+-- Chặn sự kiện click xuyên thấu giao diện
+local BlockInputFrame = Instance.new("TextButton", ScreenGui)
+BlockInputFrame.Size = UDim2.new(1, 0, 1, 0)
+BlockInputFrame.BackgroundTransparency = 1
+BlockInputFrame.Text = ""
+BlockInputFrame.AutoButtonColor = false
+BlockInputFrame.Active = true -- Chặn click chuột lọt ra ngoài game phía sau khi menu hiển thị
 
 -- =========================================================
 -- INTRO BÁ KHÍ
@@ -74,7 +96,7 @@ BirthdayFrame.Size = UDim2.new(0, 520, 0, 135)
 BirthdayFrame.Position = UDim2.new(0.5, -260, 0.18, 0)
 BirthdayFrame.BackgroundColor3 = Color3.fromRGB(15, 22, 40)
 BirthdayFrame.BackgroundTransparency = 0.05
-BirthdayFrame.Active = false
+BirthdayFrame.Active = true
 BirthdayFrame.ZIndex = 1000
 corner(BirthdayFrame, 18)
 stroke(BirthdayFrame, Color3.fromRGB(255, 180, 40), 2, 0.1)
@@ -169,6 +191,7 @@ ToggleBtn.Font = FONT_BOLD
 ToggleBtn.TextSize = 12
 ToggleBtn.Active = true
 ToggleBtn.Draggable = true
+ToggleBtn.ZIndex = 500
 corner(ToggleBtn, 18)
 local ToggleStroke = stroke(ToggleBtn, C_CYAN, 1.8, 0.1)
 
@@ -177,6 +200,7 @@ ToggleDot.Size = UDim2.new(0, 8, 0, 8)
 ToggleDot.Position = UDim2.new(0, 10, 0.5, -4)
 ToggleDot.BackgroundColor3 = C_CYAN
 ToggleDot.BorderSizePixel = 0
+ToggleDot.ZIndex = 501
 corner(ToggleDot, 8)
 
 -- ============ KHUNG CHÍNH ============
@@ -185,8 +209,9 @@ Main.Size = UDim2.new(0, 580, 0, 360)
 Main.Position = UDim2.new(0.5, -290, 0.5, -180)
 Main.BackgroundColor3 = C_BG
 Main.BackgroundTransparency = 0.05
-Main.Active = false
+Main.Active = true
 Main.Visible = true
+Main.ZIndex = 100
 corner(Main, 16)
 local MainStroke = stroke(Main, C_CYAN, 1.5, 0.25)
 
@@ -195,6 +220,7 @@ TopGlow.Size = UDim2.new(1, -32, 0, 2)
 TopGlow.Position = UDim2.new(0, 16, 0, 0)
 TopGlow.BackgroundColor3 = C_CYAN
 TopGlow.BorderSizePixel = 0
+TopGlow.ZIndex = 101
 corner(TopGlow, 2)
 
 -- ============ HEADER ============
@@ -204,6 +230,7 @@ TopHeader.Position = UDim2.new(0, 12, 0, 10)
 TopHeader.BackgroundColor3 = C_CARD
 TopHeader.BackgroundTransparency = 0.1
 TopHeader.Active = true
+TopHeader.ZIndex = 102
 corner(TopHeader, 12)
 stroke(TopHeader, Color3.fromRGB(255,255,255), 1, 0.85)
 
@@ -212,6 +239,7 @@ Logo.Size = UDim2.new(0, 36, 0, 36)
 Logo.Position = UDim2.new(0, 8, 0.5, -18)
 Logo.BackgroundColor3 = Color3.fromRGB(0, 180, 220)
 Logo.BorderSizePixel = 0
+Logo.ZIndex = 103
 corner(Logo, 18)
 
 local LogoTxt = Instance.new("TextLabel", Logo)
@@ -221,16 +249,18 @@ LogoTxt.Text = "H"
 LogoTxt.Font = FONT_BOLD
 LogoTxt.TextSize = 18
 LogoTxt.TextColor3 = Color3.fromRGB(8,12,22)
+LogoTxt.ZIndex = 104
 
 local HeaderText = Instance.new("TextLabel", TopHeader)
 HeaderText.Size = UDim2.new(0, 270, 0, 22)
 HeaderText.Position = UDim2.new(0, 52, 0, 5)
 HeaderText.BackgroundTransparency = 1
-HeaderText.Text = "H-HUB  •  v9.2.4"
+HeaderText.Text = "H-HUB  •  v9.2.5"
 HeaderText.TextColor3 = C_TEXT
 HeaderText.Font = FONT_BOLD
 HeaderText.TextSize = 14
 HeaderText.TextXAlignment = Enum.TextXAlignment.Left
+HeaderText.ZIndex = 103
 
 local SubText = Instance.new("TextLabel", TopHeader)
 SubText.Size = UDim2.new(0, 270, 0, 16)
@@ -241,12 +271,14 @@ SubText.TextColor3 = C_SUB
 SubText.Font = FONT
 SubText.TextSize = 11
 SubText.TextXAlignment = Enum.TextXAlignment.Left
+SubText.ZIndex = 103
 
 local Badge = Instance.new("Frame", TopHeader)
 Badge.Size = UDim2.new(0, 86, 0, 22)
 Badge.Position = UDim2.new(1, -150, 0.5, -11)
 Badge.BackgroundColor3 = Color3.fromRGB(16, 60, 48)
 Badge.BorderSizePixel = 0
+Badge.ZIndex = 103
 corner(Badge, 11)
 stroke(Badge, C_OK, 1, 0.4)
 
@@ -257,6 +289,7 @@ BadgeTxt.Text = "● ONLINE"
 BadgeTxt.Font = FONT_BOLD
 BadgeTxt.TextSize = 10
 BadgeTxt.TextColor3 = Color3.fromRGB(52, 211, 153)
+BadgeTxt.ZIndex = 104
 
 local MinBtn = Instance.new("TextButton", TopHeader)
 MinBtn.Size = UDim2.new(0, 28, 0, 28)
@@ -266,6 +299,7 @@ MinBtn.Text = "–"
 MinBtn.Font = FONT_BOLD
 MinBtn.TextSize = 16
 MinBtn.TextColor3 = C_TEXT
+MinBtn.ZIndex = 103
 corner(MinBtn, 14)
 
 local CloseBtn = Instance.new("TextButton", TopHeader)
@@ -276,10 +310,18 @@ CloseBtn.Text = "✕"
 CloseBtn.Font = FONT_BOLD
 CloseBtn.TextSize = 12
 CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.ZIndex = 103
 corner(CloseBtn, 14)
 
-CloseBtn.MouseButton1Click:Connect(function() Main.Visible = false end)
-local function toggleMain() Main.Visible = not Main.Visible end
+CloseBtn.MouseButton1Click:Connect(function() 
+    Main.Visible = false 
+    BlockInputFrame.Visible = false
+end)
+
+local function toggleMain() 
+    Main.Visible = not Main.Visible 
+    BlockInputFrame.Visible = Main.Visible
+end
 ToggleBtn.MouseButton1Click:Connect(toggleMain)
 MinBtn.MouseButton1Click:Connect(toggleMain)
 
@@ -305,7 +347,8 @@ SideBar.Size = UDim2.new(0, 148, 1, -142)
 SideBar.Position = UDim2.new(0, 12, 0, 70)
 SideBar.BackgroundColor3 = C_CARD
 SideBar.BackgroundTransparency = 0.1
-SideBar.Active = false
+SideBar.Active = true
+SideBar.ZIndex = 102
 corner(SideBar, 12)
 stroke(SideBar, Color3.fromRGB(255,255,255), 1, 0.85)
 
@@ -325,13 +368,15 @@ SideTitle.Font = FONT_BOLD
 SideTitle.TextSize = 10
 SideTitle.TextColor3 = C_SUB
 SideTitle.LayoutOrder = 0
+SideTitle.ZIndex = 103
 
 local CenterPanel = Instance.new("Frame", Main)
 CenterPanel.Size = UDim2.new(0, 396, 1, -142)
 CenterPanel.Position = UDim2.new(0, 168, 0, 70)
 CenterPanel.BackgroundColor3 = C_CARD
 CenterPanel.BackgroundTransparency = 0.05
-CenterPanel.Active = false
+CenterPanel.Active = true
+CenterPanel.ZIndex = 102
 corner(CenterPanel, 12)
 local CenterStroke = stroke(CenterPanel, C_CYAN, 1.2, 0.45)
 
@@ -344,12 +389,14 @@ PageTitle.Font = FONT_BOLD
 PageTitle.TextSize = 13
 PageTitle.TextColor3 = C_TEXT
 PageTitle.TextXAlignment = Enum.TextXAlignment.Left
+PageTitle.ZIndex = 103
 
 local TabContentArea = Instance.new("Frame", CenterPanel)
 TabContentArea.Size = UDim2.new(1, -24, 1, -44)
 TabContentArea.Position = UDim2.new(0, 12, 0, 32)
 TabContentArea.BackgroundTransparency = 1
-TabContentArea.Active = false
+TabContentArea.Active = true
+TabContentArea.ZIndex = 103
 
 local function createPage()
     local p = Instance.new("ScrollingFrame", TabContentArea)
@@ -360,8 +407,9 @@ local function createPage()
     p.AutomaticCanvasSize = Enum.AutomaticSize.Y
     p.ScrollBarThickness = 3
     p.ScrollBarImageColor3 = C_CYAN
-    p.Active = false
+    p.Active = true
     p.Visible = false
+    p.ZIndex = 104
     return p
 end
 
@@ -384,6 +432,7 @@ local function mkBtn(parent, text, h, bg, order)
     b.LayoutOrder = order or 0
     b.AutoButtonColor = true
     b.Active = true
+    b.ZIndex = 105
     corner(b, 10)
     stroke(b, Color3.fromRGB(255,255,255), 1, 0.7)
     return b
@@ -400,6 +449,7 @@ local function sectionLabel(parent, text, order)
     l.Size = UDim2.new(1, -4, 0, 18)
     l.BackgroundTransparency = 1; l.Text = text; l.Font = FONT_BOLD
     l.TextSize = 11; l.TextColor3 = C_CYAN; l.TextXAlignment = Enum.TextXAlignment.Left; l.LayoutOrder = order or 0
+    l.ZIndex = 105
     return l
 end
 
@@ -408,12 +458,12 @@ local mapInfo = Instance.new("TextLabel", P1)
 mapInfo.Size = UDim2.new(1, -4, 0, 30); mapInfo.BackgroundColor3 = Color3.fromRGB(12, 30, 48)
 mapInfo.TextColor3 = C_CYAN; mapInfo.Font = FONT_BOLD; mapInfo.TextSize = 11
 mapInfo.Text = "  🗺 CHỌN ĐIỂM DỊCH CHUYỂN"; mapInfo.TextXAlignment = Enum.TextXAlignment.Left
-mapInfo.LayoutOrder = 1; corner(mapInfo, 10); stroke(mapInfo, C_CYAN, 1, 0.6)
+mapInfo.LayoutOrder = 1; mapInfo.ZIndex = 105; corner(mapInfo, 10); stroke(mapInfo, C_CYAN, 1, 0.6)
 
 local IslandGrid = Instance.new("Frame", P1)
 IslandGrid.Size = UDim2.new(1, 0, 0, 150); IslandGrid.BackgroundTransparency = 1
 IslandGrid.AutomaticSize = Enum.AutomaticSize.Y; IslandGrid.LayoutOrder = 2
-IslandGrid.Active = false
+IslandGrid.Active = true; IslandGrid.ZIndex = 105
 local gridP1 = Instance.new("UIGridLayout", IslandGrid)
 gridP1.CellSize = UDim2.new(0, 176, 0, 40); gridP1.CellPadding = UDim2.new(0, 8, 0, 8); gridP1.SortOrder = Enum.SortOrder.LayoutOrder
 
@@ -484,6 +534,7 @@ for i, island in ipairs(Islands) do
     btn.Text = island.Name
     btn.LayoutOrder = i
     btn.Active = true
+    btn.ZIndex = 106
     corner(btn, 10); stroke(btn, C_CYAN, 1, 0.6)
     btn.MouseButton1Click:Connect(function() task.spawn(function() teleportAndRespawnAtIsland(island.Pos) end) end)
 end
@@ -495,14 +546,14 @@ local ServerDmgBtn = mkBtn(P2, "⚡  SÁT THƯƠNG: TẮT", 40, Color3.fromRGB(3
 local tip2 = Instance.new("TextLabel", P2)
 tip2.Size = UDim2.new(1,-4,0,28); tip2.BackgroundColor3 = Color3.fromRGB(14,22,38)
 tip2.TextColor3 = C_SUB; tip2.Font = FONT; tip2.TextSize = 10; tip2.Text = "  💡 Tự động khóa cá NPC và spam click"
-tip2.LayoutOrder = 3; corner(tip2, 8)
+tip2.LayoutOrder = 3; tip2.ZIndex = 105; corner(tip2, 8)
 
 -- ====================== TAB 3: THƯƠNG MẠI ======================
 sectionLabel(P3, "  KHO & BÁN TỰ ĐỘNG", 0)
 local FishStatus = Instance.new("TextLabel", P3)
 FishStatus.Size = UDim2.new(1, -4, 0, 36); FishStatus.BackgroundColor3 = Color3.fromRGB(12, 40, 44)
 FishStatus.TextColor3 = Color3.fromRGB(45, 255, 200); FishStatus.Font = FONT_BOLD; FishStatus.TextSize = 11
-FishStatus.LayoutOrder = 1; FishStatus.Text = "🎒 Kho cá: 0 / Ngưỡng bán: 50"
+FishStatus.LayoutOrder = 1; FishStatus.ZIndex = 105; FishStatus.Text = "🎒 Kho cá: 0 / Ngưỡng bán: 50"
 corner(FishStatus, 10); stroke(FishStatus, Color3.fromRGB(45,255,200), 1, 0.6)
 
 local MaxFishCapBtn = mkBtn(P3, "🔄  ĐỔI NGƯỠNG KHO: 50", 40, Color3.fromRGB(217, 119, 6), 2)
@@ -519,18 +570,18 @@ end)
 -- ====================== TAB 4: PHÍM ẢO ======================
 sectionLabel(P4, "  PHÍM KỸ NĂNG ẢO", 0)
 local KeyRow = Instance.new("Frame", P4)
-KeyRow.Size = UDim2.new(1, -4, 0, 40); KeyRow.BackgroundTransparency = 1; KeyRow.LayoutOrder = 1; KeyRow.Active = false
+KeyRow.Size = UDim2.new(1, -4, 0, 40); KeyRow.BackgroundTransparency = 1; KeyRow.LayoutOrder = 1; KeyRow.Active = true; KeyRow.ZIndex = 105
 
 local ShowMarkersBtn = Instance.new("TextButton", KeyRow)
 ShowMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); ShowMarkersBtn.BackgroundColor3 = Color3.fromRGB(13, 110, 253)
 ShowMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); ShowMarkersBtn.Font = FONT_BOLD; ShowMarkersBtn.TextSize = 10
-ShowMarkersBtn.Text = "⌨ PHÍM ẢO: TẮT"; ShowMarkersBtn.Active = true
+ShowMarkersBtn.Text = "⌨ PHÍM ẢO: TẮT"; ShowMarkersBtn.Active = true; ShowMarkersBtn.ZIndex = 106
 corner(ShowMarkersBtn, 10); stroke(ShowMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
 
 local LockMarkersBtn = Instance.new("TextButton", KeyRow)
 LockMarkersBtn.Size = UDim2.new(0.49, 0, 1, 0); LockMarkersBtn.Position = UDim2.new(0.51, 0, 0, 0)
 LockMarkersBtn.BackgroundColor3 = Color3.fromRGB(50, 60, 80)
-LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"; LockMarkersBtn.Active = true
+LockMarkersBtn.TextColor3 = Color3.fromRGB(255, 255, 255); LockMarkersBtn.Font = FONT_BOLD; LockMarkersBtn.TextSize = 10; LockMarkersBtn.Text = "🔓 KHÓA: MỞ"; LockMarkersBtn.Active = true; LockMarkersBtn.ZIndex = 106
 corner(LockMarkersBtn, 10); stroke(LockMarkersBtn, Color3.fromRGB(255,255,255), 1, 0.7)
 
 local MarkersGui = Instance.new("ScreenGui")
@@ -569,22 +620,22 @@ sectionLabel(P5, "  NHẠC NỀN", 0)
 local MusicInput = Instance.new("TextBox", P5)
 MusicInput.Size = UDim2.new(1, -4, 0, 34); MusicInput.BackgroundColor3 = Color3.fromRGB(10, 16, 30)
 MusicInput.TextColor3 = Color3.fromRGB(255, 255, 255); MusicInput.PlaceholderText = "🔎  Nhập ID nhạc..."; MusicInput.PlaceholderColor3 = C_SUB
-MusicInput.Text = ""; MusicInput.Font = FONT; MusicInput.TextSize = 11; MusicInput.LayoutOrder = 1; MusicInput.ClearTextOnFocus = false; MusicInput.Active = true
+MusicInput.Text = ""; MusicInput.Font = FONT; MusicInput.TextSize = 11; MusicInput.LayoutOrder = 1; MusicInput.ClearTextOnFocus = false; MusicInput.Active = true; MusicInput.ZIndex = 105
 corner(MusicInput, 10); stroke(MusicInput, C_CYAN, 1, 0.6)
 
 local MusicRow = Instance.new("Frame", P5)
-MusicRow.Size = UDim2.new(1, -4, 0, 36); MusicRow.BackgroundTransparency = 1; MusicRow.LayoutOrder = 2; MusicRow.Active = false
+MusicRow.Size = UDim2.new(1, -4, 0, 36); MusicRow.BackgroundTransparency = 1; MusicRow.LayoutOrder = 2; MusicRow.Active = true; MusicRow.ZIndex = 105
 
 local PlayMusicBtn = Instance.new("TextButton", MusicRow)
 PlayMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); PlayMusicBtn.BackgroundColor3 = Color3.fromRGB(16, 185, 129)
 PlayMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); PlayMusicBtn.Font = FONT_BOLD; PlayMusicBtn.TextSize = 11
-PlayMusicBtn.Text = "▶ PHÁT NHẠC"; PlayMusicBtn.Active = true; corner(PlayMusicBtn, 10)
+PlayMusicBtn.Text = "▶ PHÁT NHẠC"; PlayMusicBtn.Active = true; PlayMusicBtn.ZIndex = 106; corner(PlayMusicBtn, 10)
 
 local StopMusicBtn = Instance.new("TextButton", MusicRow)
 StopMusicBtn.Size = UDim2.new(0.49, 0, 1, 0); StopMusicBtn.Position = UDim2.new(0.51, 0, 0, 0)
 StopMusicBtn.BackgroundColor3 = Color3.fromRGB(220, 38, 38)
 StopMusicBtn.TextColor3 = Color3.fromRGB(255, 255, 255); StopMusicBtn.Font = FONT_BOLD; StopMusicBtn.TextSize = 11
-StopMusicBtn.Text = "⏹ DỪNG"; StopMusicBtn.Active = true; corner(StopMusicBtn, 10)
+StopMusicBtn.Text = "⏹ DỪNG"; StopMusicBtn.Active = true; StopMusicBtn.ZIndex = 106; corner(StopMusicBtn, 10)
 
 local HipSwayToggleBtn = mkBtn(P5, "⚡ LẮC HÔNG & HUD TRÊN ĐẦU: TẮT", 34, Color3.fromRGB(220, 38, 38), 3)
 
@@ -592,7 +643,7 @@ local PresetContainer = Instance.new("ScrollingFrame", P5)
 PresetContainer.Size = UDim2.new(1, -4, 0, 110); PresetContainer.BackgroundColor3 = Color3.fromRGB(8, 12, 24)
 PresetContainer.BackgroundTransparency = 0.1; PresetContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
 PresetContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y; PresetContainer.ScrollBarThickness = 3
-PresetContainer.ScrollBarImageColor3 = C_CYAN; PresetContainer.BorderSizePixel = 0; PresetContainer.LayoutOrder = 4; PresetContainer.Active = false
+PresetContainer.ScrollBarImageColor3 = C_CYAN; PresetContainer.BorderSizePixel = 0; PresetContainer.LayoutOrder = 4; PresetContainer.Active = true; PresetContainer.ZIndex = 105
 corner(PresetContainer, 10); stroke(PresetContainer, Color3.fromRGB(255,255,255), 1, 0.85)
 
 local PresetLayout = Instance.new("UIListLayout", PresetContainer)
@@ -642,7 +693,7 @@ for i, song in ipairs(PresetSongs) do
     pBtn.Size = UDim2.new(1, -6, 0, 26); pBtn.BackgroundColor3 = Color3.fromRGB(24, 38, 62)
     pBtn.TextColor3 = Color3.fromRGB(220, 245, 255); pBtn.Font = FONT; pBtn.TextSize = 10
     pBtn.Text = "  ♫  " .. song.Name; pBtn.TextXAlignment = Enum.TextXAlignment.Left; pBtn.TextTruncate = Enum.TextTruncate.AtEnd
-    pBtn.LayoutOrder = i; pBtn.Active = true; corner(pBtn, 8)
+    pBtn.LayoutOrder = i; pBtn.Active = true; pBtn.ZIndex = 106; corner(pBtn, 8)
     pBtn.MouseButton1Click:Connect(function()
         MusicInput.Text = song.Id; bgSound.SoundId = "rbxassetid://" .. song.Id; pcall(function() bgSound:Play() end)
         if MusicIcon then MusicIcon.Text = "⏸" end
@@ -730,41 +781,43 @@ createFixLagButton("MỞ KHÓA FPS", 3, function(enabled) pcall(function() if se
 P7.AutomaticCanvasSize = Enum.AutomaticSize.Y
 local sysCard = Instance.new("Frame", P7)
 sysCard.Size = UDim2.new(1, 0, 0, 285); sysCard.BackgroundColor3 = Color3.fromRGB(13, 20, 36)
-sysCard.Active = false
+sysCard.Active = true; sysCard.ZIndex = 105
 corner(sysCard, 12); stroke(sysCard, C_CYAN, 1, 0.6)
 local sysPad = Instance.new("UIPadding", sysCard)
 sysPad.PaddingTop = UDim.new(0,10); sysPad.PaddingLeft = UDim.new(0,12); sysPad.PaddingRight = UDim.new(0,12); sysPad.PaddingBottom = UDim.new(0,10)
 local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.4 (DIRECT UI CLICK & FORCE UNFREEZE)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Kích hoạt event UI trực tiếp không sợ lệch tọa độ màn hình\n• Khóa mở chân liên tục từng khung hình bằng forceUnfreezeCharacter\n• Tự động xả vận tốc tồn dư và nhấp nhả Jump kích hoạt tự do\n• Bán cá xong hoàn tất mới bay về điểm câu cũ\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.ZIndex = 106
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.5 (ADVANCED AUTO SELL & LAYER UI)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động tìm vị trí NPC bán cá bằng thuật toán quét động\n• Bay trực tiếp đến NPC, xử lý bán và quay về vị trí câu ban đầu an toàn\n• Chặn tương tác click xuyên thấu giao diện game nhờ Layer ZIndex tối đa\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
 MusicBarContainer.Size = UDim2.new(0, 396, 0, 52); MusicBarContainer.Position = UDim2.new(0, 168, 1, -64)
-MusicBarContainer.BackgroundColor3 = Color3.fromRGB(13, 20, 36); MusicBarContainer.BackgroundTransparency = 0.1; MusicBarContainer.Active = false
+MusicBarContainer.BackgroundColor3 = Color3.fromRGB(13, 20, 36); MusicBarContainer.BackgroundTransparency = 0.1; MusicBarContainer.Active = true; MusicBarContainer.ZIndex = 102
 corner(MusicBarContainer, 12); local MusicBarStroke = stroke(MusicBarContainer, Color3.fromRGB(0, 200, 255), 1.2, 0.4)
 
 MusicIcon = Instance.new("TextButton", MusicBarContainer)
 MusicIcon.Size = UDim2.new(0, 34, 0, 34); MusicIcon.Position = UDim2.new(0, 8, 0.5, -17); MusicIcon.BackgroundColor3 = C_CYAN
 MusicIcon.Text = "▶"; MusicIcon.TextColor3 = Color3.fromRGB(8, 12, 22); MusicIcon.Font = FONT_BOLD; MusicIcon.TextSize = 13
-MusicIcon.AutoButtonColor = true; MusicIcon.Active = true; corner(MusicIcon, 17)
+MusicIcon.AutoButtonColor = true; MusicIcon.Active = true; MusicIcon.ZIndex = 103; corner(MusicIcon, 17)
 
 currentTrackNameLabel = Instance.new("TextLabel", MusicBarContainer)
 currentTrackNameLabel.Size = UDim2.new(1, -120, 0, 18); currentTrackNameLabel.Position = UDim2.new(0, 50, 0, 7)
 currentTrackNameLabel.BackgroundTransparency = 1; currentTrackNameLabel.Text = "Ai đưa em về"; currentTrackNameLabel.TextColor3 = C_TEXT
-currentTrackNameLabel.Font = FONT_BOLD; currentTrackNameLabel.TextSize = 11; currentTrackNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+currentTrackNameLabel.Font = FONT_BOLD; currentTrackNameLabel.TextSize = 11; currentTrackNameLabel.TextXAlignment = Enum.TextXAlignment.Left; currentTrackNameLabel.ZIndex = 103
 
 local artistLbl = Instance.new("TextLabel", MusicBarContainer)
 artistLbl.Size = UDim2.new(1, -120, 0, 12); artistLbl.Position = UDim2.new(0, 50, 0, 25)
 artistLbl.BackgroundTransparency = 1; artistLbl.Text = "♪  ĐANG PHÁT • H-HUB MUSIC"; artistLbl.TextColor3 = C_SUB
-artistLbl.Font = FONT; artistLbl.TextSize = 9; artistLbl.TextXAlignment = Enum.TextXAlignment.Left
+artistLbl.Font = FONT; artistLbl.TextSize = 9; artistLbl.TextXAlignment = Enum.TextXAlignment.Left; artistLbl.ZIndex = 103
 
 local ProgressBg = Instance.new("Frame", MusicBarContainer)
 ProgressBg.Size = UDim2.new(1, -62, 0, 5); ProgressBg.Position = UDim2.new(0, 50, 1, -11)
-ProgressBg.BackgroundColor3 = Color3.fromRGB(24, 36, 58); ProgressBg.BorderSizePixel = 0; corner(ProgressBg, 8)
+ProgressBg.BackgroundColor3 = Color3.fromRGB(24, 36, 58); ProgressBg.BorderSizePixel = 0; ProgressBg.ZIndex = 103; corner(ProgressBg, 8)
 currentProgressBar = Instance.new("Frame", ProgressBg)
 currentProgressBar.Size = UDim2.new(0, 0, 1, 0); currentProgressBar.BackgroundColor3 = C_CYAN; currentProgressBar.BorderSizePixel = 0
+currentProgressBar.ZIndex = 104
 corner(currentProgressBar, 8)
 
 MusicIcon.MouseButton1Click:Connect(function()
@@ -773,7 +826,8 @@ end)
 
 local FootNote = Instance.new("TextLabel", Main)
 FootNote.Size = UDim2.new(0, 148, 0, 52); FootNote.Position = UDim2.new(0, 12, 1, -64); FootNote.BackgroundColor3 = Color3.fromRGB(12, 28, 38)
-corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.4\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
+FootNote.Active = true; FootNote.ZIndex = 102
+corner(FootNote, 12); stroke(FootNote, C_CYAN, 1, 0.7); FootNote.Text = "🔥 H-HUB v9.2.5\nỔn định • Mượt • Đẹp"; FootNote.Font = FONT_BOLD
 FootNote.TextSize = 10; FootNote.TextColor3 = C_CYAN
 
 -- ====================== NÚT TAB ======================
@@ -788,11 +842,12 @@ for i, def in ipairs(tabDefs) do
     local btn = Instance.new("TextButton", SideBar)
     btn.Size = UDim2.new(1, 0, 0, 32); btn.BackgroundColor3 = C_BTN; btn.TextColor3 = Color3.fromRGB(180, 220, 255)
     btn.Font = FONT_BOLD; btn.Text = def.icon .. "  " .. def.name; btn.TextSize = 10; btn.TextXAlignment = Enum.TextXAlignment.Left
-    btn.LayoutOrder = i; btn.Active = true; corner(btn, 9); local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
+    btn.LayoutOrder = i; btn.Active = true; btn.ZIndex = 103; corner(btn, 9)
+    local pad = Instance.new("UIPadding", btn); pad.PaddingLeft = UDim.new(0, 8)
     stroke(btn, Color3.fromRGB(0, 150, 220), 1, 0.75)
     local bar = Instance.new("Frame", btn)
     bar.Name = "SelBar"; bar.Size = UDim2.new(0, 3, 0, 18); bar.Position = UDim2.new(0, 2, 0.5, -9)
-    bar.BackgroundColor3 = C_CYAN; bar.BorderSizePixel = 0; bar.Visible = false; corner(bar, 4)
+    bar.BackgroundColor3 = C_CYAN; bar.BorderSizePixel = 0; bar.Visible = false; bar.ZIndex = 104; corner(bar, 4)
     tabs[i] = btn
 end
 
@@ -877,17 +932,35 @@ task.spawn(function()
     end
 end)
 
+-- =========================================================
+-- HỆ THỐNG TÌM KIẾM VÀ QUÉT VỊ TRÍ NPC BÁN CÁ THÔNG MINH
+-- =========================================================
 local function getMerchantPosition()
-    for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj and (obj:IsA("Model") or obj:IsA("Part")) then
-            local objName = string.lower(obj.Name)
-            if objName:find("fish") and objName:find("merchant") then
-                local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
-                if primaryPart and primaryPart:IsA("BasePart") then return primaryPart.Position end
+    local closestPos = Vector3.new(1929.41, 9.79, 1093.12) -- Fallback tọa độ mặc định
+    local shortestDist = math.huge
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+
+    pcall(function()
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj and (obj:IsA("Model") or obj:IsA("Part")) then
+                local objName = string.lower(obj.Name)
+                if (objName:find("fish") or objName:find("cá") or objName:find("merchant") or objName:find("shop") or objName:find("npc")) then
+                    local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
+                    if primaryPart and primaryPart:IsA("BasePart") then
+                        if root then
+                            local dist = (primaryPart.Position - root.Position).Magnitude
+                            if dist < shortestDist and dist < 4000 then
+                                shortestDist = dist
+                                closestPos = primaryPart.Position
+                            end
+                        end
+                    end
+                end
             end
         end
-    end
-    return Vector3.new(1929.41, 9.79, 1093.12)
+    end)
+    return closestPos
 end
 
 -- =========================================================
@@ -975,7 +1048,6 @@ local function triggerTargetUI(targetText)
                         local textVal = string.lower(element.Text)
                         if textVal:find(string.lower(targetText)) then
                             
-                            -- 1. Ưu tiên Kích hoạt Event của Roblox UI trực tiếp
                             local clickableObj = element:IsA("TextButton") and element or element.Parent
                             if clickableObj and clickableObj:IsA("TextButton") then
                                 for _, conn in ipairs(getconnections and getconnections(clickableObj.MouseButton1Click) or {}) do
@@ -988,7 +1060,6 @@ local function triggerTargetUI(targetText)
                                 end
                             end
 
-                            -- 2. Fallback Click ảo tính tâm thực tế đối tượng
                             local absPos = element.AbsolutePosition
                             local absSize = element.AbsoluteSize
                             local centerClickX = absPos.X + (absSize.X / 2)
@@ -1075,7 +1146,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH
+-- VÒNG LẶP CÂU CÁ & BÁN CÁ CHÍNH (TÍCH HỢP BAY ĐẾN NPC BÁN CÁ)
 -- =========================================================
 task.spawn(function()
     while ScreenGui.Parent do
@@ -1105,7 +1176,7 @@ task.spawn(function()
                     local dynamicMerchantPos = getMerchantPosition()
                     local safeTargetPos = dynamicMerchantPos - (CFrame.new(dynamicMerchantPos).LookVector * 3.5)
 
-                    -- 1. BAY ĐẾN NPC BÁN CÁ
+                    -- 1. BAY THẲNG ĐẾN VỊ TRÍ NPC BÁN CÁ
                     safeTweenToTarget(CFrame.new(safeTargetPos, dynamicMerchantPos), 55)
                     
                     forceUnfreezeCharacter()
@@ -1116,7 +1187,7 @@ task.spawn(function()
                     local initialFishCount = getFishToSellCount()
                     local sellStartTime = tick()
 
-                    -- 2. BÁN CÁ VỚI REMOTE HOẶC TRIGGER UI TRỰC TIẾP
+                    -- 2. KÍCH HOẠT LỆNH BÁN CÁ (REMOTE + TƯƠNG TÁC E/UI)
                     repeat
                         if not isRunning then break end
 
@@ -1124,15 +1195,14 @@ task.spawn(function()
                             forceUnfreezeCharacter()
                             root.CFrame = CFrame.lookAt(safeTargetPos, Vector3.new(dynamicMerchantPos.X, safeTargetPos.Y, dynamicMerchantPos.Z))
                             
-                            -- Remote bán Stardust Packet gốc
-                            SellFishRemote:FireServer("SellAll")
+                            if SellFishRemote then
+                                SellFishRemote:FireServer("SellAll")
+                            end
 
-                            -- Mở E tương tác
                             VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                             task.wait(0.05)
                             VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                             
-                            -- Kích hoạt UI trực tiếp
                             triggerTargetUI("bán tất cả")
                             triggerTargetUI("xác nhận")
                             triggerTargetUI("tạm biệt")
@@ -1143,14 +1213,13 @@ task.spawn(function()
 
                     task.wait(0.2)
 
-                    -- 3. CHỈ BAY VỀ CHỖ CÂU NẾU KHO CÁ ĐÃ GIẢM
+                    -- 3. QUAY VỀ ĐÚNG VỊ TRÍ CÂU BAN ĐẦU SAU KHI BÁN XONG
                     local finalFishCount = getFishToSellCount()
                     if (finalFishCount < initialFishCount) and OriginalFishingSpotCFrame and isRunning then
                         pcall(function() hum.Jump = true end)
                         task.wait(0.2)
 
                         forceUnfreezeCharacter()
-                        
                         safeTweenToTarget(OriginalFishingSpotCFrame, 55)
                         
                         pcall(function()
@@ -1187,7 +1256,7 @@ task.spawn(function()
                     continue
                 end
 
-                -- CHỈ NEO VỊ TRÍ KHI ĐANG Ở BẢN ĐỒ CÂU
+                -- KHÓA VỊ TRÍ KHI ĐANG CÂU
                 if not isSellingFish then
                     pcall(function()
                         root.CFrame = OriginalFishingSpotCFrame
@@ -1200,10 +1269,10 @@ task.spawn(function()
 
                 if currentFishPos then
                     local offsets = {
-                        Vector2.new(0, 0),    -- Tâm
-                        Vector2.new(0, -32),  -- Trên (-32px)
-                        Vector2.new(-90, 0),  -- Trái (-90px)
-                        Vector2.new(90, 0)    -- Phải (+90px)
+                        Vector2.new(0, 0),
+                        Vector2.new(0, -32),
+                        Vector2.new(-90, 0),
+                        Vector2.new(90, 0)
                     }
 
                     for _, offset in ipairs(offsets) do
@@ -1265,7 +1334,6 @@ RunService.RenderStepped:Connect(function()
     pcall(function()
         updateHeadBillboard()
         
-        -- Mở thả khóa chân liên tục nếu đang bay bán cá
         if isSellingFish then
             forceUnfreezeCharacter()
         end
