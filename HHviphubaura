@@ -789,7 +789,7 @@ local t7Lbl = Instance.new("TextLabel", sysCard)
 t7Lbl.Size = UDim2.new(1, 0, 1, 0); t7Lbl.BackgroundTransparency = 1; t7Lbl.TextColor3 = Color3.fromRGB(170, 225, 255)
 t7Lbl.Font = FONT; t7Lbl.TextSize = 11; t7Lbl.TextWrapped = true; t7Lbl.TextXAlignment = Enum.TextXAlignment.Left; t7Lbl.TextYAlignment = Enum.TextYAlignment.Top
 t7Lbl.ZIndex = 106
-t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.5 (ADVANCED AUTO SELL & LAYER UI)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động tìm đúng NPC Fish Merchant (Không bay lung tung)\n• Đi bộ thông minh tốc độ 25 có Noclip vượt vật cản & tự động nhảy\n• Chặn tương tác click xuyên thấu giao diện game nhờ Layer ZIndex tối đa\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
+t7Lbl.Text = "■ MÃ DỰ ÁN: GIAO THỨC H-HUB\n■ KỸ SƯ: HOANG HAI\n■ PHIÊN BẢN: v9.2.5 (ADVANCED AUTO SELL & LAYER UI)\n■ KHẨU HIỆU: Con tuất Pikachu bố cân tất 🔥\n\n≫ CHẨN ĐOÁN HỆ THỐNG\n• Lưới hệ thống: 100%\n• Tự động tìm đúng NPC 'Fish Merchant' toàn map\n• Đi bộ tốc độ 25 (Noclip vật cản ngang, không rớt đất, waypoint 5s)\n• Chặn tương tác click xuyên thấu giao diện game nhờ Layer ZIndex tối đa\n\n≫ TRẠNG THÁI KÊNH\n• Kênh 01: TRỰC TUYẾN"
 
 -- ====================== THANH NHẠC ======================
 local MusicBarContainer = Instance.new("Frame", Main)
@@ -954,7 +954,7 @@ task.spawn(function()
 end)
 
 -- =========================================================
--- HỆ THỐNG QUÉT CHUẨN XÁC 100% - CHỈ TÌM ĐÚNG NPC FISH MERCHANT
+-- HỆ THỐNG QUÉT CHUẨN XÁC 100% - CHỈ TÌM ĐÚNG NPC "FISH MERCHANT"
 -- =========================================================
 local function getMerchantPosition()
     local closestPos = Vector3.new(1929.41, 9.79, 1093.12) 
@@ -967,17 +967,20 @@ local function getMerchantPosition()
             if obj and (obj:IsA("Model") or obj:IsA("Part")) then
                 local objName = string.lower(obj.Name)
                 
-                local isFishMerchant = (objName:find("fish") and (objName:find("merchant") or objName:find("buyer") or objName:find("shop")))
-                if objName:find("fishmerchant") or objName:find("fish_merchant") then
+                -- Khớp chính xác tên "fish merchant" (có khoảng trắng / viết hoa chuẩn game)
+                local isFishMerchant = (objName:find("fish merchant") or objName:find("fish_merchant") or objName:find("fishmerchant"))
+                
+                if (objName:find("fish") and objName:find("merchant")) or (objName:find("fish") and objName:find("buyer")) then
                     isFishMerchant = true
                 end
 
                 if isFishMerchant then
-                    local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("Part")) or obj
+                    local primaryPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("BasePart")) or obj
                     if primaryPart and primaryPart:IsA("BasePart") then
                         if root then
                             local dist = (primaryPart.Position - root.Position).Magnitude
-                            if dist < shortestDist and dist < 8000 then
+                            -- Quét toàn map không giới hạn khoảng cách gần
+                            if dist < shortestDist and dist < 99999 then
                                 shortestDist = dist
                                 closestPos = primaryPart.Position
                             end
@@ -991,7 +994,7 @@ local function getMerchantPosition()
 end
 
 -- =========================================================
--- HÀM ĐI BỘ TỐC ĐỘ 25, NHẢY & NOCLIP THÔNG MINH (KHÔNG RƠI XUỐNG ĐẤT)
+-- HÀM ĐI BỘ TỐC ĐỘ 25, NHẢY & NOCLIP THÔNG MINH (KHÔNG RƠI ĐẤT, KHÔNG TELE GIỮA CHỪNG)
 -- =========================================================
 local function walkToTarget(targetPosition)
     local char = LocalPlayer.Character
@@ -1064,11 +1067,12 @@ local function walkToTarget(targetPosition)
                 if connection then connection:Disconnect() end
             end)
 
+            -- ⭐ Tăng thời gian chờ waypoint lên 5 giây để nhân vật đi bộ liên tục trọn vẹn quãng đường không bị cắt ngang
             local waitTime = 0
-            while not reached and waitTime < 2 do
+            while not reached and waitTime < 5 do
                 task.wait(0.1)
                 waitTime = waitTime + 0.1
-                if (root.Position - waypoint.Position).Magnitude < 4 then
+                if (root.Position - waypoint.Position).Magnitude < 5 then
                     break
                 end
             end
@@ -1076,7 +1080,7 @@ local function walkToTarget(targetPosition)
         end
     else
         hum:MoveTo(targetPosition)
-        task.wait(3)
+        task.wait(5)
     end
 
     noclipActive = false
