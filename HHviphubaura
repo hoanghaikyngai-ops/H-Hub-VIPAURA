@@ -6441,7 +6441,7 @@ local function fn28()
 	return result
 end
 local v5 = fn28()
-v5:SetBackgroundImage("rbxthumb://type=Asset&id=121962960881141&w=150&h=150")
+v5:SetBackgroundImage("rbxthumb://type=Asset&id=138847881341765&w=150&h=150")
 v5:SetToggleKey(Enum.KeyCode.RightControl)
 local configManager = v5.ConfigManager
 v5:Tag({ Title = text("2.0"), Icon = "code", Color = Color3.fromHex("#FFD84A"), Radius = 6 })
