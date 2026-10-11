@@ -1,4 +1,3 @@
-
 local genv, Players, ReplicatedStorage, HttpService, TeleportService, CollectionService, localPlayer, tbl, tbl2, text
 local lib, client, packet, data, FishingPackets, FishingConfig, FishingEnums, SellEnums, AuraGachaConfig, SkillGachaConfig
 local CrateConfig, RodShopConfig, IslandConfig, RarityEnums, Catalog, PlayerDataV2Controller, FishingController, LootController, v, v2
