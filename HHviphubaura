@@ -6660,7 +6660,7 @@ AboutTab:Paragraph({
 					if not setclipboard then
 						error("Clipboard is unavailable")
 					end
-					setclipboard("https://discord.gg/fHdf4yXpVE")
+					setclipboard("https://discord.gg/ECt2cvAd4D")
 				end)
 				lib:Notify({
 					Title = text("Hoanghai Hub"),
