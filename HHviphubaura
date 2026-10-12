@@ -13520,3 +13520,150 @@ for _, track in ipairs(list28Tracks) do
         end,
     })
 end
+
+-- Kiểm tra các hàm hỗ trợ của executor
+local httpRequest = (syn and syn.request) or (http and http.request) or request
+local safeWriteFile = writefile
+local safeGetAsset = getcustomasset
+
+if not (httpRequest and safeWriteFile and safeGetAsset) then
+    warn("Executor của bạn không hỗ trợ các hàm file system để phát video!")
+    return
+end
+
+-- 1. Tạo Tab trong WindUI (Giả định biến cửa sổ của bạn tên là Window)
+local VideoTab = Window:Tab({
+    Title = "Xem Video Giải Trí",
+    Icon = "video" -- Hoặc rbxassetid của bạn
+})
+
+-- Tạo ScreenGui hiển thị khung video nổi
+local CoreGui = game:GetService("CoreGui")
+local VideoScreenGui = Instance.new("ScreenGui")
+VideoScreenGui.Name = "HHUB_CustomVideoPlayer"
+VideoScreenGui.Parent = CoreGui
+VideoScreenGui.Enabled = false
+
+local VideoContainer = Instance.new("Frame")
+VideoContainer.Size = UDim2.new(0, 480, 0, 300)
+VideoContainer.Position = UDim2.new(0.5, -240, 0.5, -150)
+VideoContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+VideoContainer.BorderSizePixel = 0
+VideoContainer.Active = true
+VideoContainer.Draggable = true
+VideoContainer.Parent = VideoScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = VideoContainer
+
+-- Thanh tiêu đề
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 35)
+TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = VideoContainer
+
+local TitleText = Instance.new("TextLabel")
+TitleText.Size = UDim2.new(1, -50, 1, 0)
+TitleText.Position = UDim2.new(0, 12, 0, 0)
+TitleText.BackgroundTransparency = 1
+TitleText.Text = "H-HUB Video: Gojo vs Sukuna"
+TitleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleText.Font = Enum.Font.GothamBold
+TitleText.TextSize = 13
+TitleText.TextXAlignment = Enum.TextXAlignment.Left
+TitleText.Parent = TitleBar
+
+-- Nút đóng khung video
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -32, 0, 2)
+CloseButton.BackgroundTransparency = 1
+CloseButton.Text = "✕"
+CloseButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+CloseButton.TextSize = 14
+CloseButton.Parent = TitleBar
+
+-- VideoFrame chính
+local VideoFrame = Instance.new("VideoFrame")
+VideoFrame.Size = UDim2.new(1, 0, 1, -35)
+VideoFrame.Position = UDim2.new(0, 0, 0, 35)
+VideoFrame.BackgroundTransparency = 1
+VideoFrame.Looped = true
+VideoFrame.Parent = VideoContainer
+
+CloseButton.MouseButton1Click:Connect(function()
+    VideoScreenGui.Enabled = false
+    VideoFrame.Playing = false
+end)
+
+-- URL Video tích hợp sẵn từ Catbox
+local presetVideoUrl = "https://files.catbox.moe/yg1f0m.mp4"
+local isVideoLoaded = false
+
+-- Hàm tự động tải và cache video xuống bộ nhớ tạm
+local function LoadAndPlayPresetVideo()
+    if isVideoLoaded then 
+        VideoScreenGui.Enabled = not VideoScreenGui.Enabled
+        VideoFrame.Playing = VideoScreenGui.Enabled
+        return 
+    end
+    
+    print("H-HUB: Đang tải video Gojo vs Sukuna vào bộ nhớ tạm...")
+    local success, response = pcall(function()
+        return httpRequest({
+            Url = presetVideoUrl,
+            Method = "GET"
+        })
+    end)
+
+    if success and response and response.Body then
+        local fileName = "hhub_gojo_sukuna.mp4"
+        
+        local writeSuccess = pcall(function()
+            safeWriteFile(fileName, response.Body)
+        end)
+
+        if writeSuccess then
+            local assetSuccess, assetUrl = pcall(function()
+                return safeGetAsset(fileName)
+            end)
+
+            if assetSuccess and assetUrl then
+                VideoFrame.Video = assetUrl
+                VideoScreenGui.Enabled = true
+                VideoFrame:Play()
+                isVideoLoaded = true
+                print("H-HUB: Phát video thành công!")
+            else
+                warn("H-HUB: Lỗi tạo custom asset.")
+            end
+        else
+            warn("H-HUB: Lỗi ghi file video.")
+        end
+    else
+        warn("H-HUB: Không thể tải dữ liệu từ URL.")
+    end
+end
+
+-- 2. Thêm Button chuẩn WindUI
+VideoTab:Button({
+    Title = "🎬 Bật / Tắt Video Gojo vs Sukuna",
+    Desc = "Mở khung phát video nổi trên màn hình",
+    Callback = function()
+        LoadAndPlayPresetVideo()
+    end
+})
+
+-- 3. Thêm Toggle chuẩn WindUI
+VideoTab:Toggle({
+    Title = "Phát / Tạm dừng Video",
+    Desc = "Bật hoặc tắt trạng thái chạy của video",
+    Default = false,
+    Callback = function(state)
+        if isVideoLoaded then
+            VideoFrame.Playing = state
+        end
+    end
+})
