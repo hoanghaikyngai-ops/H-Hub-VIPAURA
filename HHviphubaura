@@ -12460,6 +12460,515 @@ local function fn42()
 			end
 		end,
 	})
+	local ab = {
+		enabled = false,
+		busy = false,
+		fishing = false,
+		skipOthers = true,      -- khi đang câu boss: bỏ qua cá thường để recast nhanh
+		standDistance = 10,     -- đứng cách tâm boss bao nhiêu stud
+		maxSeconds = 720,       -- tối đa 12 phút cho 1 boss
+		runId = 0,
+		skipUntil = {},         -- [id#episode] = thời điểm được phép chọn lại
+		status = "Off",
+	}
+	tbl16.auto = ab
+ 
+	-- ---------- hook hệ thống có sẵn ----------
+	-- fn48 (đảo thủ công) đã gọi hàm này
+	tbl6.isBossAutomationBusy = function()
+		return ab.busy
+	end
+	-- Chặn Auto Sell chạy chen ngang khi đang tele/đi bộ (cho phép khi đang câu boss)
+	tbl6.isBoatTravelBusy = function()
+		return ab.busy and not ab.fishing
+	end
+	-- Radar boss luôn chạy khi Auto Boss bật (kể cả khi Notify/ESP tắt)
+	local origInterested = tbl16.isInterested
+	tbl16.isInterested = function()
+		return ab.enabled or origInterested()
+	end
+	-- Khi đang câu boss: bỏ cá không phải boss (nếu bật tuỳ chọn)
+	local origShouldSkip = tbl8.shouldSkip
+	tbl8.shouldSkip = function(self, fishId)
+		if ab.fishing and ab.skipOthers then
+			return resumeSoldFish and type(fishId) == "string" and fishId ~= "" and not tbl16.bossFish(fishId)
+		end
+		return origShouldSkip(self, fishId)
+	end
+ 
+	-- ---------- helper ----------
+	local function abNotify(content, duration)
+		lib:Notify({ Title = text("Auto Boss"), Content = content, Duration = duration or 4 })
+	end
+ 
+	local function abStatus(s)
+		ab.status = s
+		if ab.para and ab.para.SetDesc then
+			pcall(function()
+				ab.para:SetDesc(s)
+			end)
+		end
+	end
+ 
+	local function abKey(obs)
+		return tostring(obs.id) .. "#" .. tostring(obs.episode)
+	end
+ 
+	local function abRoot()
+		return localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
+	end
+ 
+	local function abSetFarm(on)
+		if not pcall(function()
+			FarmToggle:Set(on)
+		end) then
+			pcall(function()
+				FarmToggle:SetValue(on)
+			end)
+		end
+	end
+ 
+	local function abBossAlive(id)
+		local obs = tbl16.observations[id]
+		if not obs or tbl16.caughtRegions[id] then
+			return false
+		end
+		if obs.region and obs.effect and obs.region:IsDescendantOf(workspace) then
+			return tbl16.effectActive(obs.region, obs.effect)
+		end
+		return true -- vùng chưa stream: coi như boss còn cho tới khi bị deactivate
+	end
+ 
+	local function abPickBoss()
+		local root = abRoot()
+		local best, bestDist = nil, math.huge
+		for id, obs in pairs(tbl16.observations) do
+			local skipUntil = ab.skipUntil[abKey(obs)]
+			if obs.position and not (skipUntil and skipUntil > os.clock()) and abBossAlive(id) then
+				local d = root and (root.Position - obs.position).Magnitude or 0
+				if d < bestDist then
+					best, bestDist = obs, d
+				end
+			end
+		end
+		return best
+	end
+ 
+	local function abIslandUnlocked(info, pdata)
+		local cfg = IslandConfig[info.id]
+		return info.defaultUnlocked == true
+			or (cfg and cfg.defaultUnlocked == true)
+			or (pdata and pdata.UnlockedIslands and pdata.UnlockedIslands[info.id] == true)
+	end
+ 
+	-- Đảo (đã mở khoá) có điểm hạ cánh gần boss nhất
+	local function abNearestIsland(bossPos, fallbackId)
+		local pdata = PlayerDataV2Controller:Fetch(localPlayer)
+		local best, bestDist = nil, math.huge
+		for name, info in pairs(tbl3) do
+			local p = tbl6.getIslandLandingPosition(name)
+			if p and abIslandUnlocked(info, pdata) then
+				local d = Vector3.new(p.X - bossPos.X, 0, p.Z - bossPos.Z).Magnitude
+				if d < bestDist then
+					best, bestDist = info.id, d
+				end
+			end
+		end
+		return best or fallbackId
+	end
+ 
+	-- Tele sang đảo: ưu tiên Fast Travel Gamepass, không có thì dùng xe/thuyền (Ngao)
+	local function abTravel(islandId, landing, alive)
+		local info = Catalog.Island.GetById(islandId)
+		local name = info and info.name
+		if not name then
+			return false, "UnknownIsland"
+		end
+		local done, okFlag, msg = false, false, nil
+		local function cb(success, m)
+			okFlag, msg, done = success, m, true
+		end
+		local hasPass = false
+		pcall(function()
+			local pdata = PlayerDataV2Controller:Fetch(localPlayer)
+			hasPass = (tbl6.hasFastTravelGamepass(pdata)) == true
+		end)
+		local started, err = false, nil
+		if hasPass and tbl6.nativeIslandTravel then
+			started, err = tbl6.nativeIslandTravel.Start(name, cb, landing, true)
+		end
+		if not started then
+			done = false
+			started, err = tbl6.ngaoIslandTravel.Start(islandId, cb, landing, true, {
+				maxAttempts = 3,
+				waitForIdle = true,
+				timeout = 300,
+			})
+		end
+		if not started then
+			return false, tostring(err)
+		end
+		local deadline = os.clock() + 420
+		while not done do
+			if not alive() or os.clock() > deadline then
+				pcall(tbl6.ngaoIslandTravel.Cancel)
+				pcall(tbl6.nativeIslandTravel.Cancel)
+				return false, alive() and "TravelTimeout" or "Cancelled"
+			end
+			task.wait(0.25)
+		end
+		return okFlag, msg
+	end
+ 
+	-- Đi bộ (có đi trên nước), khoá flag20 để Auto Sell không chen vào
+	local function abWalk(target, stopDist, alive)
+		local why = "WalkFailed"
+		for _ = 1, 4 do
+			if not alive() then
+				return false, "Cancelled"
+			end
+			flag20 = true
+			local ok, r1, r2 = pcall(function()
+				if not fn13(nil, true, alive) then
+					return false, "MovementLocked"
+				end
+				tbl6.enableWaterWalk()
+				return walkTo(target, alive, stopDist)
+			end)
+			flag20 = false
+			if ok and r1 then
+				return true
+			end
+			why = ok and tostring(r2) or tostring(r1)
+			task.wait(1)
+		end
+		return false, why
+	end
+ 
+	local function abStandPoint(bossPos)
+		local root = abRoot()
+		if not root then
+			return nil
+		end
+		local flat = Vector3.new(root.Position.X - bossPos.X, 0, root.Position.Z - bossPos.Z)
+		local dir = flat.Magnitude > 0.1 and flat.Unit or Vector3.new(0, 0, 1)
+		local p = bossPos + dir * ab.standDistance
+		return Vector3.new(p.X, root.Position.Y, p.Z)
+	end
+ 
+	local function abGoToBoss(bossId, alive)
+		local obs = tbl16.observations[bossId]
+		if not obs or not obs.position then
+			return false, "Boss disappeared"
+		end
+		local bossPos = obs.position
+		task.spawn(function()
+			pcall(function()
+				localPlayer:RequestStreamAroundAsync(bossPos, 2)
+			end)
+		end)
+		local stand = abStandPoint(bossPos)
+		if not stand then
+			return false, "CharacterNotReady"
+		end
+		local ok, why = abWalk(stand, 3, alive)
+		if not ok then
+			return false, why
+		end
+		local root = abRoot()
+		if root then
+			root.CFrame = CFrame.lookAt(root.Position, Vector3.new(bossPos.X, root.Position.Y, bossPos.Z))
+		end
+		return true, stand
+	end
+ 
+	-- Nhiệm vụ chính: tới boss + câu cho tới khi hết boss
+	local function abMission(ctx, alive)
+		local bossId = ctx.bossId
+		local obs = tbl16.observations[bossId]
+		if not obs then
+			return false, "Boss disappeared"
+		end
+		abStatus("Stopping Auto Farm...")
+		abSetFarm(false)
+		task.wait(0.4)
+		if not fn13(nil, true, alive) then
+			return false, "Could not stop fishing"
+		end
+ 
+		local dest = abNearestIsland(obs.position, obs.islandId)
+		if dest and fn18() ~= dest then
+			local info = Catalog.Island.GetById(dest)
+			abStatus("Traveling to " .. (info and info.name or tostring(dest)) .. "...")
+			local ok, msg = abTravel(dest, nil, alive)
+			if not ok then
+				return false, "Travel failed: " .. tostring(msg)
+			end
+		end
+		if not alive() then
+			return false, "Cancelled"
+		end
+		if not abBossAlive(bossId) then
+			return true -- boss hết trong lúc đang đi
+		end
+ 
+		abStatus("Walking to boss...")
+		local ok, stand = abGoToBoss(bossId, alive)
+		if not ok then
+			return false, "Walk failed: " .. tostring(stand)
+		end
+ 
+		abSetFarm(true)
+		task.wait(0.5)
+		if not resumeSoldFish then
+			abSetFarm(true)
+			task.wait(0.5)
+		end
+		ab.fishing = true
+		abStatus("Fishing boss...")
+ 
+		local startedAt, deadSince = os.clock(), nil
+		local reason = nil
+		while alive() do
+			task.wait(0.5)
+			if abBossAlive(bossId) then
+				deadSince = nil
+			else
+				deadSince = deadSince or os.clock()
+				if os.clock() - deadSince >= 4 then
+					break -- boss đã hết (bị câu / hết giờ)
+				end
+			end
+			if os.clock() - startedAt > ab.maxSeconds then
+				reason = "Boss timeout"
+				break
+			end
+			local busy = flag14 or flag20 or flag15 or tbl6.pending or tbl6.resumeFarm
+			if not busy then
+				local root = abRoot()
+				local far = root and Vector3.new(root.Position.X - stand.X, 0, root.Position.Z - stand.Z).Magnitude > 20
+				if far or not resumeSoldFish then
+					ab.fishing = false
+					abStatus("Repositioning...")
+					abSetFarm(false)
+					task.wait(0.3)
+					local ok2, stand2 = abGoToBoss(bossId, alive)
+					if not ok2 then
+						reason = "Reposition failed: " .. tostring(stand2)
+						break
+					end
+					stand = stand2
+					abSetFarm(true)
+					task.wait(0.5)
+					ab.fishing = true
+					abStatus("Fishing boss...")
+				end
+			end
+		end
+		ab.fishing = false
+		if not alive() then
+			return false, "Cancelled"
+		end
+ 
+		-- chờ nhận xong loot / hết trận kéo
+		abStatus("Boss finished, collecting loot...")
+		local waitUntil = os.clock() + 8
+		while alive() and os.clock() < waitUntil do
+			local st = fn7()
+			if tbl8:lootHasClosed() and st ~= FishingEnums.State.Reeling and st ~= FishingEnums.State.FirstPull then
+				break
+			end
+			task.wait(0.2)
+		end
+		abSetFarm(false)
+		task.wait(0.3)
+		fn13(nil, true, alive)
+		if reason then
+			return false, reason
+		end
+		return true
+	end
+ 
+	-- Quay về đảo cũ + đi bộ về đúng chỗ câu ban đầu
+	local function abReturn(home, homeIsland, alive)
+		abStatus("Returning to fishing spot...")
+		for _ = 1, 3 do
+			if not alive() then
+				return false
+			end
+			if homeIsland and fn18() ~= homeIsland then
+				local ok, msg = abTravel(homeIsland, home, alive)
+				if not ok then
+					task.wait(3)
+				end
+			end
+			if not homeIsland or fn18() == homeIsland then
+				break
+			end
+		end
+		if homeIsland and fn18() ~= homeIsland then
+			return false
+		end
+		local root = abRoot()
+		if root and (root.Position - home.Position).Magnitude > 4 then
+			local ok = abWalk(home, 2.5, alive)
+			if not ok and alive() then
+				pcall(tbl6.teleportTo, home) -- phương án cuối nếu đi bộ thất bại
+			end
+		end
+		root = abRoot()
+		if root and (root.Position - home.Position).Magnitude <= 8 then
+			root.CFrame = CFrame.new(root.Position) * home.Rotation
+			return true
+		end
+		return false
+	end
+ 
+	local abToggle
+ 
+	local function abRun(boss)
+		ab.busy = true
+		ab.runId += 1
+		local myRun = ab.runId
+		local function alive()
+			return flag and ab.enabled and ab.runId == myRun
+		end
+		local root = abRoot()
+		if not root then
+			ab.busy = false
+			return
+		end
+ 
+		local key = abKey(boss)
+		local wasFarming = resumeSoldFish == true
+		local prev3, prev2 = cFrame3, cFrame2
+		local home = (wasFarming and cFrame3) or root.CFrame
+		local homeIsland = fn18() or boss.islandId
+		local bossName = tostring(boss.id)
+		abNotify("Boss detected: " .. bossName, 4)
+ 
+		local ok, missionOk, reason = pcall(abMission, { bossId = boss.id }, alive)
+		ab.fishing = false
+		if not ok then
+			reason = tostring(missionOk)
+			missionOk = false
+		end
+		ab.skipUntil[key] = missionOk and math.huge or (os.clock() + 60)
+		if not missionOk and reason and reason ~= "Cancelled" then
+			abNotify("Mission failed: " .. tostring(reason), 5)
+		end
+ 
+		if alive() then
+			local retOk = false
+			local okR, resR = pcall(abReturn, home, homeIsland, alive)
+			retOk = okR and resR == true
+			pcall(tbl6.disableWaterWalk)
+			if not tbl6.pending and not flag15 then
+				cFrame = nil
+			end
+			if retOk then
+				cFrame3 = wasFarming and home or prev3
+				if flag19 then
+					cFrame2 = wasFarming and home or prev2
+				end
+				tbl6.farmSpotPending = false
+				if wasFarming then
+					abSetFarm(true)
+					task.wait(0.4)
+					cFrame3 = home
+					if flag19 then
+						cFrame2 = home
+					end
+				end
+				abStatus("Waiting for boss spawn...")
+				abNotify(missionOk and "Boss done. Back at fishing spot." or "Back at fishing spot.", 4)
+			else
+				abNotify("Could not return to the fishing spot. Auto Boss stopped.", 6)
+				ab.enabled = false
+				if abToggle then
+					pcall(function()
+						abToggle:Set(false)
+					end)
+				end
+				abStatus("Stopped (return failed)")
+			end
+		else
+			pcall(tbl6.disableWaterWalk)
+			abStatus("Off")
+		end
+		ab.busy = false
+	end
+ 
+	-- Vòng lặp chính
+	task.spawn(function()
+		while flag do
+			task.wait(1)
+			if ab.enabled and not ab.busy then
+				local idle = not (flag14 or flag20 or flag15 or tbl6.pending or tbl6.resumeFarm)
+					and not (tbl6.isNgaoTravelBusy and tbl6.isNgaoTravelBusy())
+					and not (tbl6.nativeIslandTravel and tbl6.nativeIslandTravel.GetStatus().active)
+				if idle then
+					local boss = abPickBoss()
+					if boss then
+						local ok, err = pcall(abRun, boss)
+						if not ok then
+							ab.busy = false
+							ab.fishing = false
+							warn("[Hoanghai Hub] Auto Boss error: " .. tostring(err))
+						end
+					else
+						abStatus("Waiting for boss spawn...")
+					end
+				else
+					abStatus("Waiting for current action to finish...")
+				end
+			end
+		end
+	end)
+ 
+	-- ---------- UI ----------
+	BossTab:Section({ Title = text("Auto Boss") })
+	abToggle = BossTab:Toggle({
+		Title = text("Auto Fish Boss"),
+		Default = false,
+		Flag = "AutoFishBoss",
+		Callback = function(on)
+			ab.enabled = on
+			if on then
+				pcall(tbl16.refreshEsp)
+				fn44("Auto Boss Enabled")
+				abStatus("Waiting for boss spawn...")
+				abNotify("Auto Boss enabled.", 3)
+			else
+				ab.runId += 1 -- huỷ nhiệm vụ đang chạy
+				pcall(tbl6.ngaoIslandTravel.Cancel)
+				pcall(tbl6.nativeIslandTravel.Cancel)
+				abStatus("Off")
+				abNotify("Auto Boss disabled.", 3)
+			end
+		end,
+	})
+	BossTab:Toggle({
+		Title = text("Skip Non-Boss Fish"),
+		Default = true,
+		Flag = "AutoBossSkipOthers",
+		Callback = function(v)
+			ab.skipOthers = v
+		end,
+	})
+	BossTab:Slider({
+		Title = text("Boss Stand Distance (Studs)"),
+		Value = { Min = 0, Max = 25, Default = 10 },
+		Step = 1,
+		Flag = "AutoBossStandDistance",
+		Callback = function(v)
+			ab.standDistance = tonumber(v) or 10
+		end,
+	})
+	ab.para = BossTab:Paragraph({ Title = text("Auto Boss Status"), Desc = "Off" })
+	genv.HoanghaiHubFishingMaster.GetAutoBossStatus = function()
+		return { enabled = ab.enabled, busy = ab.busy, fishing = ab.fishing, status = ab.status }
+	end
 	genv.HoanghaiHubFishingMaster.GetBossStatus = function()
 		local tbl17 = {}
 		for k, observation in pairs(tbl16.observations) do
