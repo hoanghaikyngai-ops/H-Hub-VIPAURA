@@ -1,67 +1,67 @@
--- ====================== PHẦN BÁN CÁ TỰ ĐỘNG (CÓP VÀO THAY THẾ) ======================
--- Thay thế phần từ line 989 đến hết
-
-merchantLockConnection = RunService.RenderStepped:Connect(function()
-    pcall(function()
-        local cc = LocalPlayer.Character
-        local cr = cc and cc:FindFirstChild("HumanoidRootPart")
-        local ch = cc and cc:FindFirstChildOfClass("Humanoid")
-        
-        if cr and dynamicMerchantPos then
-            cr.Anchored = true
-            if ch then ch.WalkSpeed = 0 end
-            
-            -- Quay camera & nhân vật về phía NPC
-            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, dynamicMerchantPos)
-            cr.CFrame = CFrame.lookAt(cr.Position, Vector3.new(dynamicMerchantPos.X, cr.Position.Y, dynamicMerchantPos.Z))
-        end
-    end)
-end)
-
--- Đợi 2 giây rồi tìm & click nút "Bán hết"
-task.delay(2, function()
-    pcall(function()
-        local inset = GuiService:GetGuiInset()
-        local found = false
-        
-        -- Tìm nút bán (có thể là "sell", "bán", "sell all", "bán hết")
-        for _, obj in pairs(PlayerGui:GetDescendants()) do
-            if (obj:IsA("TextButton") or obj:IsA("TextLabel")) and obj.Visible then
-                local txt = string.lower(obj.Text or "")
-                if txt:find("bán") or txt:find("sell") then
-                    local pos, sz = obj.AbsolutePosition, obj.AbsoluteSize
-                    local cx, cy = pos.X + sz.X/2 + inset.X, pos.Y + sz.Y/2 + inset.Y
-                    
-                    VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, true, game, 1)
-                    task.wait(0.05)
-                    VirtualInputManager:SendMouseButtonEvent(cx, cy, 0, false, game, 1)
-                    found = true
-                    break
-                end
-            end
-        end
-        
-        -- Nếu click nút bán xong, đợi 3 giây rồi return về chỗ câu cá
-        if found then
-            task.delay(3, function()
-                isSellingFish = false
-                pcall(function()
-                    local cc = LocalPlayer.Character
-                    local cr = cc and cc:FindFirstChild("HumanoidRootPart")
-                    local ch = cc and cc:FindFirstChildOfClass("Humanoid")
-                    
-                    if cr and OriginalFishingSpotCFrame then
-                        cr.CFrame = OriginalFishingSpotCFrame
-                        cr.Anchored = true
-                        if ch then ch.WalkSpeed = 0 end
-                    end
-                end)
-                
-                if merchantLockConnection then
-                    merchantLockConnection:Disconnect()
-                    merchantLockConnection = nil
-                end
-            end)
-        end
-    end)
-end)
+local CS = game:GetService("CollectionService")
+local plr = game:GetService("Players").LocalPlayer
+local root = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+assert(root, "Chưa có nhân vật")
+ 
+local function fmt(v)
+	return string.format("Vector3.new(%.2f, %.2f, %.2f)", v.X, v.Y, v.Z)
+end
+ 
+local function posOf(o)
+	if o:IsA("Model") then return o:GetPivot().Position end
+	if o:IsA("BasePart") then return o.Position end
+end
+ 
+-- ID đảo hiện tại (theo vùng IslandRegion chứa vị trí của bạn)
+local islandId = ""
+for _, r in ipairs(CS:GetTagged("IslandRegion")) do
+	if r:IsA("BasePart") then
+		local p = r.CFrame:PointToObjectSpace(root.Position)
+		if math.abs(p.X) <= r.Size.X / 2 and math.abs(p.Z) <= r.Size.Z / 2 then
+			islandId = r:GetAttribute("islandId") or ""
+			break
+		end
+	end
+end
+ 
+-- Tìm Boat Merchant gần bạn nhất
+local best, bestDist, bestPos
+for _, v in ipairs(CS:GetTagged("Interactive")) do
+	if v:GetAttribute("InteractiveId") == "npc_car_merchant" then
+		local p = posOf(v)
+		if p then
+			local d = (p - root.Position).Magnitude
+			if not bestDist or d < bestDist then
+				best, bestDist, bestPos = v, d, p
+			end
+		end
+	end
+end
+ 
+local out = {}
+local function line(s) table.insert(out, s) print(s) end
+ 
+line("== Island ID hiện tại: " .. (islandId ~= "" and islandId or "(không xác định)"))
+local id = best and best:GetAttribute("IslandId") or islandId
+if best then
+	line(string.format("== Boat Merchant: IslandId=%s, cách bạn %.0f stud", tostring(id), bestDist))
+	if islandId ~= "" and id ~= islandId then
+		line("!! Cảnh báo: merchant này thuộc đảo khác, hãy tới gần NPC của đảo mới rồi chạy lại")
+	end
+else
+	line("!! Không thấy Boat Merchant. Đi lại gần NPC (để map stream) rồi chạy lại.")
+end
+line("")
+line("-- 1) Dán ĐẦU script (override toạ độ NPC):")
+line('getgenv().HoanghaiHubMerchantOverrides = { ["' .. tostring(id) .. '"] = ' .. (bestPos and fmt(bestPos) or "nil --[[chưa tìm thấy]]") .. " }")
+line("")
+line("-- 2) (Tuỳ chọn) dòng thêm vào bảng tbl22 (vị trí NPC):")
+line('["' .. tostring(id) .. '"] = ' .. (bestPos and fmt(bestPos) or "nil") .. ",")
+line("")
+line("-- 3) (Tuỳ chọn) dòng thêm vào bảng toạ độ hạ cánh (đứng chỗ bạn đang đứng):")
+line('["' .. tostring(id) .. '"] = ' .. fmt(root.Position) .. ",")
+ 
+if setclipboard then
+	pcall(setclipboard, table.concat(out, "\n"))
+	print("(Đã copy vào clipboard)")
+end
