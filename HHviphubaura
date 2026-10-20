@@ -7392,6 +7392,7 @@ local function fn41()
 				island_snow = Vector3.new(1171.7, 9.4, -266.5),
 				island_volcano = Vector3.new(1772.5, 9.2, 1069.3),
 				island_fossil = Vector3.new(-543.2, 10.6, 2172.3),
+                island_lotus = Vector3.new(1180.80, 11.91, 2392.69),
 			}
 			local function fn59(arg2)
 				for _, v11 in game:GetService("CollectionService"):GetTagged("Interactive") do
