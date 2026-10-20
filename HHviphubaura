@@ -7090,6 +7090,7 @@ local function fn41()
 		island_snow = Vector3.new(1240.44, 9.72, -309.4),
 		island_volcano = Vector3.new(1874.55, 13.12, 1063.6),
 		island_fossil = Vector3.new(-574.39, 13.87, 2296.03),
+        island_lotus = Vector3.new(1175.28, 11.90, 2389.77),
 	}
 	local function getIslandLandingPosition(arg)
 		local v10 = tbl3[arg]
