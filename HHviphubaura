@@ -12467,7 +12467,7 @@ local function fn42()
 		enabled = false,
 		busy = false,
 		fishing = false,
-		skipOthers = true,      -- khi đang câu boss: bỏ qua cá thường để recast nhanh
+		skipOthers = false,     -- bật nếu muốn bỏ cá thường khi câu boss (mặc định TẮT cho an toàn)
 		standDistance = 24,     -- khoảng cách ưu tiên từ điểm đứng (trên đất) tới tâm boss
 		maxSeconds = 720,       -- tối đa 12 phút cho 1 boss
 		runId = 0,
@@ -12629,6 +12629,37 @@ local function fn42()
 			task.wait(0.25)
 		end
 		return okFlag, msg
+	end
+ 
+	-- Mở khoá nhân vật khi bị kẹt anchor / WalkSpeed 0 / tắt điều khiển
+	-- (giống đoạn cuối của fn13, nhưng không đụng tới Freeze Character do người dùng bật)
+	local function abUnlockCharacter()
+		if flag18 then
+			return
+		end
+		pcall(function()
+			local char = localPlayer.Character
+			local root = char and char:FindFirstChild("HumanoidRootPart")
+			local hum = char and char:FindFirstChildOfClass("Humanoid")
+			if root then
+				root.Anchored = false
+			end
+			if hum then
+				local SP = game:GetService("StarterPlayer")
+				if hum.WalkSpeed <= 0 then
+					hum.WalkSpeed = SP.CharacterWalkSpeed
+				end
+				if hum.JumpPower <= 0 then
+					hum.JumpPower = SP.CharacterJumpPower
+				end
+				hum.AutoRotate = true
+				hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+			end
+			local pm = localPlayer.PlayerScripts:FindFirstChild("PlayerModule")
+			if pm then
+				require(pm):GetControls():Enable()
+			end
+		end)
 	end
  
 	-- Ép bật bục đi trên nước (kể cả khi người dùng đã tắt Walk On Water)
@@ -12818,6 +12849,7 @@ local function fn42()
 		if not onLand then
 			abEnsureWaterWalk()
 		end
+		abUnlockCharacter()
  
 		abSetFarm(true)
 		task.wait(0.5)
@@ -12829,6 +12861,7 @@ local function fn42()
 		abStatus("Fishing boss...")
  
 		local startedAt, deadSince = os.clock(), nil
+		local lastSt, lastChange = nil, os.clock()
 		local reason = nil
 		while alive() do
 			task.wait(0.5)
@@ -12843,6 +12876,29 @@ local function fn42()
 			if os.clock() - startedAt > ab.maxSeconds then
 				reason = "Boss timeout"
 				break
+			end
+			-- Watchdog: Throwing / FirstPull vốn chỉ kéo dài vài giây. Kẹt >12s thì huỷ để farm tự thả lại.
+			-- (Không đụng tới Reeling vì trận kéo boss có thể rất lâu)
+			local curSt = fn7()
+			if curSt ~= lastSt then
+				lastSt, lastChange = curSt, os.clock()
+			else
+				local stuckFor = os.clock() - lastChange
+				local rootNow = abRoot()
+				local anchored = rootNow and rootNow.Anchored and not flag18
+				if curSt == FishingEnums.State.Idling and anchored and stuckFor > 3 then
+					-- Đang rảnh mà vẫn bị anchor = kẹt
+					abUnlockCharacter()
+					lastChange = os.clock()
+				elseif (curSt == FishingEnums.State.Throwing or curSt == FishingEnums.State.FirstPull)
+					and stuckFor > 8 then
+					-- Lúc thả cần / giật đầu bị kẹt quá lâu: huỷ + mở khoá để farm thả lại
+					pcall(function()
+						FishingPackets.FishCancel:Fire()
+					end)
+					abUnlockCharacter()
+					lastChange = os.clock()
+				end
 			end
 			local busy = flag14 or flag20 or flag15 or tbl6.pending or tbl6.resumeFarm
 			if not onLand then
@@ -13059,7 +13115,7 @@ local function fn42()
 	})
 	BossTab:Toggle({
 		Title = text("Skip Non-Boss Fish"),
-		Default = true,
+		Default = false,
 		Flag = "AutoBossSkipOthers",
 		Callback = function(v)
 			ab.skipOthers = v
