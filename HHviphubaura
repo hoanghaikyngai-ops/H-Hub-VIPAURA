@@ -12871,7 +12871,11 @@ local function fn42()
 		local reason = nil
 		while alive() do
 			task.wait(0.5)
-			if abBossAlive(bossId) then
+			-- Đang kéo boss (kể cả chuyển sang thanh máu 2) thì KHÔNG coi là boss đã hết,
+			-- vì hiệu ứng vùng boss có thể tắt khi boss đã bị móc
+			local stNow = fn7()
+			local fighting = stNow == FishingEnums.State.Reeling or stNow == FishingEnums.State.FirstPull
+			if fighting or abBossAlive(bossId) then
 				deadSince = nil
 			else
 				deadSince = deadSince or os.clock()
@@ -12879,7 +12883,7 @@ local function fn42()
 					break -- boss đã hết (bị câu / hết giờ)
 				end
 			end
-			if os.clock() - startedAt > ab.maxSeconds then
+			if os.clock() - startedAt > ab.maxSeconds and not fighting then
 				reason = "Boss timeout"
 				break
 			end
@@ -12910,7 +12914,7 @@ local function fn42()
 			if not onLand then
 				abEnsureWaterWalk()
 			end
-			if not busy then
+			if not busy and not fighting then
 				local root = abRoot()
 				local far = root and Vector3.new(root.Position.X - stand.X, 0, root.Position.Z - stand.Z).Magnitude > 20
 				if far or not resumeSoldFish then
