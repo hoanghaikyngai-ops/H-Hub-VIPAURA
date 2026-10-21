@@ -5038,7 +5038,7 @@ do
 							if tbl5.isEnabled() then
 								fn22()
 							end
-							if flag7 or os.clock() < n8 or localPlayer:GetAttribute("IsUsingSkill") == true then
+							if flag7 or os.clock() < n8 or os.clock() < (tbl8.bossStunUntil or 0) or localPlayer:GetAttribute("IsUsingSkill") == true then
 								task.wait(0.01)
 							else
 								n19 = (n19 + 1) % 65536
